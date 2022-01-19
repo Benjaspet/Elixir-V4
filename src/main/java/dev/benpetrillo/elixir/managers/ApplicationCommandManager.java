@@ -57,7 +57,8 @@ public final class ApplicationCommandManager {
                 new PauseCommand(),
                 new ResumeCommand(),
                 new SkipCommand(),
-                new StopCommand()
+                new StopCommand(),
+                new LoopCommand()
         );
     }
     

@@ -1,2 +1,6 @@
 # Bot Testing
 src/test/
+target/
+
+# IntelliJ
+.idea/
