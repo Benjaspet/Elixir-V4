@@ -41,17 +41,17 @@ public final class PauseCommand implements ApplicationCommand {
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
         assert selfVoiceState != null;
         if (!selfVoiceState.inAudioChannel()) {
-            event.reply("I must be in a voice channel.").queue();
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("I must be in a voice channel.")).queue();
             return;
         }
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         assert memberVoiceState != null;
         if (!memberVoiceState.inAudioChannel()) {
-            event.reply("You must be in a voice channel.").queue();
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel.")).queue();
             return;
         }
         if (!Objects.equals(memberVoiceState.getChannel(), selfVoiceState.getChannel())) {
-            event.reply("You need to be in my voice channel.").queue();
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You need to be in my voice channel.")).queue();
             return;
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());

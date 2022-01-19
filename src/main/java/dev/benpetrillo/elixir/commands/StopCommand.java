@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.commands;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
+import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -41,17 +42,17 @@ public final class StopCommand implements ApplicationCommand {
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
         assert selfVoiceState != null;
         if (!selfVoiceState.inAudioChannel()) {
-            event.reply("I must be in a voice channel.").queue();
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("I must be in a voice channel.")).queue();
             return;
         }
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         assert memberVoiceState != null;
         if (!memberVoiceState.inAudioChannel()) {
-            event.reply("You must be in a voice channel.").queue();
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel.")).queue();
             return;
         }
         if (!Objects.equals(memberVoiceState.getChannel(), selfVoiceState.getChannel())) {
-            event.reply("You need to be in my voice channel.").queue();
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You need to be in my voice channel.")).queue();
             return;
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
@@ -61,7 +62,7 @@ public final class StopCommand implements ApplicationCommand {
         }
         musicManager.scheduler.player.stopTrack();
         musicManager.scheduler.queue.clear();
-        event.reply("The queue has been cleared and the player has been stopped.").queue();
+        event.replyEmbeds(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped.")).queue();
     }
 
     @Override

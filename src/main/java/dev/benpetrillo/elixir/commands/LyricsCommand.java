@@ -18,6 +18,8 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.managers.LyricManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
@@ -27,6 +29,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
@@ -34,7 +37,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
 
-public class LyricsCommand implements ApplicationCommand {
+public final class LyricsCommand implements ApplicationCommand {
 
     private final String name = "lyrics";
     private final String description = "Obtain the lyrics of a track.";
@@ -45,7 +48,25 @@ public class LyricsCommand implements ApplicationCommand {
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
         event.deferReply().queue(hook -> {
             try {
-                SongSearch result = LyricManager.getTrackData(Objects.requireNonNull(event.getOption("track")).getAsString());
+                String track; OptionMapping rawTrack = event.getOption("track");
+                if(rawTrack == null) {
+                    GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
+                    if(musicManager.audioPlayer.getPlayingTrack() == null) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("No track is currently playing.")).queue();
+                        return;
+                    }
+                    track = musicManager.audioPlayer.getPlayingTrack().getInfo().title;
+                } else track = rawTrack.getAsString();
+                
+                SongSearch result = LyricManager.getTrackData(track);
+                if(result.getHits().size() == 0) {
+                    MessageEmbed message;
+                    if(rawTrack == null) {
+                        message = EmbedUtil.sendErrorEmbed(String.format("No lyrics found for \"%s\". Try searching manually instead.", track));
+                    } else message = EmbedUtil.sendErrorEmbed("No lyrics found for \"" + track + "\".");
+                    hook.editOriginalEmbeds(message).queue();
+                    return;
+                }
                 SongSearch.Hit shortened = result.getHits().get(0);
                 MessageEmbed embed = new EmbedBuilder()
                         .setTitle(shortened.getTitle())
@@ -75,6 +96,6 @@ public class LyricsCommand implements ApplicationCommand {
     @Override
     public CommandData getCommandData() {
         return new CommandData(this.name, this.description)
-                .addOption(OptionType.STRING, this.options[0], this.optionDescriptions[0], true);
+                .addOption(OptionType.STRING, this.options[0], this.optionDescriptions[0], false);
     }
 }

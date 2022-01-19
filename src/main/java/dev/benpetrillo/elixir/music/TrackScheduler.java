@@ -33,7 +33,7 @@ public final class TrackScheduler extends AudioEventAdapter {
 
     public final AudioPlayer player;
     public final BlockingQueue<AudioTrack> queue;
-    public boolean repeating = false;
+    public LoopMode repeating = LoopMode.NONE;
     private final Guild guild;
 
     public TrackScheduler(AudioPlayer player, Guild guild) {
@@ -69,15 +69,22 @@ public final class TrackScheduler extends AudioEventAdapter {
             }
         }
         if (endReason.mayStartNext) {
-            if (this.repeating) {
+            if (this.repeating == LoopMode.TRACK) {
                 this.player.startTrack(track.makeClone(), false);
                 return;
-            }
+            } else if (this.repeating == LoopMode.QUEUE)
+                this.queue.add(track.makeClone());
             nextTrack();
         }
     }
 
     public BlockingQueue<AudioTrack> getQueue() {
         return this.queue;
+    }
+    
+    public enum LoopMode {
+        NONE,
+        TRACK,
+        QUEUE
     }
 }

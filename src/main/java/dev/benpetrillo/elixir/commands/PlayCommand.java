@@ -53,7 +53,7 @@ public final class PlayCommand implements ApplicationCommand {
         assert memberVoiceState != null;
         event.deferReply().queue(hook -> {
             if (!memberVoiceState.inAudioChannel()) {
-                hook.editOriginal("You must be in a voice channel to run this command.").queue();
+                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command.")).queue();
                 return;
             }
 //        if (!memberVoiceState.getChannel().equals(voiceState.getChannel())) {

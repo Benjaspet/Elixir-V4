@@ -40,7 +40,7 @@ public final class JoinCommand implements ApplicationCommand {
         assert memberVoiceState != null;
         event.deferReply().queue(hook -> {
             if (!memberVoiceState.inAudioChannel()) {
-                hook.editOriginal("You must be in a voice channel to run this command.").queue();
+                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command.")).queue();
                 return;
             }
             final AudioManager audioManager = channel.getGuild().getAudioManager();
