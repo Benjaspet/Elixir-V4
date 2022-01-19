@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.events;
 
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -28,8 +29,8 @@ public class ApplicationCommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommand(SlashCommandEvent event) {
         String commandName = event.getName();
-        ApplicationCommand command;
-        if ((command = ApplicationCommandManager.commands.get(commandName)) != null) {
+        ApplicationCommand command; ApplicationCommandManager manager = ElixirClient.applicationCommandManager;
+        if ((command = manager.commands.get(commandName)) != null) {
             command.runCommand(event, event.getMember(), event.getGuild());
         }
     }

@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.events;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.*;
+import dev.benpetrillo.elixir.types.ApplicationCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -39,21 +40,13 @@ public final class ReadyListener extends ListenerAdapter {
             Guild guild = jda.getGuildById(id);
             if (guild != null) {
                 if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
-                    CommandListUpdateAction commands = guild.updateCommands().addCommands(
-                            new JoinCommand().getCommandData(),
-                            new LyricsCommand().getCommandData(),
-                            new NowPlayingCommand().getCommandData(),
-                            new PlayCommand().getCommandData(),
-                            new PauseCommand().getCommandData(),
-                            new ResumeCommand().getCommandData(),
-                            new SkipCommand().getCommandData(),
-                            new StopCommand().getCommandData()
-                    );
+                    CommandListUpdateAction commands = guild.updateCommands();
+                    for(ApplicationCommand command : ElixirClient.applicationCommandManager.commands.values())
+                        commands = commands.addCommands(command.getCommandData());
                     commands.queue();
                     ElixirClient.logger.info("All guild slash commands have been deployed.");
                 } else if (Boolean.parseBoolean(Config.get("DELETE-GUILD"))) {
-                    CommandListUpdateAction commands = guild.updateCommands().addCommands();
-                    commands.queue();
+                    guild.updateCommands().addCommands().queue();
                     ElixirClient.logger.info("All guild slash commands have been deleted.");
                 }
             } else {

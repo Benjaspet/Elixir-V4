@@ -61,17 +61,21 @@ public final class PlayCommand implements ApplicationCommand {
 //            return;
 //        }
             String query = Objects.requireNonNull(event.getOption("query")).getAsString();
-            if (!Utilities.isValidURL(query)) {
-                query = "ytsearch:" + query;
-            }
             final AudioManager audioManager = channel.getGuild().getAudioManager();
             final AudioChannel memberChannel = memberVoiceState.getChannel();
             assert voiceState != null;
+            if (!voiceState.inAudioChannel()) {
+                audioManager.openAudioConnection(memberChannel);
+                audioManager.setSelfDeafened(true);
+            }
+            if (!Utilities.isValidURL(query)) {
+                query = "ytsearch:" + query;
+            }
             if (query.contains("spotify") && query.contains("/track/") && Utilities.isValidURL(query)) {
                 try {
                     query = "ytsearch:" + Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query)).get(0);
                 } catch (ParseException | SpotifyWebApiException | IOException ignored) {
-                    hook.editOriginal("Unable to find a track by that URL.").queue();
+                    hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Unable to find a track by that URL.")).queue();
                     return;
                 }
             }
@@ -80,13 +84,8 @@ public final class PlayCommand implements ApplicationCommand {
                     List<String> playlist = Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query));
                     ElixirMusicManager.getInstance().loadAndPlayMultipleTracks(channel, playlist, hook);
                 } catch (ParseException | SpotifyWebApiException | IOException ignored) {
-                    hook.editOriginal("Unable to find a track by that URL.").queue();
-                    return;
-                }
-            }
-            if (!voiceState.inAudioChannel()) {
-                audioManager.openAudioConnection(memberChannel);
-                audioManager.setSelfDeafened(true);
+                    hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Unable to find a track by that URL.")).queue();
+                } return;
             }
             ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, query, hook);
         });

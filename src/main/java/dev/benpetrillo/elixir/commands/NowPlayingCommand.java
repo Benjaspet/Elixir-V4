@@ -51,11 +51,9 @@ public final class NowPlayingCommand implements ApplicationCommand {
                 final AudioPlayer audioPlayer = musicManager.audioPlayer;
                 final AudioTrack track = audioPlayer.getPlayingTrack();
                 if (track == null) {
-                    MessageEmbed embed = new EmbedBuilder()
-                            .setDescription("There is no track playing at the moment.")
-                            .setColor(EmbedUtil.getErrorEmbedColor())
-                            .build();
-                    hook.editOriginalEmbeds(embed).queue();
+                    hook.editOriginalEmbeds(
+                            EmbedUtil.sendErrorEmbed("There is no track playing at the moment.")
+                    ).queue();
                 } else {
                     final AudioTrackInfo info = track.getInfo();
                     final String title = info.title.length() > 60 ? info.title.substring(0, 60) + "..." : info.title;

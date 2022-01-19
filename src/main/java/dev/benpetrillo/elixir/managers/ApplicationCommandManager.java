@@ -25,31 +25,44 @@ import dev.benpetrillo.elixir.types.ApplicationCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class ApplicationCommandManager {
+    public final Map<String, ApplicationCommand> commands = new ConcurrentHashMap<>();
 
-    public static ConcurrentHashMap<String, ApplicationCommand> commands;
+    public static ApplicationCommandManager initialize(JDA jda) {
+        ApplicationCommandManager manager = new ApplicationCommandManager();
 
-    public ApplicationCommandManager(JDA jda) {
-        commands = new ConcurrentHashMap<>();
-        commands.put(new JoinCommand().getName(), new JoinCommand());
-        commands.put(new LyricsCommand().getName(), new LyricsCommand());
-        commands.put(new NowPlayingCommand().getName(), new NowPlayingCommand());
-        commands.put(new PlayCommand().getName(), new PlayCommand());
-        commands.put(new PauseCommand().getName(), new PauseCommand());
-        commands.put(new ResumeCommand().getName(), new ResumeCommand());
-        commands.put(new SkipCommand().getName(), new SkipCommand());
-        commands.put(new StopCommand().getName(), new StopCommand());
         if (Boolean.parseBoolean(Config.get("DEPLOY-GLOBAL"))) {
             CommandListUpdateAction commands = jda.updateCommands();
-            commands.addCommands(
-                    new PlayCommand().getCommandData()
-            ).queue();
+            for(ApplicationCommand command : manager.commands.values()) {
+                commands = commands.addCommands(command.getCommandData());
+            } commands.queue();
         } else if (Boolean.parseBoolean(Config.get("DELETE-GLOBAL"))) {
             CommandListUpdateAction commands = jda.updateCommands();
             commands.addCommands().queue();
             ElixirClient.logger.info("All global slash commands have been deleted.");
         }
+        
+        return manager;
+    }
+    
+    private ApplicationCommandManager() {
+        registerCommand(
+                new JoinCommand(),
+                new LyricsCommand(),
+                new NowPlayingCommand(),
+                new PlayCommand(),
+                new PauseCommand(),
+                new ResumeCommand(),
+                new SkipCommand(),
+                new StopCommand()
+        );
+    }
+    
+    private void registerCommand(ApplicationCommand... commands) {
+        for(ApplicationCommand cmd : commands)
+            this.commands.put(cmd.getCommandData().getName(), cmd);
     }
 }

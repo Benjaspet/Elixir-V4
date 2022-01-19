@@ -4,7 +4,6 @@ import core.GLA;
 import dev.benpetrillo.elixir.events.ApplicationCommandListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
-import dev.benpetrillo.elixir.music.SpotifyURLConverter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -20,10 +19,8 @@ import javax.security.auth.login.LoginException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
-import java.util.List;
 
 public final class ElixirClient {
-
 
     public static ApplicationCommandManager applicationCommandManager;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
@@ -48,7 +45,7 @@ public final class ElixirClient {
                 .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
                 .build();
         AllowedMentions.setDefaultMentionRepliedUser(false);
-        applicationCommandManager = new ApplicationCommandManager(jda);
+        applicationCommandManager = ApplicationCommandManager.initialize(jda);
     }
 
     public ElixirClient getInstance() {

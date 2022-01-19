@@ -25,6 +25,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -125,10 +126,12 @@ public final class ElixirMusicManager {
             this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 
                 @Override
-                public void trackLoaded(AudioTrack track) { musicManager.scheduler.queue(track); }
+                public void trackLoaded(AudioTrack track) {}
 
                 @Override
-                public void playlistLoaded(AudioPlaylist audioPlaylist) {}
+                public void playlistLoaded(AudioPlaylist audioPlaylist) {
+                    musicManager.scheduler.queue(audioPlaylist.getTracks().get(0));
+                }
 
                 @Override
                 public void noMatches() {}
