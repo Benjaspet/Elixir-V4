@@ -56,10 +56,6 @@ public final class PlayCommand implements ApplicationCommand {
                 hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command.")).queue();
                 return;
             }
-//        if (!memberVoiceState.getChannel().equals(voiceState.getChannel())) {
-//            event.reply("You must be in my voice channel to play tracks.").queue();
-//            return;
-//        }
             String query = Objects.requireNonNull(event.getOption("query")).getAsString();
             final AudioManager audioManager = channel.getGuild().getAudioManager();
             final AudioChannel memberChannel = memberVoiceState.getChannel();
@@ -81,8 +77,8 @@ public final class PlayCommand implements ApplicationCommand {
             }
             if (query.contains("spotify") && query.contains("/playlist/") && Utilities.isValidURL(query)) {
                 try {
-                    List<String> playlist = Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query));
-                    ElixirMusicManager.getInstance().loadAndPlayMultipleTracks(channel, playlist, hook);
+                    List<String> tracks = Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query));
+                    ElixirMusicManager.getInstance().loadAndPlayMultipleTracks(channel, tracks, hook);
                 } catch (ParseException | SpotifyWebApiException | IOException ignored) {
                     hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Unable to find a track by that URL.")).queue();
                 } return;

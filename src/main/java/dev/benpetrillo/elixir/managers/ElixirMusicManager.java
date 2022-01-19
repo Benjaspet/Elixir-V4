@@ -65,6 +65,7 @@ public final class ElixirMusicManager {
 
             @Override
             public void trackLoaded(AudioTrack track) {
+                track.setUserData(hook.getInteraction().getUser().getAsTag());
                 musicManager.scheduler.queue(track);
                 final String title = track.getInfo().title;
                 final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
@@ -95,6 +96,7 @@ public final class ElixirMusicManager {
                             .build();
                     hook.editOriginalEmbeds(embed).queue();
                     for (final AudioTrack track : tracks) {
+                        track.setUserData(hook.getInteraction().getUser().getAsTag());
                         musicManager.scheduler.queue(track);
                     }
                 }

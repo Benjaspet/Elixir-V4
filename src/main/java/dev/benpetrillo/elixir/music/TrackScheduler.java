@@ -22,6 +22,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -72,8 +73,9 @@ public final class TrackScheduler extends AudioEventAdapter {
             if (this.repeating == LoopMode.TRACK) {
                 this.player.startTrack(track.makeClone(), false);
                 return;
-            } else if (this.repeating == LoopMode.QUEUE)
+            } else if (this.repeating == LoopMode.QUEUE) {
                 this.queue.add(track.makeClone());
+            }
             nextTrack();
         }
     }

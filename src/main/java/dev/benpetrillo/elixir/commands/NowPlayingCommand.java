@@ -62,9 +62,10 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     final String isLive = info.isStream ? "yes" : "no";
                     final String artist = info.author;
                     final String url = info.uri;
+                    final String requestedBy = track.getUserData().toString();
                     final String spacer = "\n";
-                    final String contents = "• Artist: %s%s• Duration: %s%s• Video ID: `%s`%s• Livestream: %s";
-                    final String trackData = String.format(contents, artist, spacer, duration, spacer, identifier, spacer, isLive);
+                    final String contents = "• Artist: %s%s• Requested by: %s• Duration: %s%s• Video ID: `%s`%s• Livestream: %s";
+                    final String trackData = String.format(contents, artist, requestedBy, spacer, duration, spacer, identifier, spacer, isLive);
                     MessageEmbed embed = new EmbedBuilder()
                             .setTitle("Currently Playing")
                             .setDescription(String.format("[%s](%s)", title, url))

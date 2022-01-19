@@ -36,8 +36,7 @@ public final class SpotifyURLConverter {
 
     private static SpotifyURLConverter instance;
     private SpotifyApi spotifyApi;
-    private String id;
-    private String type;
+
 
     public SpotifyURLConverter() {
         try {
@@ -46,6 +45,13 @@ public final class SpotifyURLConverter {
             exception.printStackTrace();
         }
     }
+
+    /**
+     * Initialize requests with the Spotify Web API and obtain an OAuth token.
+     * @throws ParseException If invalid API credentials are passed.
+     * @throws SpotifyWebApiException If an error occurs on Spotify's end.
+     * @throws IOException If all else fails.
+     */
 
     private void initialize() throws ParseException, SpotifyWebApiException, IOException {
         spotifyApi = new SpotifyApi.Builder()
@@ -61,14 +67,16 @@ public final class SpotifyURLConverter {
     public List<String> queueSpotifyTracks(String url) throws ParseException, SpotifyWebApiException, IOException {
         String[] firstSplit = url.split("/");
         String[] secondSplit;
+        String type;
+        String id;
         if (firstSplit.length > 5) {
             secondSplit = firstSplit[6].split("\\?");
-            this.type = firstSplit[5];
+            type = firstSplit[5];
         } else {
             secondSplit = firstSplit[4].split("\\?");
-            this.type = firstSplit[3];
+            type = firstSplit[3];
         }
-        this.id = secondSplit[0];
+        id = secondSplit[0];
         List<String> listOfTracks = new ArrayList<>();
         if (type.contentEquals("track")) {
             listOfTracks.add(getArtistAndName(id));
@@ -81,28 +89,21 @@ public final class SpotifyURLConverter {
             Paging<PlaylistTrack> playlistPaging = playlist.getTracks();
             PlaylistTrack[] playlistTracks = playlistPaging.getItems();
             for (PlaylistTrack track : playlistTracks) {
-                listOfTracks.add("ytsearch:" + track.getTrack().getName());
+                listOfTracks.add("ytsearch:" + getArtistAndName(track.getTrack().getId()));
             }
             return listOfTracks;
         }
         return null;
     }
 
-    public String fetchSongInfo(String trackId) {
-        String artistNameAndTrackName = null;
-        try {
-            GetTrackRequest trackRequest = spotifyApi.getTrack(trackId).build();
-            Track track = trackRequest.execute();
-            artistNameAndTrackName = track.getName() + " - ";
-            ArtistSimplified[] artists = track.getArtists();
-            for(ArtistSimplified i : artists) {
-                artistNameAndTrackName += i.getName() + " ";
-            }
-        } catch (SpotifyWebApiException | IOException | ParseException | NullPointerException exception) {
-            exception.printStackTrace();
-        }
-        return artistNameAndTrackName;
-    }
+    /**
+     * Get the artist and name of a track ID.
+     * @param trackID The track ID whose data will be fetched.
+     * @return String
+     * @throws ParseException If an invalid ID was provided.
+     * @throws SpotifyWebApiException If an error occurred on Spotify's end.
+     * @throws IOException If all else fails.
+     */
 
     private String getArtistAndName(String trackID) throws ParseException, SpotifyWebApiException, IOException {
         StringBuilder artistNameAndTrackName;
@@ -111,10 +112,15 @@ public final class SpotifyURLConverter {
         artistNameAndTrackName = new StringBuilder(track.getName() + " - ");
         ArtistSimplified[] artists = track.getArtists();
         for (ArtistSimplified i : artists) {
-            artistNameAndTrackName.append(i.getName()).append(" ");
+            artistNameAndTrackName.append(i.getName());
         }
         return artistNameAndTrackName.toString();
     }
+
+    /**
+     * Get an instance of this class.
+     * @return SpotifyURLConverter
+     */
 
     public static SpotifyURLConverter getInstance() {
         return instance;

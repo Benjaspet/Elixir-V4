@@ -35,7 +35,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Objects;
 
 public final class LyricsCommand implements ApplicationCommand {
 
@@ -57,7 +56,7 @@ public final class LyricsCommand implements ApplicationCommand {
                     }
                     track = musicManager.audioPlayer.getPlayingTrack().getInfo().title;
                 } else track = rawTrack.getAsString();
-                
+
                 SongSearch result = LyricManager.getTrackData(track);
                 if(result.getHits().size() == 0) {
                     MessageEmbed message;
