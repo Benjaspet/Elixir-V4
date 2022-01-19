@@ -26,16 +26,11 @@ import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
-import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 public final class SpotifyURLConverter {
 
@@ -63,48 +58,7 @@ public final class SpotifyURLConverter {
         spotifyApi.setAccessToken(credentials.getAccessToken());
     }
 
-    public List<String> convertSpotifyPlaylistURL(String url) throws IOException, ParseException, SpotifyWebApiException {
-        String[] first = url.split("/");
-        String[] second;
-        String type;
-        if(first.length > 5) {
-            second = first[6].split("\\?");
-            type = first[5];
-        } else {
-            second = first[4].split("\\?");
-            type = first[3];
-        }
-        String id1 = second[0];
-        List<String> listOfTracks = new ArrayList<>();
-        GetPlaylistRequest playlistRequest = spotifyApi.getPlaylist(id1).build();
-        Playlist playlist = playlistRequest.execute();
-        Paging<PlaylistTrack> playlistPaging = playlist.getTracks();
-        PlaylistTrack[] playlistTracks = playlistPaging.getItems();
-
-        for (PlaylistTrack i : playlistTracks) {
-            Track track = (Track) i.getTrack();
-            String id = track.getId();
-            if(!Objects.equals(fetchSongInfo(id), "")) {
-                listOfTracks.add(fetchSongInfo(id));
-            }
-        }
-        return listOfTracks;
-//        try {
-//            final GetPlaylistsItemsRequest getPlaylistsItemsRequest = spotifyApi.getPlaylistsItems(id).build();
-//            final CompletableFuture<Paging<PlaylistTrack>> pagingCompletableFuture = getPlaylistsItemsRequest.executeAsync();
-//            final Paging<PlaylistTrack> playlistTrackPaging = pagingCompletableFuture.join();
-//            PlaylistTrack[] items = playlistTrackPaging.getItems();
-//            ArrayList<String> tracks = new ArrayList<>();
-//            for (PlaylistTrack item : items) {
-//                tracks.add(getArtistAndName(item.getTrack().getId()));
-//            }
-//            return tracks;
-//        } catch (CompletionException | CancellationException | ParseException | SpotifyWebApiException | IOException ignored) {
-//            return null;
-//        }
-    }
-
-    public String convertSpotifyTrackURL(String url) throws ParseException, SpotifyWebApiException, IOException {
+    public List<String> queueSpotifyTracks(String url) throws ParseException, SpotifyWebApiException, IOException {
         String[] firstSplit = url.split("/");
         String[] secondSplit;
         if (firstSplit.length > 5) {
@@ -115,8 +69,21 @@ public final class SpotifyURLConverter {
             this.type = firstSplit[3];
         }
         this.id = secondSplit[0];
+        List<String> listOfTracks = new ArrayList<>();
         if (type.contentEquals("track")) {
-            return getArtistAndName(id);
+            listOfTracks.add(getArtistAndName(id));
+            return listOfTracks;
+        }
+        if (type.contentEquals("playlist")) {
+            String id1 = secondSplit[0];
+            GetPlaylistRequest playlistRequest = spotifyApi.getPlaylist(id1).build();
+            Playlist playlist = playlistRequest.execute();
+            Paging<PlaylistTrack> playlistPaging = playlist.getTracks();
+            PlaylistTrack[] playlistTracks = playlistPaging.getItems();
+            for (PlaylistTrack track : playlistTracks) {
+                listOfTracks.add("ytsearch:" + track.getTrack().getName());
+            }
+            return listOfTracks;
         }
         return null;
     }

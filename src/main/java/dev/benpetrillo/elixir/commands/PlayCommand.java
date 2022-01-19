@@ -69,20 +69,26 @@ public final class PlayCommand implements ApplicationCommand {
             assert voiceState != null;
             if (query.contains("spotify") && query.contains("/track/") && Utilities.isValidURL(query)) {
                 try {
-                    query = "ytsearch:" + new SpotifyURLConverter().convertSpotifyTrackURL(query);
+                    query = "ytsearch:" + Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query)).get(0);
                 } catch (ParseException | SpotifyWebApiException | IOException ignored) {
                     hook.editOriginal("Unable to find a track by that URL.").queue();
                     return;
                 }
             }
             if (query.contains("spotify") && query.contains("/playlist/") && Utilities.isValidURL(query)) {
-                hook.editOriginal("Spotify playlists are not currently supported.").queue();
+                try {
+                    List<String> playlist = Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query));
+                    ElixirMusicManager.getInstance().loadAndPlayMultipleTracks(channel, playlist, hook);
+                } catch (ParseException | SpotifyWebApiException | IOException ignored) {
+                    hook.editOriginal("Unable to find a track by that URL.").queue();
+                    return;
+                }
             }
             if (!voiceState.inAudioChannel()) {
                 audioManager.openAudioConnection(memberChannel);
                 audioManager.setSelfDeafened(true);
             }
-            ElixirMusicManager.getInstance().loadAndPlay(channel, query, hook);
+            ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, query, hook);
         });
     }
 

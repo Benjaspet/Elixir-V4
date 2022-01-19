@@ -57,7 +57,7 @@ public final class ElixirMusicManager {
         });
     }
 
-    public void loadAndPlay(TextChannel channel, String track, InteractionHook hook) {
+    public void loadAndPlaySingleTrack(TextChannel channel, String track, InteractionHook hook) {
 
         final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
@@ -112,6 +112,32 @@ public final class ElixirMusicManager {
             }
 
         });
+    }
+
+    public void loadAndPlayMultipleTracks(TextChannel channel, List<String> tracks, InteractionHook hook) {
+        final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
+        MessageEmbed embed = new EmbedBuilder()
+                .setColor(EmbedUtil.getDefaultEmbedColor())
+                .setDescription(String.format("Queued **%s** tracks from Spotify.", tracks.size()))
+                .build();
+        hook.editOriginalEmbeds(embed).queue();
+        for (String track : tracks) {
+            this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
+
+                @Override
+                public void trackLoaded(AudioTrack track) { musicManager.scheduler.queue(track); }
+
+                @Override
+                public void playlistLoaded(AudioPlaylist audioPlaylist) {}
+
+                @Override
+                public void noMatches() {}
+
+                @Override
+                public void loadFailed(FriendlyException e) {}
+
+            });
+        }
     }
 
     public static ElixirMusicManager getInstance() {
