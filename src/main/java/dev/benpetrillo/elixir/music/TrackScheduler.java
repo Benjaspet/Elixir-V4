@@ -87,6 +87,7 @@ public final class TrackScheduler extends AudioEventAdapter {
     public enum LoopMode {
         NONE,
         TRACK,
-        QUEUE
+        QUEUE,
+        AUTOPLAY
     }
 }
