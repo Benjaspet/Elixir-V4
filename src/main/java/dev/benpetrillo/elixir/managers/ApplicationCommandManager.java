@@ -36,9 +36,10 @@ public final class ApplicationCommandManager {
 
         if (Boolean.parseBoolean(Config.get("DEPLOY-GLOBAL"))) {
             CommandListUpdateAction commands = jda.updateCommands();
-            for(ApplicationCommand command : manager.commands.values()) {
-                commands = commands.addCommands(command.getCommandData());
-            } commands.queue();
+            for (ApplicationCommand command : manager.commands.values()) {
+                commands.addCommands(command.getCommandData()).queue();
+            }
+            ElixirClient.logger.info("All global slash commands have been deployed.");
         } else if (Boolean.parseBoolean(Config.get("DELETE-GLOBAL"))) {
             CommandListUpdateAction commands = jda.updateCommands();
             commands.addCommands().queue();
@@ -54,6 +55,7 @@ public final class ApplicationCommandManager {
                 new NowPlayingCommand(),
                 new PlayCommand(),
                 new PauseCommand(),
+                new QueueCommand(),
                 new ResumeCommand(),
                 new SkipCommand(),
                 new StopCommand(),
@@ -63,7 +65,8 @@ public final class ApplicationCommandManager {
     }
     
     private void registerCommand(ApplicationCommand... commands) {
-        for(ApplicationCommand cmd : commands)
+        for (ApplicationCommand cmd : commands) {
             this.commands.put(cmd.getCommandData().getName(), cmd);
+        }
     }
 }

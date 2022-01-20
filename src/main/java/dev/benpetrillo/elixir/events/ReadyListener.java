@@ -20,7 +20,6 @@ package dev.benpetrillo.elixir.events;
 
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.commands.*;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

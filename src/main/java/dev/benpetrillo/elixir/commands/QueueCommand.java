@@ -28,7 +28,6 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 public final class QueueCommand implements ApplicationCommand {
@@ -40,15 +39,19 @@ public final class QueueCommand implements ApplicationCommand {
 
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        try {
-            final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-            final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
-            for (AudioTrack track : queue) {
-                //hit optical off
+        event.deferReply().queue(hook -> {
+            try {
+                final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
+                final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
+                hook.editOriginal("Queue length: " + queue.size()).queue();
+//                String queueDescription = "";
+//                for (AudioTrack track : queue) {
+//                    queueDescription += track.getInfo().title;
+//                }
+            } catch (PermissionException ignored) {
+
             }
-        } catch (PermissionException ignored) {
-            
-        }
+        });
     }
 
     @Override

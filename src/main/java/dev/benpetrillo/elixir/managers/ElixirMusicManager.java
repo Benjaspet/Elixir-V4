@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
 
 import java.util.HashMap;
 import java.util.List;
@@ -104,7 +105,7 @@ public final class ElixirMusicManager {
 
             @Override
             public void noMatches() {
-                System.out.println("no matches");
+
             }
 
             @Override
@@ -124,6 +125,9 @@ public final class ElixirMusicManager {
                 .setDescription(String.format("Queued **%s** tracks from Spotify.", tracks.size()))
                 .build();
         hook.editOriginalEmbeds(embed).queue();
+        if (tracks.size() > 120) {
+            hook.sendMessage("It may take some time for all tracks in the playlist to be fully queued.").queue();
+        }
         for (String track : tracks) {
             this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 

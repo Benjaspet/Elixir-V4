@@ -25,7 +25,6 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
-import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
@@ -37,8 +36,6 @@ public final class SpotifyURLConverter {
 
     private static SpotifyURLConverter instance;
     private SpotifyApi spotifyApi;
-    private String id;
-    private String type;
 
     public SpotifyURLConverter() {
         try {
@@ -72,7 +69,6 @@ public final class SpotifyURLConverter {
         String[] firstSplit = url.split("/");
         String[] secondSplit;
         String type;
-        String id;
         if (firstSplit.length > 5) {
             secondSplit = firstSplit[6].split("\\?");
             type = firstSplit[5];
@@ -80,19 +76,22 @@ public final class SpotifyURLConverter {
             secondSplit = firstSplit[4].split("\\?");
             type = firstSplit[3];
         }
-        id = secondSplit[0];
+        String id = secondSplit[0];
         List<String> listOfTracks = new ArrayList<>();
         if (type.contentEquals("track")) {
-            listOfTracks.add(getArtistAndName(id));
+            listOfTracks.add(getTrackData(id));
             return listOfTracks;
         }
         if (type.contentEquals("playlist")) {
-            String id1 = secondSplit[0];
-            GetPlaylistsItemsRequest playlistRequest = spotifyApi.getPlaylistsItems(id1).build();
+            GetPlaylistsItemsRequest playlistRequest = spotifyApi.getPlaylistsItems(id).build();
             final Paging<PlaylistTrack> playlist = playlistRequest.execute();
             PlaylistTrack[] playlistTracks = playlist.getItems();
             for (PlaylistTrack track : playlistTracks) {
-                listOfTracks.add("ytsearch:" + getArtistAndName(track.getTrack().getId()));
+                Track fullTrack = (Track) track.getTrack();
+                String trackName = fullTrack.getName();
+                String trackArtist = fullTrack.getArtists()[0].getName();
+                String searchQuery = trackArtist + " - " + trackName;
+                listOfTracks.add("ytsearch:" + searchQuery);
             }
             final int playlistLength = playlist.getTotal();
             if (playlistLength < 100) return listOfTracks;
@@ -100,29 +99,15 @@ public final class SpotifyURLConverter {
                 int offsetAmount = 100;
                 int tracker = 100;
                 while (true) {
-                    GetPlaylistsItemsRequest secondPlaylistRequest = spotifyApi.getPlaylistsItems(id1).offset(offsetAmount).build();
+                    GetPlaylistsItemsRequest secondPlaylistRequest = spotifyApi.getPlaylistsItems(id).offset(offsetAmount).build();
                     final Paging<PlaylistTrack> secondPlaylist = secondPlaylistRequest.execute();
                     PlaylistTrack[] additionalTracks = secondPlaylist.getItems();
                     for (PlaylistTrack track : additionalTracks) {
-                        listOfTracks.add("ytsearch:" + getArtistAndName(track.getTrack().getId()));
-                    }
-                    offsetAmount += 100; tracker += additionalTracks.length;
-                    if (tracker >= playlistLength) {
-                        return listOfTracks;
-                    }
-                }
-            }
-            final int playlistLength = playlist.getTotal();
-            if (playlistLength < 100) return listOfTracks;
-            if (playlist.getTotal() > 100) {
-                int offsetAmount = 100;
-                int tracker = 100;
-                while (true) {
-                    GetPlaylistsItemsRequest secondPlaylistRequest = spotifyApi.getPlaylistsItems(id1).offset(offsetAmount).build();
-                    final Paging<PlaylistTrack> secondPlaylist = secondPlaylistRequest.execute();
-                    PlaylistTrack[] additionalTracks = secondPlaylist.getItems();
-                    for (PlaylistTrack track : additionalTracks) {
-                        listOfTracks.add("ytsearch:" + getArtistAndName(track.getTrack().getId()));
+                        Track fullTrack = (Track) track.getTrack();
+                        String trackName = fullTrack.getName();
+                        String trackArtist = fullTrack.getArtists()[0].getName();
+                        String searchQuery = trackArtist + " - " + trackName;
+                        listOfTracks.add("ytsearch:" + searchQuery);
                     }
                     offsetAmount += 100; tracker += additionalTracks.length;
                     if (tracker >= playlistLength) {
@@ -135,16 +120,28 @@ public final class SpotifyURLConverter {
         return null;
     }
 
-    private String getArtistAndName(String trackID) throws ParseException, SpotifyWebApiException, IOException {
-        StringBuilder artistNameAndTrackName;
+    /**
+     * Get the track name, artist, and album name as a string.
+     * @param trackID The ID of the track to fetch.
+     * @return String
+     * @throws ParseException If the ID is invalid.
+     * @throws SpotifyWebApiException If an error occurs on Spotify's end.
+     * @throws IOException If all else fails.
+     */
+
+    private String getTrackData(String trackID) throws ParseException, SpotifyWebApiException, IOException {
+        StringBuilder fullSearchQuery;
         GetTrackRequest trackRequest = spotifyApi.getTrack(trackID).build();
         Track track = trackRequest.execute();
-        artistNameAndTrackName = new StringBuilder(track.getName() + " - " + track.getArtists()[0].getName());
+        String trackName = track.getName();
+        String artistName = track.getArtists()[0].getName();
+        String albumName = track.getAlbum().getName();
+        fullSearchQuery = new StringBuilder(trackName + " - " + artistName + " " + albumName);
         ArtistSimplified[] artists = track.getArtists();
         for (ArtistSimplified i : artists) {
-            artistNameAndTrackName.append(i.getName()).append(" ");
+            fullSearchQuery.append(i.getName()).append(" ");
         }
-        return artistNameAndTrackName.toString();
+        return fullSearchQuery.toString();
     }
 
     public static SpotifyURLConverter getInstance() {
