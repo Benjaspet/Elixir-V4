@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.commands;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
@@ -62,15 +63,19 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     final String isLive = info.isStream ? "yes" : "no";
                     final String artist = info.author;
                     final String url = info.uri;
-                    final String requestedBy = track.getUserData().toString();
-                    final String spacer = "\n";
-                    final String contents = "• Artist: %s%s• Requested by: %s• Duration: %s%s• Video ID: `%s`%s• Livestream: %s";
-                    final String trackData = String.format(contents, artist, requestedBy, spacer, duration, spacer, identifier, spacer, isLive);
+                    final String requestedBy = member.getAsMention();
+                    final String contents = """
+                            • Artist: %s
+                            • Requested by: %s
+                            • Duration: %s
+                            • Video ID: `%s`
+                            • Livestream: %s
+                            """.formatted(artist, requestedBy, duration, identifier, isLive);
                     MessageEmbed embed = new EmbedBuilder()
                             .setTitle("Currently Playing")
                             .setDescription(String.format("[%s](%s)", title, url))
                             .setColor(EmbedUtil.getDefaultEmbedColor())
-                            .addField("Track Data", trackData, false)
+                            .addField("Track Data", contents, false)
                             .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
                             .setTimestamp(new Date().toInstant())
                             .build();

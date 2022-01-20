@@ -71,14 +71,16 @@ public final class SpotifyURLConverter {
     public List<String> queueSpotifyTracks(String url) throws ParseException, SpotifyWebApiException, IOException {
         String[] firstSplit = url.split("/");
         String[] secondSplit;
+        String type;
+        String id;
         if (firstSplit.length > 5) {
             secondSplit = firstSplit[6].split("\\?");
-            this.type = firstSplit[5];
+            type = firstSplit[5];
         } else {
             secondSplit = firstSplit[4].split("\\?");
-            this.type = firstSplit[3];
+            type = firstSplit[3];
         }
-        this.id = secondSplit[0];
+        id = secondSplit[0];
         List<String> listOfTracks = new ArrayList<>();
         if (type.contentEquals("track")) {
             listOfTracks.add(getArtistAndName(id));
@@ -90,7 +92,25 @@ public final class SpotifyURLConverter {
             final Paging<PlaylistTrack> playlist = playlistRequest.execute();
             PlaylistTrack[] playlistTracks = playlist.getItems();
             for (PlaylistTrack track : playlistTracks) {
-                listOfTracks.add("ytsearch:" + track.getTrack().getName());
+                listOfTracks.add("ytsearch:" + getArtistAndName(track.getTrack().getId()));
+            }
+            final int playlistLength = playlist.getTotal();
+            if (playlistLength < 100) return listOfTracks;
+            if (playlist.getTotal() > 100) {
+                int offsetAmount = 100;
+                int tracker = 100;
+                while (true) {
+                    GetPlaylistsItemsRequest secondPlaylistRequest = spotifyApi.getPlaylistsItems(id1).offset(offsetAmount).build();
+                    final Paging<PlaylistTrack> secondPlaylist = secondPlaylistRequest.execute();
+                    PlaylistTrack[] additionalTracks = secondPlaylist.getItems();
+                    for (PlaylistTrack track : additionalTracks) {
+                        listOfTracks.add("ytsearch:" + getArtistAndName(track.getTrack().getId()));
+                    }
+                    offsetAmount += 100; tracker += additionalTracks.length;
+                    if (tracker >= playlistLength) {
+                        return listOfTracks;
+                    }
+                }
             }
             final int playlistLength = playlist.getTotal();
             if (playlistLength < 100) return listOfTracks;
@@ -115,27 +135,11 @@ public final class SpotifyURLConverter {
         return null;
     }
 
-    public String fetchSongInfo(String trackId) {
-        String artistNameAndTrackName = null;
-        try {
-            GetTrackRequest trackRequest = spotifyApi.getTrack(trackId).build();
-            Track track = trackRequest.execute();
-            artistNameAndTrackName = track.getName() + " - ";
-            ArtistSimplified[] artists = track.getArtists();
-            for(ArtistSimplified i : artists) {
-                artistNameAndTrackName += i.getName() + " ";
-            }
-        } catch (SpotifyWebApiException | IOException | ParseException | NullPointerException exception) {
-            exception.printStackTrace();
-        }
-        return artistNameAndTrackName;
-    }
-
     private String getArtistAndName(String trackID) throws ParseException, SpotifyWebApiException, IOException {
         StringBuilder artistNameAndTrackName;
         GetTrackRequest trackRequest = spotifyApi.getTrack(trackID).build();
         Track track = trackRequest.execute();
-        artistNameAndTrackName = new StringBuilder(track.getName() + " - ");
+        artistNameAndTrackName = new StringBuilder(track.getName() + " - " + track.getArtists()[0].getName());
         ArtistSimplified[] artists = track.getArtists();
         for (ArtistSimplified i : artists) {
             artistNameAndTrackName.append(i.getName()).append(" ");
