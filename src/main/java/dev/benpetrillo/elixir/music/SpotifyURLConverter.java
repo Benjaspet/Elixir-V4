@@ -26,6 +26,7 @@ import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import java.io.IOException;
@@ -58,6 +59,15 @@ public final class SpotifyURLConverter {
         spotifyApi.setAccessToken(credentials.getAccessToken());
     }
 
+    /**
+     *
+     * @param url The playlist URL to fetch.
+     * @return List<String>
+     * @throws ParseException If the URL is invalid.
+     * @throws SpotifyWebApiException If something goes wrong on Spotify's side.
+     * @throws IOException If all else fails.
+     */
+
     public List<String> queueSpotifyTracks(String url) throws ParseException, SpotifyWebApiException, IOException {
         String[] firstSplit = url.split("/");
         String[] secondSplit;
@@ -76,12 +86,29 @@ public final class SpotifyURLConverter {
         }
         if (type.contentEquals("playlist")) {
             String id1 = secondSplit[0];
-            GetPlaylistRequest playlistRequest = spotifyApi.getPlaylist(id1).build();
-            Playlist playlist = playlistRequest.execute();
-            Paging<PlaylistTrack> playlistPaging = playlist.getTracks();
-            PlaylistTrack[] playlistTracks = playlistPaging.getItems();
+            GetPlaylistsItemsRequest playlistRequest = spotifyApi.getPlaylistsItems(id1).build();
+            final Paging<PlaylistTrack> playlist = playlistRequest.execute();
+            PlaylistTrack[] playlistTracks = playlist.getItems();
             for (PlaylistTrack track : playlistTracks) {
                 listOfTracks.add("ytsearch:" + track.getTrack().getName());
+            }
+            final int playlistLength = playlist.getTotal();
+            if (playlistLength < 100) return listOfTracks;
+            if (playlist.getTotal() > 100) {
+                int offsetAmount = 100;
+                int tracker = 100;
+                while (true) {
+                    GetPlaylistsItemsRequest secondPlaylistRequest = spotifyApi.getPlaylistsItems(id1).offset(offsetAmount).build();
+                    final Paging<PlaylistTrack> secondPlaylist = secondPlaylistRequest.execute();
+                    PlaylistTrack[] additionalTracks = secondPlaylist.getItems();
+                    for (PlaylistTrack track : additionalTracks) {
+                        listOfTracks.add("ytsearch:" + getArtistAndName(track.getTrack().getId()));
+                    }
+                    offsetAmount += 100; tracker += additionalTracks.length;
+                    if (tracker >= playlistLength) {
+                        return listOfTracks;
+                    }
+                }
             }
             return listOfTracks;
         }
