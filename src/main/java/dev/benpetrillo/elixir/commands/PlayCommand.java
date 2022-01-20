@@ -75,7 +75,7 @@ public final class PlayCommand implements ApplicationCommand {
             if (query.contains("spotify") && query.contains("/playlist/") && Utilities.isValidURL(query)) {
                 try {
                     List<String> tracks = Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query));
-                    ElixirMusicManager.getInstance().loadAndPlayMultipleTracks(channel, tracks, hook);
+                    ElixirMusicManager.getInstance().loadAndPlayMultipleTracks(tracks, hook);
                 } catch (ParseException | SpotifyWebApiException | IOException ignored) {
                     hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An error occurred while searching for tracks.")).queue();
                 } return;

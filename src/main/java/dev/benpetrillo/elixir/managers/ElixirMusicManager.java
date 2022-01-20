@@ -22,21 +22,22 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class ElixirMusicManager {
 
@@ -45,10 +46,13 @@ public final class ElixirMusicManager {
     private final AudioPlayerManager audioPlayerManager;
 
     public ElixirMusicManager() {
+        var youtubeManager = new YoutubeAudioSourceManager();
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
+        this.audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -118,8 +122,41 @@ public final class ElixirMusicManager {
         });
     }
 
-    public void loadAndPlayMultipleTracks(TextChannel channel, List<String> tracks, InteractionHook hook) {
-        final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
+    public void lazyPlaySingularTrack(String track, Guild guild) {
+        final GuildMusicManager musicManager = this.getMusicManager(guild);
+        this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
+
+            @Override
+            public void trackLoaded(AudioTrack track) {
+                musicManager.scheduler.queue(track);
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                final List<AudioTrack> tracks = playlist.getTracks();
+                if (playlist.isSearchResult()) {
+                    musicManager.scheduler.queue(tracks.get(0));
+                } else {
+                    for (final AudioTrack track : tracks) {
+                        musicManager.scheduler.queue(track);
+                    }
+                }
+            }
+
+            @Override
+            public void noMatches() {
+
+            }
+
+            @Override
+            public void loadFailed(FriendlyException e) {
+
+            }
+        });
+    }
+
+    public void loadAndPlayMultipleTracks(List<String> tracks, InteractionHook hook) {
+        final GuildMusicManager musicManager = this.getMusicManager(Objects.requireNonNull(hook.getInteraction().getGuild()));
         MessageEmbed embed = new EmbedBuilder()
                 .setColor(EmbedUtil.getDefaultEmbedColor())
                 .setDescription(String.format("Queued **%s** tracks from Spotify.", tracks.size()))
@@ -153,5 +190,4 @@ public final class ElixirMusicManager {
         if (instance == null) instance = new ElixirMusicManager();
         return instance;
     }
-
 }
