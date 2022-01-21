@@ -32,7 +32,9 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public final class QueueCommand implements ApplicationCommand {
@@ -48,16 +50,24 @@ public final class QueueCommand implements ApplicationCommand {
             try {
                 final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
                 final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
+                final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
                 StringBuilder description = new StringBuilder();
-                for (AudioTrack track : queue) {
-                    for (int i = 0; i < 12; i++) {
-                        description
-                                .append(String.format("**%s** ─ ", i + 1))
-                                .append(String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri))
-                                .append("\n");
-                        if (i == 11) break;
-                    }
-                    break;
+                int size = Math.min(queue.size(), 13);
+                int maxAmount = 12; int stringLength = 60;
+                int thresholdAmount = Math.min(queue.size() - 1, maxAmount);
+                for (int i = 0; i < maxAmount; i++) {
+                    final AudioTrack track = arrayQueue.get(i);
+                    final AudioTrackInfo info = track.getInfo();
+                    String title = info.title.length() > 60 ? info.title.substring(0, 57) + "..." : info.title;
+                    String formattedString = String.format("**%s** ─ [%s](%s)", i + 1, title, info.uri);
+                    description
+                            .append(formattedString)
+                            .append("\n");
+                }
+                if (arrayQueue.size() > maxAmount) {
+                    description
+                            .append("\n")
+                            .append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
                 }
                 MessageEmbed embed = new EmbedBuilder()
                         .setTitle("Guild Queue")
@@ -69,7 +79,7 @@ public final class QueueCommand implements ApplicationCommand {
                         .build();
                 hook.editOriginalEmbeds(embed).queue();
             } catch (PermissionException ignored) {
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("something went wrong")).queue();
+                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An error occurred while running this command.")).queue();
             }
         });
     }

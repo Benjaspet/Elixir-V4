@@ -29,23 +29,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class ApplicationCommandManager {
+
     public final Map<String, ApplicationCommand> commands = new ConcurrentHashMap<>();
 
     public static ApplicationCommandManager initialize(JDA jda) {
         ApplicationCommandManager manager = new ApplicationCommandManager();
-
-        if (Boolean.parseBoolean(Config.get("DEPLOY-GLOBAL"))) {
+        if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GLOBAL"))) {
             CommandListUpdateAction commands = jda.updateCommands();
             for (ApplicationCommand command : manager.commands.values()) {
                 commands.addCommands(command.getCommandData()).queue();
             }
             ElixirClient.logger.info("All global slash commands have been deployed.");
-        } else if (Boolean.parseBoolean(Config.get("DELETE-GLOBAL"))) {
+        } else if (Boolean.parseBoolean(Config.get("DELETE-APPLICATION-COMMANDS-GLOBAL"))) {
             CommandListUpdateAction commands = jda.updateCommands();
             commands.addCommands().queue();
             ElixirClient.logger.info("All global slash commands have been deleted.");
         }
-        
         return manager;
     }
     

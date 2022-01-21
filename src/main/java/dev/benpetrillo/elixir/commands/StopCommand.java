@@ -60,6 +60,7 @@ public final class StopCommand implements ApplicationCommand {
         if (selfVoiceState.inAudioChannel()) {
             audioManager.closeAudioConnection();
         }
+        musicManager.scheduler.queue.clear();
         musicManager.audioPlayer.destroy(); musicManager.scheduler.destroy();
         event.replyEmbeds(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped.")).queue();
     }
