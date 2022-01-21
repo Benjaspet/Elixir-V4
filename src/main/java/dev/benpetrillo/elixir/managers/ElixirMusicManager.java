@@ -64,7 +64,6 @@ public final class ElixirMusicManager {
     }
 
     public void loadAndPlaySingleTrack(TextChannel channel, String track, InteractionHook hook) {
-
         final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 
@@ -83,6 +82,8 @@ public final class ElixirMusicManager {
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
+                if(musicManager.scheduler.destroyed()) return;
+
                 final List<AudioTrack> tracks = playlist.getTracks();
                 if (playlist.isSearchResult()) {
                     final String title = tracks.get(0).getInfo().title;
@@ -128,11 +129,13 @@ public final class ElixirMusicManager {
 
             @Override
             public void trackLoaded(AudioTrack track) {
+                if(musicManager.scheduler.destroyed()) return;
                 musicManager.scheduler.queue(track);
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
+                if(musicManager.scheduler.destroyed()) return;
                 final List<AudioTrack> tracks = playlist.getTracks();
                 if (playlist.isSearchResult()) {
                     musicManager.scheduler.queue(tracks.get(0));
@@ -144,14 +147,10 @@ public final class ElixirMusicManager {
             }
 
             @Override
-            public void noMatches() {
-
-            }
+            public void noMatches() {}
 
             @Override
-            public void loadFailed(FriendlyException e) {
-
-            }
+            public void loadFailed(FriendlyException e) {}
         });
     }
 
@@ -162,10 +161,8 @@ public final class ElixirMusicManager {
                 .setDescription(String.format("Queued **%s** tracks from Spotify.", tracks.size()))
                 .build();
         hook.editOriginalEmbeds(embed).queue();
-        if (tracks.size() > 120) {
-            hook.sendMessage("It may take some time for all tracks in the playlist to be fully queued.").queue();
-        }
         for (String track : tracks) {
+            if(musicManager.scheduler.destroyed()) return;
             this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 
                 @Override
@@ -173,6 +170,7 @@ public final class ElixirMusicManager {
 
                 @Override
                 public void playlistLoaded(AudioPlaylist audioPlaylist) {
+                    if(musicManager.scheduler.destroyed()) return;
                     musicManager.scheduler.queue(audioPlaylist.getTracks().get(0));
                 }
 

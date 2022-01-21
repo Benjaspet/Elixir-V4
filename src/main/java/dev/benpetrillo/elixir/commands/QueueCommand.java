@@ -19,15 +19,20 @@
 package dev.benpetrillo.elixir.commands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
+import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 
 public final class QueueCommand implements ApplicationCommand {
@@ -43,13 +48,28 @@ public final class QueueCommand implements ApplicationCommand {
             try {
                 final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
                 final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
-                hook.editOriginal("Queue length: " + queue.size()).queue();
-//                String queueDescription = "";
-//                for (AudioTrack track : queue) {
-//                    queueDescription += track.getInfo().title;
-//                }
+                StringBuilder description = new StringBuilder();
+                for (AudioTrack track : queue) {
+                    for (int i = 0; i < 12; i++) {
+                        description
+                                .append(String.format("**%s** ─ ", i + 1))
+                                .append(String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri))
+                                .append("\n");
+                        if (i == 11) break;
+                    }
+                    break;
+                }
+                MessageEmbed embed = new EmbedBuilder()
+                        .setTitle("Guild Queue")
+                        .setColor(EmbedUtil.getDefaultEmbedColor())
+                        .setDescription(description)
+                        .addField("Queue Data", String.format("• Tracks queued: %s", queue.size()), false)
+                        .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
+                        .setTimestamp(new Date().toInstant())
+                        .build();
+                hook.editOriginalEmbeds(embed).queue();
             } catch (PermissionException ignored) {
-
+                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("something went wrong")).queue();
             }
         });
     }

@@ -32,10 +32,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public final class TrackScheduler extends AudioEventAdapter {
 
+    private final Guild guild;
+    private boolean destroyed = false;
+    
     public final AudioPlayer player;
     public final BlockingQueue<AudioTrack> queue;
+
     public LoopMode repeating = LoopMode.NONE;
-    private final Guild guild;
 
     public TrackScheduler(AudioPlayer player, Guild guild) {
         this.player = player;
@@ -84,6 +87,14 @@ public final class TrackScheduler extends AudioEventAdapter {
 
     public BlockingQueue<AudioTrack> getQueue() {
         return this.queue;
+    }
+    
+    public void destroy() {
+        this.destroyed = true;
+    }
+    
+    public boolean destroyed() {
+        return this.destroyed;
     }
     
     public enum LoopMode {

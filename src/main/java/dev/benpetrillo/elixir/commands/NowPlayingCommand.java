@@ -21,7 +21,6 @@ package dev.benpetrillo.elixir.commands;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
@@ -59,7 +58,6 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     final AudioTrackInfo info = track.getInfo();
                     final String title = info.title.length() > 60 ? info.title.substring(0, 60) + "..." : info.title;
                     final String duration = info.isStream ? "LIVE" : Utilities.formatDuration(track.getDuration());
-                    final String identifier = info.identifier;
                     final String isLive = info.isStream ? "yes" : "no";
                     final String artist = info.author;
                     final String url = info.uri;
@@ -67,10 +65,9 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     final String contents = """
                             • Artist: %s
                             • Requested by: %s
-                            • Duration: %s
-                            • Video ID: `%s`
+                            • Duration: %s                         
                             • Livestream: %s
-                            """.formatted(artist, requestedBy, duration, identifier, isLive);
+                            """.formatted(artist, requestedBy, duration, isLive);
                     MessageEmbed embed = new EmbedBuilder()
                             .setTitle("Currently Playing")
                             .setDescription(String.format("[%s](%s)", title, url))

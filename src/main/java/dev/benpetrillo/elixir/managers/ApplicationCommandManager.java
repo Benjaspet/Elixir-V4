@@ -52,15 +52,15 @@ public final class ApplicationCommandManager {
     private ApplicationCommandManager() {
         registerCommand(
                 new JoinCommand(),
+                new LoopCommand(),
+                new LyricsCommand(),
                 new NowPlayingCommand(),
-                new PlayCommand(),
                 new PauseCommand(),
+                new PlayCommand(),
                 new QueueCommand(),
                 new ResumeCommand(),
                 new SkipCommand(),
-                new StopCommand(),
-                new LoopCommand(),
-                new LyricsCommand()
+                new StopCommand()
         );
     }
     
