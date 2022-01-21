@@ -61,7 +61,7 @@ public final class StopCommand implements ApplicationCommand {
             audioManager.closeAudioConnection();
         }
         musicManager.scheduler.queue.clear();
-        musicManager.audioPlayer.destroy(); musicManager.scheduler.destroy();
+        musicManager.audioPlayer.destroy();
         event.replyEmbeds(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped.")).queue();
     }
 

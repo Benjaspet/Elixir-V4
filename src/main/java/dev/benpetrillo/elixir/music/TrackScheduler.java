@@ -22,7 +22,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -33,7 +32,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 public final class TrackScheduler extends AudioEventAdapter {
 
     private final Guild guild;
-    private boolean destroyed = false;
     
     public final AudioPlayer player;
     public final BlockingQueue<AudioTrack> queue;
@@ -85,14 +83,6 @@ public final class TrackScheduler extends AudioEventAdapter {
 
     public BlockingQueue<AudioTrack> getQueue() {
         return this.queue;
-    }
-    
-    public void destroy() {
-        this.destroyed = true;
-    }
-    
-    public boolean destroyed() {
-        return this.destroyed;
     }
     
     public enum LoopMode {

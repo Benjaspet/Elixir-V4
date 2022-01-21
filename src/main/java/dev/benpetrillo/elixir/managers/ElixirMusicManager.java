@@ -79,8 +79,6 @@ public final class ElixirMusicManager {
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
-                if(musicManager.scheduler.destroyed()) return;
-
                 final List<AudioTrack> tracks = playlist.getTracks();
                 if (playlist.isSearchResult()) {
                     final String title = tracks.get(0).getInfo().title;
@@ -117,37 +115,6 @@ public final class ElixirMusicManager {
                 hook.editOriginalEmbeds(embed).queue();
             }
 
-        });
-    }
-
-    public void lazyPlaySingularTrack(String track, Guild guild) {
-        final GuildMusicManager musicManager = this.getMusicManager(guild);
-        this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
-
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                if(musicManager.scheduler.destroyed()) return;
-                musicManager.scheduler.queue(track);
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-                if(musicManager.scheduler.destroyed()) return;
-                final List<AudioTrack> tracks = playlist.getTracks();
-                if (playlist.isSearchResult()) {
-                    musicManager.scheduler.queue(tracks.get(0));
-                } else {
-                    for (final AudioTrack track : tracks) {
-                        musicManager.scheduler.queue(track);
-                    }
-                }
-            }
-
-            @Override
-            public void noMatches() {}
-
-            @Override
-            public void loadFailed(FriendlyException e) {}
         });
     }
 
