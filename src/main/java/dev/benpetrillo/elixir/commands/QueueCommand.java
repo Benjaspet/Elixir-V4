@@ -26,6 +26,7 @@ import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -47,8 +48,14 @@ public final class QueueCommand implements ApplicationCommand {
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        if(musicManager.scheduler.queue.isEmpty()) {
+        final GuildVoiceState memberVoiceState = member.getVoiceState();
+        if (musicManager.scheduler.queue.isEmpty()) {
             event.replyEmbeds(EmbedUtil.sendErrorEmbed("There are no songs in the queue.")).queue();
+            return;
+        }
+        assert memberVoiceState != null;
+        if (!memberVoiceState.inAudioChannel()) {
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command.")).queue();
             return;
         }
         event.deferReply().queue(hook -> {
@@ -56,9 +63,7 @@ public final class QueueCommand implements ApplicationCommand {
                 final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
                 final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
                 StringBuilder description = new StringBuilder();
-                int size = Math.min(queue.size(), 13);
-                int maxAmount = 12; int stringLength = 60;
-                int thresholdAmount = Math.min(queue.size() - 1, maxAmount);
+                int maxAmount = 12;
                 for (int i = 0; i < maxAmount; i++) {
                     final AudioTrack track = arrayQueue.get(i);
                     final AudioTrackInfo info = track.getInfo();
