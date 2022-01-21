@@ -57,7 +57,8 @@ public final class PlayCommand implements ApplicationCommand {
                 audioManager.setSelfDeafened(true);
             }
             if (!Utilities.isValidURL(query)) {
-                query = "ytsearch:" + query;
+                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Elixir currently only supports Spotify or YouTube URLs.")).queue();
+                return;
             }
             ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, query, hook);
         });

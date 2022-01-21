@@ -52,7 +52,6 @@ public final class ApplicationCommandManager {
         registerCommand(
                 new JoinCommand(),
                 new LoopCommand(),
-                new LyricsCommand(),
                 new NowPlayingCommand(),
                 new PauseCommand(),
                 new PlayCommand(),

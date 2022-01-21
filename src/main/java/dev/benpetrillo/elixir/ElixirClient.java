@@ -18,20 +18,20 @@
 
 package dev.benpetrillo.elixir;
 
-import com.github.topisenpai.plugin.spotify.SpotifyConfig;
-import com.github.topisenpai.plugin.spotify.SpotifySourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import dev.benpetrillo.elixir.events.ApplicationCommandListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
+import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.AllowedMentions;
+import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import javax.security.auth.login.LoginException;
 
@@ -40,22 +40,21 @@ import java.io.IOException;
 public final class ElixirClient {
 
     static {
-        var spotifyConfig = new SpotifyConfig();
-        spotifyConfig.setClientId(Config.get("SPOTIFY-CLIENT-ID"));
-        spotifyConfig.setClientSecret(Config.get("SPOTIFY-CLIENT-SECRET"));
-        var youtubeSource = new YoutubeAudioSourceManager();
-        spotifySource = new SpotifySourceManager(spotifyConfig, youtubeSource);
+        try {
+            SpotifySourceManager.authorize();
+        } catch (IOException | ParseException | SpotifyWebApiException e) {
+            e.printStackTrace();
+        }
     }
     
     public static ApplicationCommandManager applicationCommandManager;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
-    public static final SpotifySourceManager spotifySource;
 
     public static void main(String[] args) {
         try {
             new ElixirClient(Config.get("TOKEN"));
         } catch (LoginException | IllegalArgumentException | IOException ignored) {
-            logger.error("Unable to log into the bot. Is the token valid?");
+            logger.error("Unable to initiate Elixir Music. Is the token valid?");
         }
     }
 
