@@ -20,8 +20,11 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 public final class Utilities {
@@ -40,6 +43,24 @@ public final class Utilities {
         catch (MalformedURLException e){
             return false;
         }
+    }
+
+    /**
+     * Encode a specific URI component.
+     * @param str The string to encode.
+     * @return String
+     */
+
+    public static String encodeURIComponent(String str) {
+        String result;
+        result = URLEncoder.encode(str, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20")
+                .replaceAll("\\%21", "!")
+                .replaceAll("\\%27", "'")
+                .replaceAll("\\%28", "(")
+                .replaceAll("\\%29", ")")
+                .replaceAll("\\%7E", "~");
+        return result;
     }
 
     /**

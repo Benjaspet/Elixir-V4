@@ -22,6 +22,7 @@ import dev.benpetrillo.elixir.events.ApplicationCommandListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
+import dev.benpetrillo.elixir.utilities.HttpUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;

@@ -22,12 +22,15 @@ import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.SpotifyURLConverter;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
 public final class PlayCommand implements ApplicationCommand {
@@ -57,8 +60,13 @@ public final class PlayCommand implements ApplicationCommand {
                 audioManager.setSelfDeafened(true);
             }
             if (!Utilities.isValidURL(query)) {
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Elixir currently only supports Spotify or YouTube URLs.")).queue();
-                return;
+                try {
+                    ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, HttpUtil.getYouTubeURL(query), hook);
+                    return;
+                } catch (UnsupportedEncodingException ignored) {
+                    hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("No search results found.")).queue();
+                    return;
+                }
             }
             ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, query, hook);
         });
