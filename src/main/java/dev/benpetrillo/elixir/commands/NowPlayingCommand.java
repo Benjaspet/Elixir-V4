@@ -21,10 +21,13 @@ package dev.benpetrillo.elixir.commands;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
+import dev.benpetrillo.elixir.types.YTVideoData;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -55,7 +58,8 @@ public final class NowPlayingCommand implements ApplicationCommand {
                             EmbedUtil.sendErrorEmbed("There is no track playing at the moment.")
                     ).queue();
                 } else {
-                    final AudioTrackInfo info = track.getInfo();
+                    final AudioTrackInfo info = track.getInfo(); final YTVideoData videoInfo = 
+                            HttpUtil.getVideoData(Utilities.extractVideoId(info.uri));
                     final String title = info.title.length() > 60 ? info.title.substring(0, 60) + "..." : info.title;
                     final String duration = info.isStream ? "LIVE" : Utilities.formatDuration(track.getDuration());
                     final String isLive = info.isStream ? "yes" : "no";
@@ -75,12 +79,14 @@ public final class NowPlayingCommand implements ApplicationCommand {
                             .addField("Track Data", contents, false)
                             .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
                             .setTimestamp(new Date().toInstant())
+                            .setThumbnail(videoInfo.items.get(0).snippet.thumbnails.get("default").get("url"))
                             .build();
                     hook.editOriginalEmbeds(embed).queue();
                 }
             } catch (PermissionException ignored) {
                 hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("I do not have permission to do this.")).queue();
-            } catch (Exception ignored) {
+            } catch (Exception exception) {
+                ElixirClient.logger.error("Error occurred while getting the currently playing track.", exception);
                 hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An unknown error occurred.")).queue();
             }
         });

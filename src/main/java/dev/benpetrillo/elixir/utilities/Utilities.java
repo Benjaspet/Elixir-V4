@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public final class Utilities {
@@ -73,5 +74,16 @@ public final class Utilities {
         final long minutes = ms / TimeUnit.MINUTES.toMillis(1);
         final long seconds = ms / TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    /**
+     * Extracts the video ID from a given URL.
+     * @param url The YouTube URL to extract the video ID from.
+     * @return A video ID.
+     */
+    
+    public static String extractVideoId(String url) {
+        String[] segments = url.split("/");
+        return url.contains("youtu.be") ? segments[3] : segments[3].split("v=")[1];
     }
 }
