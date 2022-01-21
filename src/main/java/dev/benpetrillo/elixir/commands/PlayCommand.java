@@ -21,7 +21,6 @@ package dev.benpetrillo.elixir.commands;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
-import dev.benpetrillo.elixir.utilities.Cooldown;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
@@ -35,7 +34,6 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -65,14 +63,9 @@ public final class PlayCommand implements ApplicationCommand {
                 audioManager.openAudioConnection(memberChannel);
                 audioManager.setSelfDeafened(true);
             }
-            if (Cooldown.isInCooldown(hook.getInteraction().getUser().getId(), new Date().toInstant().getEpochSecond())) {
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You're queueing tracks too fast!")).queue();
-                return;
-            }
             if (!Utilities.isValidURL(query)) {
                 try {
                     ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, HttpUtil.getYouTubeURL(query), hook);
-                    Cooldown.add(hook.getInteraction().getUser().getId());
                     return;
                 } catch (UnsupportedEncodingException ignored) {
                     hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("No search results found.")).queue();
