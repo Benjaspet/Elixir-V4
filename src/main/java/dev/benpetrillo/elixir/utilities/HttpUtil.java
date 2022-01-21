@@ -20,6 +20,7 @@ package dev.benpetrillo.elixir.utilities;
 
 import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.YTSearchData;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import okhttp3.OkHttpClient;
@@ -63,7 +64,7 @@ public final class HttpUtil {
                 videoId;
         Request request = new Request.Builder()
                 .url(url)
-                .build();   
+                .build();
         try (Response response = client.newCall(request).execute()) {
             assert response.body() != null;
             return new Gson().fromJson(response.body().string(), YTVideoData.class);

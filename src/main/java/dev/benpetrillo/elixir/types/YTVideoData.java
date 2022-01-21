@@ -26,8 +26,7 @@ public final class YTVideoData {
     public List<Item> items;
 
     public static class Item {
-        public String kind, etag;
-        public Map<String, String> id;
+        public String kind, etag, id;
         public YTSearchData.Item.Snippet snippet;
 
         public static class Snippet {

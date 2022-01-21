@@ -58,7 +58,8 @@ public final class ApplicationCommandManager {
                 new QueueCommand(),
                 new ResumeCommand(),
                 new SkipCommand(),
-                new StopCommand()
+                new StopCommand(),
+                new VolumeCommand()
         );
     }
     

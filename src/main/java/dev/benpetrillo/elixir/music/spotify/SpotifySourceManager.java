@@ -107,8 +107,8 @@ public final class SpotifySourceManager implements AudioSourceManager {
                 case "artist":
                     return this.getArtist(id);
             }
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | ParseException | SpotifyWebApiException | NullPointerException e) {
+            return null;
         }
         return null;
     }
@@ -131,8 +131,7 @@ public final class SpotifySourceManager implements AudioSourceManager {
 
     @Override
     public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
-        String isrc = null;
-        String artworkURL = null;
+        String isrc = null, artworkURL = null;
         try {
             isrc = readNullableText(input);
             artworkURL = readNullableText(input);
@@ -143,7 +142,6 @@ public final class SpotifySourceManager implements AudioSourceManager {
 
     @Override
     public void shutdown() {}
-
 
     public AudioItem getSearch(String query) throws IOException, ParseException, SpotifyWebApiException {
         var searchResult = spotify.searchTracks(query).build().execute();
@@ -183,7 +181,7 @@ public final class SpotifySourceManager implements AudioSourceManager {
         return new BasicAudioPlaylist(album.getName(), tracks, null, false);
     }
 
-    public AudioItem getPlaylist(String id) throws IOException, SpotifyWebApiException, ParseException {
+    public AudioItem getPlaylist(String id) throws IOException, SpotifyWebApiException, ParseException, NullPointerException {
         var playlist = spotify.getPlaylist(id).build().execute();
         var tracks = new ArrayList<AudioTrack>();
 

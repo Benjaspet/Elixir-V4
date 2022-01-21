@@ -4,6 +4,7 @@ import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
+import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -24,27 +25,9 @@ public final class LoopCommand implements ApplicationCommand {
     
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
-        assert selfVoiceState != null;
-        if (!selfVoiceState.inAudioChannel()) {
-            event.replyEmbeds(EmbedUtil.sendErrorEmbed("I must be in a voice channel.")).queue();
-            return;
-        }
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
-        assert memberVoiceState != null;
-        if (!memberVoiceState.inAudioChannel()) {
-            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel.")).queue();
-            return;
-        }
-        if (!Objects.equals(memberVoiceState.getChannel(), selfVoiceState.getChannel())) {
-            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You need to be in my voice channel.")).queue();
-            return;
-        }
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        if(musicManager.audioPlayer.getPlayingTrack() == null) {
-            event.replyEmbeds(EmbedUtil.sendErrorEmbed("There's no queue in this server.")).queue();
-            return;
-        }   
+        if(!AudioUtil.audioCheck(event, guild, member)) return;
+        if(!AudioUtil.playerCheck(event, guild, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
         final TrackScheduler scheduler = musicManager.scheduler;
         
         String loop = Objects.requireNonNull(event.getOption("mode")).getAsString(); String mode;

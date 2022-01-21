@@ -23,31 +23,30 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 import java.util.Objects;
 
-public final class PauseCommand implements ApplicationCommand {
-
-    private final String name = "pause";
-    private final String description = "Pause the track currently playing.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
+public final class VolumeCommand implements ApplicationCommand {
+    private final String name = "volume";
+    private final String description = "Set the volume of the player.";
+    private final String[] options = {"volume"}; 
+    private final String[] optionDescriptions = {"The volume (out of 150) for the player."};
 
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
+        if(!AudioUtil.playerCheck(event, guild, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         if(!AudioUtil.audioCheck(event, guild, member)) return;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        if (!musicManager.scheduler.player.isPaused()) {
-            musicManager.scheduler.player.setPaused(true);
-            MessageEmbed embed = EmbedUtil.sendDefaultEmbed("Successfully paused the queue.");
-            event.replyEmbeds(embed).queue();
-        } else {
-            MessageEmbed embed = EmbedUtil.sendErrorEmbed("The queue is already paused.");
-            event.replyEmbeds(embed).queue();
-        }
+        final int volume = Math.min(150, Math.max(0, 
+                (int) Objects.requireNonNull(event.getOption("volume")).getAsLong()));
+        musicManager.audioPlayer.setVolume(volume);
+        event.replyEmbeds(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**.")).queue();
     }
 
     @Override
@@ -62,6 +61,7 @@ public final class PauseCommand implements ApplicationCommand {
 
     @Override
     public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+        return new CommandData(this.name, this.description)
+                .addOption(OptionType.INTEGER, this.options[0], this.optionDescriptions[0], true);
     }
 }

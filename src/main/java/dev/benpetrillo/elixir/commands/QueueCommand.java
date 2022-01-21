@@ -48,14 +48,8 @@ public final class QueueCommand implements ApplicationCommand {
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
         if (musicManager.scheduler.queue.isEmpty()) {
             event.replyEmbeds(EmbedUtil.sendErrorEmbed("There are no songs in the queue.")).queue();
-            return;
-        }
-        assert memberVoiceState != null;
-        if (!memberVoiceState.inAudioChannel()) {
-            event.replyEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command.")).queue();
             return;
         }
         event.deferReply().queue(hook -> {
