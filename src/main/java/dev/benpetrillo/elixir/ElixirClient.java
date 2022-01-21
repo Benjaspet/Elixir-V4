@@ -39,6 +39,9 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 
 public final class ElixirClient {
+    
+    public static ApplicationCommandManager applicationCommandManager;
+    public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
 
     static {
         try {
@@ -47,9 +50,6 @@ public final class ElixirClient {
             e.printStackTrace();
         }
     }
-    
-    public static ApplicationCommandManager applicationCommandManager;
-    public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
 
     public static void main(String[] args) {
         try {

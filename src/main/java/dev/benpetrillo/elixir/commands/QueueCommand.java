@@ -63,12 +63,12 @@ public final class QueueCommand implements ApplicationCommand {
                 final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
                 final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
                 StringBuilder description = new StringBuilder();
-                int maxAmount = 12;
+                int maxAmount = Math.min(arrayQueue.size(), 12);
                 for (int i = 0; i < maxAmount; i++) {
                     final AudioTrack track = arrayQueue.get(i);
                     final AudioTrackInfo info = track.getInfo();
                     String title = info.title.length() > 60 ? info.title.substring(0, 57) + "..." : info.title;
-                    String formattedString = String.format("**%s** ─ [%s](%s)", i + 1, title, info.uri);
+                    String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
                     description
                             .append(formattedString)
                             .append("\n");

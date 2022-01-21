@@ -20,7 +20,6 @@
 
 package dev.benpetrillo.elixir.utilities;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;

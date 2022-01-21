@@ -34,14 +34,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
-import org.apache.hc.core5.http.ParseException;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public final class ElixirMusicManager {
 
@@ -153,36 +149,6 @@ public final class ElixirMusicManager {
             @Override
             public void loadFailed(FriendlyException e) {}
         });
-    }
-
-    public void loadAndPlayMultipleTracks(List<String> tracks, InteractionHook hook) {
-        final GuildMusicManager musicManager = this.getMusicManager(Objects.requireNonNull(hook.getInteraction().getGuild()));
-        MessageEmbed embed = new EmbedBuilder()
-                .setColor(EmbedUtil.getDefaultEmbedColor())
-                .setDescription(String.format("Queued **%s** tracks from Spotify.", tracks.size()))
-                .build();
-        hook.editOriginalEmbeds(embed).queue();
-        for (String track : tracks) {
-            if(musicManager.scheduler.destroyed()) return;
-            this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
-
-                @Override
-                public void trackLoaded(AudioTrack track) {}
-
-                @Override
-                public void playlistLoaded(AudioPlaylist audioPlaylist) {
-                    if(musicManager.scheduler.destroyed()) return;
-                    musicManager.scheduler.queue(audioPlaylist.getTracks().get(0));
-                }
-
-                @Override
-                public void noMatches() {}
-
-                @Override
-                public void loadFailed(FriendlyException e) {}
-
-            });
-        }
     }
 
     public static ElixirMusicManager getInstance() {

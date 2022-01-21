@@ -78,8 +78,6 @@ public final class TrackScheduler extends AudioEventAdapter {
                 return;
             } else if (this.repeating == LoopMode.QUEUE) {
                 this.queue.add(track.makeClone());
-            } else if (this.queue.size() > 0 && this.queue.poll() != null) {
-                ElixirMusicManager.getInstance().lazyPlaySingularTrack(Objects.requireNonNull(this.queue.poll()).getInfo().title, guild);
             }
             nextTrack();
         }

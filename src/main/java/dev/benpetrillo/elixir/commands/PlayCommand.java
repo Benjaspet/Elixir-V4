@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir.commands;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.music.SpotifyURLConverter;
+import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
@@ -29,7 +29,10 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.apache.hc.core5.http.ParseException;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
@@ -66,6 +69,13 @@ public final class PlayCommand implements ApplicationCommand {
                 } catch (UnsupportedEncodingException ignored) {
                     hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("No search results found.")).queue();
                     return;
+                }
+            }
+            if (Utilities.isValidURL(query) && query.contains("spotify")) {
+                try {
+                    SpotifySourceManager.authorize();
+                } catch (IOException | ParseException | SpotifyWebApiException e) {
+                    e.printStackTrace();
                 }
             }
             ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, query, hook);
