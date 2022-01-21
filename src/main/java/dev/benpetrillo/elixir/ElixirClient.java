@@ -18,6 +18,9 @@
 
 package dev.benpetrillo.elixir;
 
+import com.github.topisenpai.plugin.spotify.SpotifyConfig;
+import com.github.topisenpai.plugin.spotify.SpotifySourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import dev.benpetrillo.elixir.events.ApplicationCommandListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
@@ -36,8 +39,17 @@ import java.io.IOException;
 
 public final class ElixirClient {
 
+    static {
+        var spotifyConfig = new SpotifyConfig();
+        spotifyConfig.setClientId(Config.get("SPOTIFY-CLIENT-ID"));
+        spotifyConfig.setClientSecret(Config.get("SPOTIFY-CLIENT-SECRET"));
+        var youtubeSource = new YoutubeAudioSourceManager();
+        spotifySource = new SpotifySourceManager(spotifyConfig, youtubeSource);
+    }
+    
     public static ApplicationCommandManager applicationCommandManager;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
+    public static final SpotifySourceManager spotifySource;
 
     public static void main(String[] args) {
         try {

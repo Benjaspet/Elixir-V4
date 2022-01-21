@@ -46,9 +46,13 @@ public final class QueueCommand implements ApplicationCommand {
 
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
+        if(musicManager.scheduler.queue.isEmpty()) {
+            event.replyEmbeds(EmbedUtil.sendErrorEmbed("There are no songs in the queue.")).queue();
+            return;
+        }
         event.deferReply().queue(hook -> {
             try {
-                final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
                 final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
                 final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
                 StringBuilder description = new StringBuilder();

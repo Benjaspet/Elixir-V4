@@ -28,11 +28,6 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
-import org.apache.hc.core5.http.ParseException;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-
-import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 public final class PlayCommand implements ApplicationCommand {
@@ -63,22 +58,6 @@ public final class PlayCommand implements ApplicationCommand {
             }
             if (!Utilities.isValidURL(query)) {
                 query = "ytsearch:" + query;
-            }
-            if (query.contains("spotify") && query.contains("/track/") && Utilities.isValidURL(query)) {
-                try {
-                    query = "ytsearch:" + Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query)).get(0);
-                } catch (ParseException | SpotifyWebApiException | IOException ignored) {
-                    hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Unable to find a track by that URL.")).queue();
-                    return;
-                }
-            }
-            if (query.contains("spotify") && query.contains("/playlist/") && Utilities.isValidURL(query)) {
-                try {
-                    List<String> tracks = Objects.requireNonNull(new SpotifyURLConverter().queueSpotifyTracks(query));
-                    ElixirMusicManager.getInstance().loadAndPlayMultipleTracks(tracks, hook);
-                } catch (ParseException | SpotifyWebApiException | IOException ignored) {
-                    hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An error occurred while searching for tracks.")).queue();
-                } return;
             }
             ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, query, hook);
         });

@@ -18,6 +18,8 @@
 
 package dev.benpetrillo.elixir.managers;
 
+import com.github.topisenpai.plugin.spotify.SpotifyConfig;
+import com.github.topisenpai.plugin.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -27,6 +29,8 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,17 +46,13 @@ import java.util.Objects;
 public final class ElixirMusicManager {
 
     private static ElixirMusicManager instance;
-    private final Map<String, GuildMusicManager> musicManagers;
-    private final AudioPlayerManager audioPlayerManager;
+    private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
+    private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
 
     public ElixirMusicManager() {
-        var youtubeManager = new YoutubeAudioSourceManager();
-        this.musicManagers = new HashMap<>();
-        this.audioPlayerManager = new DefaultAudioPlayerManager();
-        this.audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        this.audioPlayerManager.registerSourceManager(ElixirClient.spotifySource);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
-
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -110,7 +110,7 @@ public final class ElixirMusicManager {
 
             @Override
             public void noMatches() {
-
+                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Nothing found by that search term.")).queue();
             }
 
             @Override
