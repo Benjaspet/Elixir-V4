@@ -22,7 +22,6 @@ import dev.benpetrillo.elixir.events.ApplicationCommandListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
-import dev.benpetrillo.elixir.utilities.HttpUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -37,6 +36,9 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import javax.security.auth.login.LoginException;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public final class ElixirClient {
     
@@ -44,11 +46,15 @@ public final class ElixirClient {
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
 
     static {
-        try {
-            SpotifySourceManager.authorize();
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            e.printStackTrace();
-        }
+        new Timer().schedule(new TimerTask() {
+            @Override public void run() {
+                try {
+                    SpotifySourceManager.authorize();
+                } catch (IOException | ParseException | SpotifyWebApiException e) {
+                    logger.debug(e.getMessage());
+                }
+            }
+        }, 0L, TimeUnit.MINUTES.toMillis(45));
     }
 
     public static void main(String[] args) {
@@ -61,7 +67,7 @@ public final class ElixirClient {
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         JDA jda = JDABuilder.createDefault(token)
-                .setActivity(Activity.listening("lofi hiphop!"))
+                .setActivity(Activity.listening(Config.get("ACTIVITY")))
                 .addEventListeners(
                         new ReadyListener(),
                         new ApplicationCommandListener()
