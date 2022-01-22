@@ -1,8 +1,11 @@
 {
-  "name": "(playlist name)",
-  "description": "(playlist description)",
-  "playlistCoverUrl": "https://i.ytimg.com/vi/tntOCGkgt98/hqdefault.jpg",
-  "author": "(discord snowflake)",
+  "info": {
+    "id": "(playlist id)",
+    "name": "(playlist name)",
+    "description": "(playlist description)",
+    "playlistCoverUrl": "https://i.ytimg.com/vi/tntOCGkgt98/hqdefault.jpg",
+    "author": "(discord snowflake)"
+  },
   
   "tracks": {
     "(track title)": {

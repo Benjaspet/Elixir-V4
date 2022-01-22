@@ -59,7 +59,7 @@ public final class QueueCommand implements ApplicationCommand {
                 final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
                 final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
                 final AudioTrack nowPlaying = musicManager.audioPlayer.getPlayingTrack();
-                final String thumbnail = TrackUtil.getCoverArt(nowPlaying);
+                final String thumbnail = TrackUtil.getCoverArt(nowPlaying.getInfo());
                 StringBuilder description = new StringBuilder();
                 int maxAmount = Math.min(arrayQueue.size(), 12);
                 for (int i = 0; i < maxAmount; i++) {

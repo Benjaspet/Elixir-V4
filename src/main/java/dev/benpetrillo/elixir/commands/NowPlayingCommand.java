@@ -58,7 +58,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     ).queue();
                 } else {
                     final AudioTrackInfo info = track.getInfo();
-                    final String thumbnail = TrackUtil.getCoverArt(track);
+                    final String thumbnail = TrackUtil.getCoverArt(track.getInfo());
                     final String title = info.title.length() > 60 ? info.title.substring(0, 60) + "..." : info.title;
                     final String duration = info.isStream ? "LIVE" : Utilities.formatDuration(track.getDuration());
                     final String isLive = info.isStream ? "yes" : "no";

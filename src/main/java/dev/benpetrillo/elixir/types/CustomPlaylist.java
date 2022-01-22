@@ -18,16 +18,32 @@
 
 package dev.benpetrillo.elixir.types;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.utilities.TrackUtil;
+
 import java.util.Map;
 
 public final class CustomPlaylist {
-    public String name, description, playlistCoverUrl, author;
+    public Info info;
     public Map<String, CustomPlaylistTrack> tracks;
     public Options options;
+    
+    public static class Info {
+        public String id, name, description, playlistCoverUrl, author;
+    }
     
     public static class CustomPlaylistTrack {
         public String url, artist, coverArt;
         public long duration;
+        
+        public static CustomPlaylistTrack from(AudioTrackInfo info) {
+            var track = new CustomPlaylistTrack();
+            track.url = info.uri;
+            track.artist = info.author;
+            track.coverArt = TrackUtil.getCoverArt(info);
+            track.duration = info.length;
+            return track;
+        }
     }
     
     public static class Options {

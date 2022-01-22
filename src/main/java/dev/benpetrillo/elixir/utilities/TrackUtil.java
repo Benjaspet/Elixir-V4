@@ -18,7 +18,7 @@
 
 package dev.benpetrillo.elixir.utilities;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import org.apache.hc.core5.http.ParseException;
@@ -37,8 +37,8 @@ public final class TrackUtil {
      * @return String
      */
     
-    public static String getCoverArt(AudioTrack track) {
-        String trackUri = track.getInfo().uri;
+    public static String getCoverArt(AudioTrackInfo track) {
+        var trackUri = track.uri;
         if (trackUri.contains("spotify") && trackUri.contains("/track/")) {
             try {
                 String[] firstSplit = trackUri.split("/");
@@ -58,9 +58,29 @@ public final class TrackUtil {
                 return null;
             }
         } else if (trackUri.contains("www.youtube.com") || trackUri.contains("youtu.be")) {
-            final YTVideoData data = HttpUtil.getVideoData(Utilities.extractVideoId(track.getInfo().uri));
+            final YTVideoData data = HttpUtil.getVideoData(Utilities.extractVideoId(track.uri));
             return data != null ? data.items.get(0).snippet.thumbnails.get("default").get("url") : null;
         }
         return null;
+    }
+
+    /**
+     * Determines the source for a given URL.
+     * @param url The URL to find the source of.
+     * @return A {@link TrackType} representing the source of the URL.
+     */
+    
+    public static TrackType determineTrackType(String url) {
+        if(url.contains("youtu"))
+            return TrackType.YOUTUBE;
+        if(url.contains("spotify"))
+            return TrackType.SPOTIFY;
+        return TrackType.UNKNOWN;
+    }
+    
+    public enum TrackType {
+        YOUTUBE,
+        SPOTIFY,
+        UNKNOWN
     }
 }

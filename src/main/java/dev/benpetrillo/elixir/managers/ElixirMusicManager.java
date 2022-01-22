@@ -44,10 +44,12 @@ public final class ElixirMusicManager {
     private static ElixirMusicManager instance;
     private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
-    private final AudioSourceManager audioSourceManager = new YoutubeAudioSourceManager();
+    
+    public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
+    public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
 
     public ElixirMusicManager() {
-        this.audioPlayerManager.registerSourceManager(new SpotifySourceManager(audioSourceManager));
+        this.audioPlayerManager.registerSourceManager(this.spotifySource);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
     }

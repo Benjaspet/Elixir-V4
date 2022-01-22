@@ -132,4 +132,14 @@ public final class Utilities {
     public static <T> T deserialize(String json, Class <T> klass) {
         return new Gson().fromJson(json, klass);
     }
+
+    /**
+     * Convert a given object to a JSON string.
+     * @param object The object to convert.
+     * @return A serialized object.
+     */
+    
+    public static String serialize(Object object) {
+        return new Gson().toJson(object);
+    }
 }
