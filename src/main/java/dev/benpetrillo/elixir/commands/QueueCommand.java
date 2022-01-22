@@ -24,6 +24,8 @@ import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.TrackUtil;
+import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -56,6 +58,8 @@ public final class QueueCommand implements ApplicationCommand {
             try {
                 final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
                 final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
+                final AudioTrack nowPlaying = musicManager.audioPlayer.getPlayingTrack();
+                final String thumbnail = TrackUtil.getCoverArt(nowPlaying);
                 StringBuilder description = new StringBuilder();
                 int maxAmount = Math.min(arrayQueue.size(), 12);
                 for (int i = 0; i < maxAmount; i++) {
@@ -72,10 +76,12 @@ public final class QueueCommand implements ApplicationCommand {
                             .append("\n")
                             .append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
                 }
-                final String queueData = "• Tracks queued: %s\n• Loop mode: %s".formatted(queue.size(), musicManager.scheduler.repeating);
+                final String queueData = "• Tracks queued: %s\n• Loop mode: %s".formatted(queue.size(), Utilities.prettyPrint(musicManager.scheduler.repeating.toString()));
                 MessageEmbed embed = new EmbedBuilder()
                         .setTitle("Guild Queue")
                         .setColor(EmbedUtil.getDefaultEmbedColor())
+                        .setAuthor("Now Playing: " + nowPlaying.getInfo().title, nowPlaying.getInfo().uri)
+                        .setThumbnail(thumbnail)
                         .setDescription(description)
                         .addField("Queue Data", queueData, false)
                         .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())

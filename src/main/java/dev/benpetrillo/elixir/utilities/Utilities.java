@@ -25,8 +25,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 public final class Utilities {
 
@@ -90,5 +88,22 @@ public final class Utilities {
     public static String extractVideoId(String url) {
         String[] segments = url.split("/");
         return url.contains("youtu.be") ? segments[3] : segments[3].split("v=")[1];
+    }
+
+    /**
+     * Pretty prints a given string.
+     * @param toPrint The string to format.
+     * @return A pretty/formatted string.
+     */
+    
+    public static String prettyPrint(String toPrint) {
+        String pass1 = toPrint.toLowerCase();
+        String[] lower = pass1.split(" ");
+        
+        StringBuilder builder = new StringBuilder();
+        for(String string : lower) {
+            String pass2 = string.substring(0, 1).toUpperCase() + string.substring(1);
+            builder.append(pass2).append(" ");
+        } return builder.toString();
     }
 }
