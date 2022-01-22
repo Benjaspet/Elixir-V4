@@ -28,7 +28,7 @@ public final class YTVideoData {
 
     public static class Item {
         public String kind, etag, id;
-        public YTSearchData.Item.Snippet snippet;
+        public Snippet snippet;
 
         public static class Snippet {
             public String publishedAt, channelId, title, description;

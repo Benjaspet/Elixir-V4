@@ -59,6 +59,7 @@ public final class ApplicationCommandManager {
                 new ResumeCommand(),
                 new SkipCommand(),
                 new StopCommand(),
+                new ShuffleCommand(),
                 new VolumeCommand()
         );
     }

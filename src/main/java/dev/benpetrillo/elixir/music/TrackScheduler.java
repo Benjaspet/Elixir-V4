@@ -34,7 +34,6 @@ public final class TrackScheduler extends AudioEventAdapter {
     private final Guild guild;
     
     public final AudioPlayer player;
-    private AudioTrack currentTrack;
     public final BlockingQueue<AudioTrack> queue;
 
     public LoopMode repeating = LoopMode.NONE;
@@ -48,9 +47,9 @@ public final class TrackScheduler extends AudioEventAdapter {
     public void queue(AudioTrack track) {
         if (player.getPlayingTrack() == null) {
             player.playTrack(track);
-            currentTrack = track;
             return;
         }
+        
         queue.add(track);
     }
 

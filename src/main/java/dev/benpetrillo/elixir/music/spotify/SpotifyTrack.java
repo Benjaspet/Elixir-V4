@@ -95,4 +95,9 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
     public AudioSourceManager getSourceManager() {
         return this.spotifySourceManager;
     }
+
+    @Override
+    protected AudioTrack makeShallowClone() {
+        return new SpotifyTrack(this.trackInfo, this.isrc, this.artworkURL, this.spotifySourceManager);
+    }
 }
