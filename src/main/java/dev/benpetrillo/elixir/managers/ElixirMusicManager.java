@@ -60,7 +60,7 @@ public final class ElixirMusicManager {
         });
     }
 
-    public void loadAndPlaySingleTrack(TextChannel channel, String track, InteractionHook hook) {
+    public void loadAndPlay(TextChannel channel, String track, InteractionHook hook, String url) {
         final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 
@@ -90,7 +90,7 @@ public final class ElixirMusicManager {
                     hook.editOriginalEmbeds(embed).queue();
                     musicManager.scheduler.queue(tracks.get(0));
                 } else {
-                    final String success = String.format("Queued **%s** tracks from %s.", tracks.size(), playlist.getName());
+                    final String success = String.format("Queued **%s** tracks from [%s](%s).", tracks.size(), playlist.getName(), url);
                     MessageEmbed embed = new EmbedBuilder()
                             .setColor(EmbedUtil.getDefaultEmbedColor())
                             .setDescription(success)

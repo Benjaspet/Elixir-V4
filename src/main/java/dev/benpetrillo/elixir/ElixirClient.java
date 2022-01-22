@@ -19,7 +19,9 @@
 package dev.benpetrillo.elixir;
 
 import dev.benpetrillo.elixir.events.ApplicationCommandListener;
+import dev.benpetrillo.elixir.events.MessageListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
+import dev.benpetrillo.elixir.events.ShutdownListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import net.dv8tion.jda.api.JDA;
@@ -69,8 +71,10 @@ public final class ElixirClient {
         JDA jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(Config.get("ACTIVITY")))
                 .addEventListeners(
+                        new ApplicationCommandListener(),
                         new ReadyListener(),
-                        new ApplicationCommandListener()
+                        new MessageListener(),
+                        new ShutdownListener()
                 )
                 .setStatus(OnlineStatus.ONLINE)
                 .enableIntents(GatewayIntent.GUILD_VOICE_STATES)

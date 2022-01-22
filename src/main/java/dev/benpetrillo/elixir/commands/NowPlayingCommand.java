@@ -28,6 +28,7 @@ import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
+import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -59,7 +60,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     ).queue();
                 } else {
                     final AudioTrackInfo info = track.getInfo();
-                    final YTVideoData videoInfo = HttpUtil.getVideoData(Utilities.extractVideoId(info.uri));
+                    final String thumbnail = TrackUtil.getCoverArt(track);
                     final String title = info.title.length() > 60 ? info.title.substring(0, 60) + "..." : info.title;
                     final String duration = info.isStream ? "LIVE" : Utilities.formatDuration(track.getDuration());
                     final String isLive = info.isStream ? "yes" : "no";
@@ -72,7 +73,6 @@ public final class NowPlayingCommand implements ApplicationCommand {
                             • Duration: %s                         
                             • Livestream: %s
                             """.formatted(artist, requestedBy, duration, isLive);
-                    assert videoInfo != null;
                     MessageEmbed embed = new EmbedBuilder()
                             .setTitle("Currently Playing")
                             .setDescription(String.format("[%s](%s)", title, url))
@@ -80,7 +80,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                             .addField("Track Data", contents, false)
                             .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
                             .setTimestamp(new Date().toInstant())
-                            .setThumbnail(videoInfo.items.get(0).snippet.thumbnails.get("default").get("url"))
+                            .setThumbnail(thumbnail)
                             .build();
                     hook.editOriginalEmbeds(embed).queue();
                 }

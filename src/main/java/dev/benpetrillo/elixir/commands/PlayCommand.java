@@ -34,7 +34,6 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
 import java.util.Objects;
 
 public final class PlayCommand implements ApplicationCommand {
@@ -65,7 +64,7 @@ public final class PlayCommand implements ApplicationCommand {
             }
             if (!Utilities.isValidURL(query)) {
                 try {
-                    ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, HttpUtil.getYouTubeURL(query), hook);
+                    ElixirMusicManager.getInstance().loadAndPlay(channel, HttpUtil.getYouTubeURL(query), hook, "https://www.youtube.com/");
                     return;
                 } catch (UnsupportedEncodingException ignored) {
                     hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("No search results found.")).queue();
@@ -79,7 +78,7 @@ public final class PlayCommand implements ApplicationCommand {
                     e.printStackTrace();
                 }
             }
-            ElixirMusicManager.getInstance().loadAndPlaySingleTrack(channel, query, hook);
+            ElixirMusicManager.getInstance().loadAndPlay(channel, query, hook, query);
         });
     }
 

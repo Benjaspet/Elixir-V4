@@ -28,8 +28,6 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-import java.util.Objects;
-
 public final class StopCommand implements ApplicationCommand {
 
     private final String name = "stop";

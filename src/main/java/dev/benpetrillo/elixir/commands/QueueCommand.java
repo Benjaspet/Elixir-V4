@@ -72,11 +72,12 @@ public final class QueueCommand implements ApplicationCommand {
                             .append("\n")
                             .append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
                 }
+                final String queueData = "• Tracks queued: %s\n• Loop mode: %s".formatted(queue.size(), musicManager.scheduler.repeating);
                 MessageEmbed embed = new EmbedBuilder()
                         .setTitle("Guild Queue")
                         .setColor(EmbedUtil.getDefaultEmbedColor())
                         .setDescription(description)
-                        .addField("Queue Data", String.format("• Tracks queued: %s", queue.size()), false)
+                        .addField("Queue Data", queueData, false)
                         .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
                         .setTimestamp(new Date().toInstant())
                         .build();

@@ -38,9 +38,6 @@ public final class LoopCommand implements ApplicationCommand {
             case "Queue Loop":
                 scheduler.repeating = TrackScheduler.LoopMode.QUEUE; mode = "queue";
                 break;
-            case "Autoplay":
-                mode = "autoplay"; // TODO: Implement autoplay.
-                break;
             case "Disable Loop":
                 scheduler.repeating = TrackScheduler.LoopMode.NONE;
                 event.replyEmbeds(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode.")).queue();
@@ -67,7 +64,6 @@ public final class LoopCommand implements ApplicationCommand {
                 .addOptions(new OptionData(OptionType.STRING, this.options[0], this.optionDescriptions[0], true)
                         .addChoice("Track Loop", "Track Loop")
                         .addChoice("Queue Loop", "Queue Loop")
-                        .addChoice("Autoplay", "Autoplay")
                         .addChoice("Disable Loop", "Disable Loop"));
     }
 }

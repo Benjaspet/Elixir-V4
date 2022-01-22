@@ -47,6 +47,8 @@ public final class SkipCommand implements ApplicationCommand {
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
         if (musicManager.scheduler.queue.isEmpty()) {
             audioManager.closeAudioConnection();
+            musicManager.scheduler.queue.clear();
+            musicManager.audioPlayer.destroy();
             MessageEmbed embed = EmbedUtil.sendDefaultEmbed("There were no tracks left in the queue, so I left.");
             event.replyEmbeds(embed).queue();
             return;
