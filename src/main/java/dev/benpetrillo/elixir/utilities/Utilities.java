@@ -91,6 +91,18 @@ public final class Utilities {
     }
 
     /**
+     * Extracts the song ID from a given URL.
+     * @param url The Spotify URL to extract the song ID from.
+     * @return A song ID.
+     * https://open.spotify.com/track/4Agtk2MrapdZAVN7v6PuFO?si=13ff06412a6340e0
+     */
+    
+    public static String extractSongId(String url) {
+        String[] segments = url.split("/");
+        return segments[5].split("\\?")[0];
+    }
+
+    /**
      * Pretty prints a given string.
      * @param toPrint The string to format.
      * @return A pretty/formatted string.

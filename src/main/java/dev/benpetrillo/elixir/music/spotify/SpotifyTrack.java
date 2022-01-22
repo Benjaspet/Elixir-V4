@@ -23,7 +23,6 @@ import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
-
 public final class SpotifyTrack extends DelegatedAudioTrack {
 
     private final String isrc;
@@ -46,7 +45,7 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
         this.artworkURL = artworkURL;
         this.spotifySourceManager = spotifySourceManager;
     }
-
+    
     public static SpotifyTrack of(TrackSimplified track, Album album, SpotifySourceManager spotifySourceManager) {
         return new SpotifyTrack(track.getName(), track.getId(), null, album.getImages(), track.getUri(), track.getArtists(), track.getDurationMs(), spotifySourceManager);
     }
