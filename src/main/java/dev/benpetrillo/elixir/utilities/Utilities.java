@@ -20,6 +20,8 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import com.google.gson.Gson;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -117,5 +119,17 @@ public final class Utilities {
             String pass2 = string.substring(0, 1).toUpperCase() + string.substring(1);
             builder.append(pass2).append(" ");
         } return builder.toString();
+    }
+
+    /**
+     * Convert a given object to a JSON string.
+     * @param json The object to convert.
+     * @param klass The class of the object.
+     * @param <T> The type of the object.
+     * @return A de-serialized object.
+     */
+    
+    public static <T> T deserialize(String json, Class <T> klass) {
+        return new Gson().fromJson(json, klass);
     }
 }
