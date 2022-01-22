@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class YTSearchData {
+
     public String kind, etag, nextPageToken, regionCode;
     public List<Item> items;
     

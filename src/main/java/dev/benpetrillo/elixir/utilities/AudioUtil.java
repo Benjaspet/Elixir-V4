@@ -24,17 +24,18 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
 public final class AudioUtil {
+
     /**
      * Runs the simple check to ensure if:
      * - The user is in a voice channel
      * - The bot is in a voice channel
      * - The user is in the same voice channel as the bot
      */
+
     public static FailureReason simpleAudioCheck(Guild guild, @Nullable Member member) {
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState(); assert selfVoiceState != null;
         if(member == null) {

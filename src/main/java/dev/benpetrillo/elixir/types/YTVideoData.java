@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class YTVideoData {
+
     public String kind, etag;
     public List<Item> items;
 

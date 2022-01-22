@@ -58,8 +58,8 @@ public final class NowPlayingCommand implements ApplicationCommand {
                             EmbedUtil.sendErrorEmbed("There is no track playing at the moment.")
                     ).queue();
                 } else {
-                    final AudioTrackInfo info = track.getInfo(); final YTVideoData videoInfo = 
-                            HttpUtil.getVideoData(Utilities.extractVideoId(info.uri));
+                    final AudioTrackInfo info = track.getInfo();
+                    final YTVideoData videoInfo = HttpUtil.getVideoData(Utilities.extractVideoId(info.uri));
                     final String title = info.title.length() > 60 ? info.title.substring(0, 60) + "..." : info.title;
                     final String duration = info.isStream ? "LIVE" : Utilities.formatDuration(track.getDuration());
                     final String isLive = info.isStream ? "yes" : "no";
@@ -72,6 +72,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                             • Duration: %s                         
                             • Livestream: %s
                             """.formatted(artist, requestedBy, duration, isLive);
+                    assert videoInfo != null;
                     MessageEmbed embed = new EmbedBuilder()
                             .setTitle("Currently Playing")
                             .setDescription(String.format("[%s](%s)", title, url))

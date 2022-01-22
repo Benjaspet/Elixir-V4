@@ -20,7 +20,6 @@ package dev.benpetrillo.elixir.utilities;
 
 import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.YTSearchData;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import okhttp3.OkHttpClient;
@@ -30,8 +29,6 @@ import okhttp3.Response;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 public final class HttpUtil {
 
