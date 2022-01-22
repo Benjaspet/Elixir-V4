@@ -18,38 +18,60 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.managers.DatabaseManager;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import net.dv8tion.jda.api.entities.Member;
+import org.bson.Document;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public final class PlaylistUtil {
     /**
+     * Get a custom playlist object by ID.
+     * @param playlistId The playlist ID to get.
+     * @return The playlist object or null if one cannot be found.
+     */
+
+    @Nullable
+    public static CustomPlaylist findPlaylist(String playlistId) {
+        MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
+        BasicDBObject object = new BasicDBObject("playlistId", playlistId);
+        Document document = dbCollection.find(object).first();
+        assert document != null;
+        String serializedPlaylistData = document.getString("playlistData");
+        return Utilities.deserialize(serializedPlaylistData, CustomPlaylist.class);
+    }
+
+    /**
      * Determines if the member is an author of the playlist.
-     * @param playlistId The playlist ID to check.
+     * @param playlist The playlist to check.
      * @param member The member to check.
      * @return The result of the check.
      */
-    
-    public static boolean isAuthor(String playlistId, Member member) {
-        return false;
+
+    public static boolean isAuthor(CustomPlaylist playlist, Member member) {
+        return playlist.info.author.matches(member.getId());
     }
 
     /**
      * Get a collection of tracks in a custom playlist.
-     * @param playlistId The playlist ID to get tracks from.
+     * @param playlist The playlist to get tracks from.
      * @return A collection of playable tracks.
      */
     
-    public static List<PlaylistTrack> getTracks(String playlistId) {
-        // TODO: Implement getting playlist data from the database.
-        CustomPlaylist playlist = Utilities.deserialize("{}", CustomPlaylist.class);
+    public static List<PlaylistTrack> getTracks(CustomPlaylist playlist) {
         final List<PlaylistTrack> tracks = new ArrayList<>();
         
         for(Map.Entry<String, CustomPlaylist.CustomPlaylistTrack> entry : playlist.tracks.entrySet()) {
@@ -70,14 +92,12 @@ public final class PlaylistUtil {
     /**
      * Adds a track to a custom playlist.
      * @param track The track to add.
-     * @param playlistId The playlist ID to add the track to.
+     * @param playlist The playlist to add the track to.
      */
     
-    public static void addTrackToList(AudioTrack track, String playlistId) {
-        // TODO: Implement getting playlist data from the database.
-        CustomPlaylist playlist = Utilities.deserialize("{}", CustomPlaylist.class);
+    public static void addTrackToList(AudioTrack track, CustomPlaylist playlist) {
         playlist.tracks.put(track.getInfo().title, CustomPlaylist.CustomPlaylistTrack.from(track.getInfo()));
-        
+
         var newData = Utilities.serialize(playlist);
         // TODO: Set data for the playlist to newData.
     }

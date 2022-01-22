@@ -19,15 +19,17 @@
 package dev.benpetrillo.elixir.managers;
 
 import com.mongodb.*;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
+import org.bson.Document;
 
 public final class DatabaseManager {
 
     private static MongoClient mongoClient;
     private static MongoDatabase database;
-    private static DBCollection playlists;
+    private static MongoCollection<Document> playlists;
 
     public DatabaseManager() {
         this.init();
@@ -36,7 +38,7 @@ public final class DatabaseManager {
     private void init() {
         mongoClient = new MongoClient(new MongoClientURI(Config.get("MONGO-URI")));
         database = mongoClient.getDatabase("elixir");
-        playlists = (DBCollection) database.getCollection("playlists");
+        playlists = database.getCollection("playlists");
         ElixirClient.logger.info("Database loaded successfully.");
     }
 
@@ -44,7 +46,7 @@ public final class DatabaseManager {
         return database;
     }
 
-    public static DBCollection getPlaylistCollection() {
+    public static MongoCollection<Document> getPlaylistCollection() {
         return playlists;
     }
 }
