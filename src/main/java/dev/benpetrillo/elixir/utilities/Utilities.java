@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -70,10 +71,14 @@ public final class Utilities {
      */
 
     public static String formatDuration(long ms) {
-        final long hours = ms / TimeUnit.HOURS.toMillis(1);
-        final long minutes = ms / TimeUnit.MINUTES.toMillis(1);
-        final long seconds = ms / TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        final Duration duration = Duration.ofMillis(ms);
+        final int hours = duration.toHoursPart();
+        final int minutes = duration.toMinutesPart();
+        final int seconds = duration.toSecondsPart();
+        if (hours > 0) {
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        }
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     /**
