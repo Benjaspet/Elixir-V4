@@ -47,5 +47,10 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver</artifactId>
+            <version>3.12.10</version>
+        </dependency>
     </dependencies>
 </project>

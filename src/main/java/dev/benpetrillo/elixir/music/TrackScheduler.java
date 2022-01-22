@@ -49,7 +49,6 @@ public final class TrackScheduler extends AudioEventAdapter {
             player.playTrack(track);
             return;
         }
-        
         queue.add(track);
     }
 
