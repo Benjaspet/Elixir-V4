@@ -40,7 +40,7 @@ public final class StopCommand implements ApplicationCommand {
         final TextChannel channel = event.getTextChannel();
         final GuildVoiceState selfVoiceState = member.getVoiceState();
         assert selfVoiceState != null;
-        if(!AudioUtil.audioCheck(event, guild, member)) return;
+        if (!AudioUtil.audioCheck(event, guild, member)) return;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
         final AudioManager audioManager = channel.getGuild().getAudioManager();
         if (selfVoiceState.inAudioChannel()) {

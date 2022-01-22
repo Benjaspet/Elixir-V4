@@ -145,11 +145,9 @@ public final class SpotifySourceManager implements AudioSourceManager {
 
     public AudioItem getSearch(String query) throws IOException, ParseException, SpotifyWebApiException {
         var searchResult = spotify.searchTracks(query).build().execute();
-
         if (searchResult.getItems().length == 0) {
             return AudioReference.NO_TRACK;
         }
-
         var tracks = new ArrayList<AudioTrack>();
         for (var item : searchResult.getItems()) {
             tracks.add(SpotifyTrack.of(item, this));
@@ -165,7 +163,6 @@ public final class SpotifySourceManager implements AudioSourceManager {
     public AudioItem getAlbum(String id) throws IOException, ParseException, SpotifyWebApiException {
         var album = spotify.getAlbum(id).build().execute();
         var tracks = new ArrayList<AudioTrack>();
-
         Paging<TrackSimplified> paging = null;
         do {
             paging = spotify.getAlbumsTracks(id).limit(50).offset(paging == null ? 0 : paging.getOffset() + 50).build().execute();
@@ -177,14 +174,12 @@ public final class SpotifySourceManager implements AudioSourceManager {
             }
         }
         while (paging.getNext() != null);
-
         return new BasicAudioPlaylist(album.getName(), tracks, null, false);
     }
 
     public AudioItem getPlaylist(String id) throws IOException, SpotifyWebApiException, ParseException, NullPointerException {
         var playlist = spotify.getPlaylist(id).build().execute();
         var tracks = new ArrayList<AudioTrack>();
-
         Paging<PlaylistTrack> paging = null;
         do {
             paging = spotify.getPlaylistsItems(id).limit(50).offset(paging == null ? 0 : paging.getOffset() + 50).build().execute();
@@ -196,22 +191,17 @@ public final class SpotifySourceManager implements AudioSourceManager {
             }
         }
         while (paging.getNext() != null);
-
         return new BasicAudioPlaylist(playlist.getName(), tracks, null, false);
     }
 
     public AudioItem getArtist(String id) throws IOException, ParseException, SpotifyWebApiException {
         var artist = spotify.getArtist(id).build().execute();
         var artistTracks = spotify.getArtistsTopTracks(id, CountryCode.US).build().execute();
-
         var tracks = new ArrayList<AudioTrack>();
         for (var item : artistTracks) {
-            if (item.getType() != ModelObjectType.TRACK) {
-                continue;
-            }
+            if (item.getType() != ModelObjectType.TRACK) continue;
             tracks.add(SpotifyTrack.of(item, this));
         }
-
         return new BasicAudioPlaylist(artist.getName() + "'s Top Tracks", tracks, null, false);
     }
 

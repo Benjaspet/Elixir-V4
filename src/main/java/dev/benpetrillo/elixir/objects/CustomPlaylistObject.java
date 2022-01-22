@@ -28,8 +28,13 @@ public class CustomPlaylistObject {
 
     private List<PlaylistTrack> tracks;
     private String author;
+    private String id;
 
     public CustomPlaylistObject() {}
+
+    public void setPlaylistId(String id) {
+        this.id = id;
+    }
 
     public void setTracks(List<PlaylistTrack> tracks) {
         this.tracks = tracks;
@@ -47,12 +52,17 @@ public class CustomPlaylistObject {
         return tracks;
     }
 
+    public String getPlaylistId() {
+        return this.id;
+    }
+
     public String getAuthor() {
         return author;
     }
 
     public static DBObject convert(CustomPlaylistObject object) {
-        return new BasicDBObject("creator", object.getAuthor())
+        return new BasicDBObject("playlistId", object.getPlaylistId())
+                .append("author", object.getAuthor())
                 .append("tracks", object.getTracks());
     }
 }

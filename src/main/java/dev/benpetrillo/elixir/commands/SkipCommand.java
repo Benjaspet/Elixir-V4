@@ -41,7 +41,7 @@ public final class SkipCommand implements ApplicationCommand {
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
         final TextChannel channel = event.getTextChannel();
-        if(!AudioUtil.audioCheck(event, guild, member)) return;
+        if (!AudioUtil.audioCheck(event, guild, member)) return;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
         final AudioManager audioManager = channel.getGuild().getAudioManager();
         final AudioPlayer audioPlayer = musicManager.audioPlayer;

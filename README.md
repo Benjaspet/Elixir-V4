@@ -18,8 +18,7 @@
 
 ### Credits
 
-- Lead developer: Ben Petrillo (Eerie6560)
-- Developer: KingRainbow44
+- Developers: Ben Petrillo (Eerie6560), KingRainbow44 (Magix)
 
 ### To-Do List
 

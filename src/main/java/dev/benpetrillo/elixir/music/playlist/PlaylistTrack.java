@@ -30,6 +30,7 @@ import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.Utilities;
 
 public final class PlaylistTrack extends DelegatedAudioTrack {
+
     private final String artworkUrl;
     private final AudioSourceManager sourceManager;
     
@@ -39,7 +40,6 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
                 from.url.contains("youtu") ? Utilities.extractVideoId(from.url) : Utilities.extractSongId(from.url),
                 false, from.url
         ));
-        
         this.artworkUrl = from.coverArt;
         this.sourceManager = sourceManager;
     }
@@ -50,7 +50,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
     
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
-        if(this.getInfo().uri.contains("youtu")) { // YouTube track.
+        if (this.getInfo().uri.contains("youtu")) { // YouTube track.
             processDelegate(new YoutubeAudioTrack(
                     this.trackInfo, (YoutubeAudioSourceManager) this.sourceManager
             ), executor);

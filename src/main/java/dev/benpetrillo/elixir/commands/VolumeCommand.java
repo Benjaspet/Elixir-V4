@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import java.util.Objects;
 
 public final class VolumeCommand implements ApplicationCommand {
+
     private final String name = "volume";
     private final String description = "Set the volume of the player.";
     private final String[] options = {"volume"}; 

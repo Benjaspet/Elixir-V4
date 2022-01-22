@@ -23,6 +23,7 @@ import dev.benpetrillo.elixir.events.MessageListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.events.ShutdownListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
+import dev.benpetrillo.elixir.managers.DatabaseManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.objects.CustomPlaylistObject;
 import net.dv8tion.jda.api.JDA;
@@ -82,6 +83,7 @@ public final class ElixirClient {
                 .build();
         AllowedMentions.setDefaultMentionRepliedUser(false);
         applicationCommandManager = ApplicationCommandManager.initialize(jda);
+        new DatabaseManager();
     }
 
     public ElixirClient getInstance() {
