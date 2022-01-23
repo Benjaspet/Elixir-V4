@@ -99,12 +99,10 @@ public final class TrackUtil {
     @Nullable
     public static AudioTrackInfo getTrackInfoFromUrl(String url) {
         TrackType type = TrackUtil.determineTrackType(url);
-        switch(type) {
+        switch (type) {
             case SPOTIFY -> {
                 Track track = TrackUtil.getTrackDataFromSpotifyURL(url);
-                if(track == null)
-                    return null;
-                
+                if (track == null) return null;
                 return new AudioTrackInfo(
                         track.getName(), track.getArtists()[0].getName(),
                         TimeUnit.MILLISECONDS.toSeconds(track.getDurationMs()),
@@ -113,8 +111,7 @@ public final class TrackUtil {
             }
             case YOUTUBE -> {
                 YTVideoData searchData = HttpUtil.getVideoData(Utilities.extractVideoId(url));
-                if(searchData == null) return null;
-                
+                if (searchData == null) return null;
                 YTVideoData.Item.Snippet query = searchData.items.get(0).snippet;
                 return new AudioTrackInfo(
                         query.title, query.channelTitle, 0,
@@ -122,7 +119,6 @@ public final class TrackUtil {
                         "https://youtu.be/" + searchData.items.get(0).id
                 );
             }
-            
             default -> {
                 return null;
             }
@@ -136,10 +132,8 @@ public final class TrackUtil {
      */
     
     public static TrackType determineTrackType(String url) {
-        if(url.contains("youtu"))
-            return TrackType.YOUTUBE;
-        if(url.contains("spotify"))
-            return TrackType.SPOTIFY;
+        if (url.contains("youtu")) return TrackType.YOUTUBE;
+        if (url.contains("spotify")) return TrackType.SPOTIFY;
         return TrackType.UNKNOWN;
     }
     

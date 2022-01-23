@@ -45,9 +45,7 @@ public final class PlaylistUtil {
      */
     
     public static boolean createPlaylist(String playlistId, Member member) {
-        if(findPlaylist(playlistId) != null)
-            return false;
-        
+        if (findPlaylist(playlistId) != null) return false;
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         dbCollection.insertOne(new Document("playlistId", playlistId)
                 .append("creatorId", member.getId())
@@ -64,9 +62,7 @@ public final class PlaylistUtil {
      */
     
     public static boolean deletePlaylist(String playlistId) {
-        if(findPlaylist(playlistId) == null)
-            return false;
-
+        if (findPlaylist(playlistId) == null) return false;
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         dbCollection.deleteOne(new Document("playlistId", playlistId));
         return true;
@@ -83,9 +79,7 @@ public final class PlaylistUtil {
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         BasicDBObject object = new BasicDBObject("playlistId", playlistId);
         Document document = dbCollection.find(object).first();
-        if(document == null)
-            return null;
-        
+        if (document == null) return null;
         String serializedPlaylistData = document.getString("playlistData");
         return Utilities.deserialize(Utilities.base64Decode(serializedPlaylistData), CustomPlaylist.class);
     }
@@ -109,18 +103,15 @@ public final class PlaylistUtil {
     
     public static List<PlaylistTrack> getTracks(CustomPlaylist playlist) {
         final List<PlaylistTrack> tracks = new ArrayList<>();
-        
-        for(CustomPlaylist.CustomPlaylistTrack track : playlist.tracks) {
+        for (CustomPlaylist.CustomPlaylistTrack track : playlist.tracks) {
             TrackUtil.TrackType trackType = TrackUtil.determineTrackType(track.url);
             AudioSourceManager source = switch (trackType) {
                 case YOUTUBE -> ElixirMusicManager.getInstance().youtubeSource;
                 case SPOTIFY -> ElixirMusicManager.getInstance().spotifySource;
                 default -> throw new IllegalArgumentException("Unsupported track URL: " + track.url);
             };
-
             tracks.add(new PlaylistTrack(track.title, track, source));
         }
-        
         return tracks;
     }
 
@@ -132,12 +123,13 @@ public final class PlaylistUtil {
     
     public static void addTrackToList(AudioTrackInfo track, CustomPlaylist playlist, int index) {
         var newTrack = CustomPlaylist.CustomPlaylistTrack.from(track);
-        if(index == -1)
+        if (index == -1) {
             playlist.tracks.add(newTrack);
-        else try {
-            playlist.tracks.add(index, newTrack);
-        } catch (IndexOutOfBoundsException ignored) { }
-
+        } else {
+            try {
+                playlist.tracks.add(index, newTrack);
+            } catch (IndexOutOfBoundsException ignored) {}
+        }
         updatePlaylist(playlist);
     }
 
@@ -151,10 +143,6 @@ public final class PlaylistUtil {
         playlist.tracks.remove(index);
         updatePlaylist(playlist);
     }
-    
-    /*
-     * Internal Methods
-     */
 
     /**
      * Updates a custom playlist.
@@ -165,14 +153,11 @@ public final class PlaylistUtil {
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         Bson dbObject = new BasicDBObject("playlistId", playlist.info.id);
         Bson playlistObject = dbCollection.find(dbObject).first();
-        if(playlistObject == null)
-            return;
-        
+        if (playlistObject == null) return;
         var newData = Utilities.base64Encode(Utilities.serialize(playlist));
         var update = Updates.set("playlistData", newData);
-        
         try {
             dbCollection.updateOne(dbObject, update, new UpdateOptions().upsert(true));
-        } catch (MongoException ignored) { }
+        } catch (MongoException ignored) {}
     }
 }

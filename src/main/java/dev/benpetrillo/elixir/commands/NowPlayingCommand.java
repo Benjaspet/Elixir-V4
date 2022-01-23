@@ -60,7 +60,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     final AudioTrackInfo info = track.getInfo();
                     final String thumbnail = TrackUtil.getCoverArt(track.getInfo());
                     final String title = info.title.length() > 60 ? info.title.substring(0, 60) + "..." : info.title;
-                    final String duration = info.isStream ? "LIVE" : Utilities.formatDuration(track.getDuration());
+                    final String duration = Utilities.formatDuration(track.getPosition()) + "/" + Utilities.formatDuration(track.getDuration());
                     final String isLive = info.isStream ? "yes" : "no";
                     final String artist = info.author;
                     final String url = info.uri;
@@ -68,7 +68,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     final String contents = """
                             • Artist: %s
                             • Requested by: %s
-                            • Duration: %s                         
+                            • Duration: %s
                             • Livestream: %s
                             """.formatted(artist, requestedBy, duration, isLive);
                     MessageEmbed embed = new EmbedBuilder()

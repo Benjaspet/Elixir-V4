@@ -24,41 +24,22 @@ import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.events.ShutdownListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
-import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.AllowedMentions;
-import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import javax.security.auth.login.LoginException;
-
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 public final class ElixirClient {
     
     public static ApplicationCommandManager applicationCommandManager;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
-
-    static {
-        new Timer().schedule(new TimerTask() {
-            @Override public void run() {
-                try {
-                    SpotifySourceManager.authorize();
-                } catch (IOException | ParseException | SpotifyWebApiException e) {
-                    logger.debug(e.getMessage());
-                }
-            }
-        }, 0L, TimeUnit.MINUTES.toMillis(45));
-    }
 
     public static void main(String[] args) {
         try {

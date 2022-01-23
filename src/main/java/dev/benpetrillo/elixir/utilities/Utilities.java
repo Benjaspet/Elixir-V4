@@ -57,13 +57,7 @@ public final class Utilities {
 
     public static String encodeURIComponent(String str) {
         String result;
-        result = URLEncoder.encode(str, StandardCharsets.UTF_8)
-                .replaceAll("\\+", "%20")
-                .replaceAll("\\%21", "!")
-                .replaceAll("\\%27", "'")
-                .replaceAll("\\%28", "(")
-                .replaceAll("\\%29", ")")
-                .replaceAll("\\%7E", "~");
+        result = URLEncoder.encode(str, StandardCharsets.UTF_8);
         return result;
     }
 
@@ -116,9 +110,8 @@ public final class Utilities {
     public static String prettyPrint(String toPrint) {
         String pass1 = toPrint.toLowerCase();
         String[] lower = pass1.split(" ");
-        
         StringBuilder builder = new StringBuilder();
-        for(String string : lower) {
+        for (String string : lower) {
             String pass2 = string.substring(0, 1).toUpperCase() + string.substring(1);
             builder.append(pass2).append(" ");
         } return builder.toString();

@@ -25,7 +25,6 @@ import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifyTrack;
-import dev.benpetrillo.elixir.music.spotify.SpotifyTrackNotFoundException;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.Utilities;
 
@@ -58,8 +57,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
             ), executor);
         } else { // Spotify track.
             processDelegate(new SpotifyTrack(
-                    this.trackInfo, Utilities.extractSongId(this.getInfo().uri), getArtworkUrl(),
-                    new SpotifySourceManager(this.sourceManager)
+                    this.trackInfo, null, this.trackObject.coverArt, (SpotifySourceManager) this.sourceManager
             ), executor);
         }
     }

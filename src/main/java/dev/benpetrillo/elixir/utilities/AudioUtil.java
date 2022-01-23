@@ -57,6 +57,7 @@ public final class AudioUtil {
     /**
      * Performs a {@link #simpleAudioCheck(Guild, Member)} and replies on failure.
      */
+
     public static boolean audioCheck(SlashCommandEvent event, Guild guild, @Nullable Member member) {
         AudioUtil.FailureReason reason = AudioUtil.simpleAudioCheck(guild, member);
         switch (reason) {
@@ -77,36 +78,34 @@ public final class AudioUtil {
     
     public static FailureReason simplePlayerCheck(Guild guild) {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
-        return musicManager.audioPlayer.getPlayingTrack() == null ? 
-                FailureReason.BOT_IS_NOT_PLAYING : FailureReason.PASSED;
+        return musicManager.audioPlayer.getPlayingTrack() == null ? FailureReason.BOT_IS_NOT_PLAYING : FailureReason.PASSED;
     }
     
     public static boolean playerCheck(SlashCommandEvent event, Guild guild, @Nullable ReturnMessage message) {
-        if(message == null)
+        if (message == null) {
             message = ReturnMessage.NO_QUEUE;
+        }
         AudioUtil.FailureReason reason = AudioUtil.simplePlayerCheck(guild);
-        if(reason == FailureReason.BOT_IS_NOT_PLAYING) {
+        if (reason == FailureReason.BOT_IS_NOT_PLAYING) {
             event.replyEmbeds(EmbedUtil.sendErrorEmbed(message.getContents())).queue();
         } return reason == FailureReason.PASSED;
     }
     
     public enum FailureReason {
         PASSED,
-        
         BOT_IS_NOT_PLAYING,
-        
         BOT_NOT_IN_VOICE_CHANNEL,
         MEMBER_NOT_IN_VOICE_CHANNEL,
-        
         BOT_NOT_IN_SAME_VOICE_CHANNEL
     }
     
     public enum ReturnMessage {
+
         NO_QUEUE("There's no queue in this server."),
         NOT_PLAYING("There is nothing playing.");
-        
+
         private final String contents;
-        
+
         ReturnMessage(String contents) {
             this.contents = contents;
         }
