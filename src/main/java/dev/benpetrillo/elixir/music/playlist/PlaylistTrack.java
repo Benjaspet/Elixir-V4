@@ -54,13 +54,10 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         if (this.getInfo().uri.contains("youtu")) { // YouTube track.
-            processDelegate(new YoutubeAudioTrack(
-                    this.trackInfo, (YoutubeAudioSourceManager) this.sourceManager
-            ), executor);
+            processDelegate(new YoutubeAudioTrack(this.trackInfo, (YoutubeAudioSourceManager) this.sourceManager), executor);
         } else { // Spotify track.
-            processDelegate(new SpotifyTrack(
-                    this.trackInfo, Utilities.extractSongId(this.getInfo().uri), getArtworkUrl(), (SpotifySourceManager) this.sourceManager
-            ), executor);
+            processDelegate(new SpotifyTrack(this.trackInfo, Utilities.extractSongId(this.getInfo().uri),
+                    getArtworkUrl(), (SpotifySourceManager) this.sourceManager), executor);
         }
     }
 
