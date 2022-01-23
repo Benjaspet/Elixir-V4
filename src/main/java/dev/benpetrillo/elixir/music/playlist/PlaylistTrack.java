@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.music.playlist;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.DelegatedAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
@@ -33,6 +34,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
 
     private final String artworkUrl;
     private final AudioSourceManager sourceManager;
+    private final CustomPlaylist.CustomPlaylistTrack trackObject;
     
     public PlaylistTrack(String title, CustomPlaylist.CustomPlaylistTrack from, AudioSourceManager sourceManager) {
         super(new AudioTrackInfo(
@@ -42,6 +44,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
         ));
         this.artworkUrl = from.coverArt;
         this.sourceManager = sourceManager;
+        this.trackObject = from;
     }
     
     public String getArtworkUrl() {
@@ -59,5 +62,10 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
                     this.trackInfo, Utilities.extractSongId(this.getInfo().uri), getArtworkUrl(), (SpotifySourceManager) this.sourceManager
             ), executor);
         }
+    }
+
+    @Override
+    protected AudioTrack makeShallowClone() {
+        return new PlaylistTrack(this.trackInfo.title, this.trackObject, this.sourceManager);
     }
 }

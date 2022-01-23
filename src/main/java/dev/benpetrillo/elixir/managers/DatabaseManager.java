@@ -37,7 +37,7 @@ public final class DatabaseManager {
 
     private void init() {
         mongoClient = new MongoClient(new MongoClientURI(Config.get("MONGO-URI")));
-        database = mongoClient.getDatabase("elixir");
+        database = mongoClient.getDatabase("Elixir");
         playlists = database.getCollection("playlists");
         ElixirClient.logger.info("Database loaded successfully.");
     }

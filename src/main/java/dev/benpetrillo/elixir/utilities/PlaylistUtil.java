@@ -25,6 +25,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
@@ -38,6 +39,33 @@ import java.util.List;
 import java.util.Map;
 
 public final class PlaylistUtil {
+
+    /**
+     * Create a custom playlist.
+     * @param playlistId The playlist ID.
+     * @return If the playlist was created.
+     */
+    
+    public static boolean createPlaylist(String playlistId) {
+        if(findPlaylist(playlistId) != null)
+            return false;
+        // TODO: Create the playlist.
+        return true;
+    }
+    
+    /**
+     * Deletes a custom playlist.
+     * @param playlistId The playlist ID.
+     * @return If the playlist was deleted.
+     */
+    
+    public static boolean deletePlaylist(String playlistId) {
+        if(findPlaylist(playlistId) == null)
+            return false;
+        // TODO: Delete the playlist.
+        return true;
+    }
+
     /**
      * Get a custom playlist object by ID.
      * @param playlistId The playlist ID to get.
@@ -49,9 +77,11 @@ public final class PlaylistUtil {
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         BasicDBObject object = new BasicDBObject("playlistId", playlistId);
         Document document = dbCollection.find(object).first();
-        assert document != null;
+        if(document == null)
+            return null;
+        
         String serializedPlaylistData = document.getString("playlistData");
-        return Utilities.deserialize(serializedPlaylistData, CustomPlaylist.class);
+        return Utilities.deserialize(Utilities.base64Decode(serializedPlaylistData), CustomPlaylist.class);
     }
 
     /**
@@ -74,16 +104,15 @@ public final class PlaylistUtil {
     public static List<PlaylistTrack> getTracks(CustomPlaylist playlist) {
         final List<PlaylistTrack> tracks = new ArrayList<>();
         
-        for(Map.Entry<String, CustomPlaylist.CustomPlaylistTrack> entry : playlist.tracks.entrySet()) {
-            CustomPlaylist.CustomPlaylistTrack track = entry.getValue();
+        for(CustomPlaylist.CustomPlaylistTrack track : playlist.tracks) {
             TrackUtil.TrackType trackType = TrackUtil.determineTrackType(track.url);
             AudioSourceManager source = switch (trackType) {
                 case YOUTUBE -> ElixirMusicManager.getInstance().youtubeSource;
                 case SPOTIFY -> ElixirMusicManager.getInstance().spotifySource;
                 default -> throw new IllegalArgumentException("Unsupported track URL: " + track.url);
             };
-            
-            tracks.add(new PlaylistTrack(entry.getKey(), track, source));
+
+            tracks.add(new PlaylistTrack(track.title, track, source));
         }
         
         return tracks;
@@ -95,10 +124,43 @@ public final class PlaylistUtil {
      * @param playlist The playlist to add the track to.
      */
     
-    public static void addTrackToList(AudioTrack track, CustomPlaylist playlist) {
-        playlist.tracks.put(track.getInfo().title, CustomPlaylist.CustomPlaylistTrack.from(track.getInfo()));
+    public static void addTrackToList(AudioTrackInfo track, CustomPlaylist playlist, int index) {
+        var newTrack = CustomPlaylist.CustomPlaylistTrack.from(track);
+        if(index == -1)
+            playlist.tracks.add(newTrack);
+        else try {
+            playlist.tracks.add(index, newTrack);
+        } catch (IndexOutOfBoundsException ignored) { }
 
-        var newData = Utilities.serialize(playlist);
-        // TODO: Set data for the playlist to newData.
+        updatePlaylist(playlist);
+    }
+
+    /**
+     * Removes a track from a custom playlist.
+     * @param index The track to remove.
+     * @param playlist The playlist to remove the track from.
+     */
+    
+    public static void removeTrackFromList(int index, CustomPlaylist playlist) {
+        playlist.tracks.remove(index);
+        updatePlaylist(playlist);
+    }
+    
+    /*
+     * Internal Methods
+     */
+
+    /**
+     * Updates a custom playlist.
+     * @param playlist The playlist to update.
+     */
+    
+    private static void updatePlaylist(CustomPlaylist playlist) {
+        var newData = Utilities.base64Encode(Utilities.serialize(playlist));
+        MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
+        BasicDBObject object = new BasicDBObject("playlistId", playlist.info.id);
+        Document document = dbCollection.find(object).first();
+        if(document == null) return;
+        document.put("playlistData", newData);
     }
 }

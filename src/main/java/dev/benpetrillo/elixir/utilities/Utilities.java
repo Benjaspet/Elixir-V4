@@ -27,6 +27,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 
 public final class Utilities {
 
@@ -141,5 +142,25 @@ public final class Utilities {
     
     public static String serialize(Object object) {
         return new Gson().toJson(object);
+    }
+
+    /**
+     * Encode a string to Base64
+     * @param toEncode The string to encode.
+     * @return A Base64 encoded string.
+     */
+    
+    public static String base64Encode(String toEncode) {
+        return Base64.getUrlEncoder().encodeToString(toEncode.getBytes());
+    }
+
+    /**
+     * Decode a Base64 string.
+     * @param toDecode The string to decode.
+     * @return A decoded string.
+     */
+    
+    public static String base64Decode(String toDecode) {
+        return new String(Base64.getUrlDecoder().decode(toDecode));
     }
 }

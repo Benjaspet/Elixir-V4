@@ -7,14 +7,15 @@
     "author": "(discord snowflake)"
   },
   
-  "tracks": {
-    "(track title)": {
+  "tracks": [
+    {
+      "title": "(track title)",
       "url": "https://www.youtube.com/watch?v=tntOCGkgt98",
       "artist": "(track artist)",
       "coverArt": "https://i.ytimg.com/vi/tntOCGkgt98/hqdefault.jpg",
       "duration": 0
     }
-  },
+  ],
   
   "options": {
     "shuffle": true,

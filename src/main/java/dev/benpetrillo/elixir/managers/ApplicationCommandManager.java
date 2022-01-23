@@ -55,6 +55,7 @@ public final class ApplicationCommandManager {
                 new NowPlayingCommand(),
                 new PauseCommand(),
                 new PlayCommand(),
+                new PlaylistCommand(),
                 new QueueCommand(),
                 new ResumeCommand(),
                 new SkipCommand(),

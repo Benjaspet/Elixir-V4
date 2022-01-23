@@ -27,7 +27,9 @@ import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public final class TrackUtil {
 
@@ -62,6 +64,69 @@ public final class TrackUtil {
             return data != null ? data.items.get(0).snippet.thumbnails.get("default").get("url") : null;
         }
         return null;
+    }
+
+    /**
+     * Get track data from a Spotify URL.
+     * @param url The Spotify URL.
+     * @return Track
+     */
+    
+    public static Track getTrackDataFromSpotifyURL(String url) {
+        try {
+            String[] firstSplit = url.split("/");
+            String[] secondSplit; String id;
+            if (firstSplit.length > 5) {
+                secondSplit = firstSplit[6].split("\\?");
+            } else {
+                secondSplit = firstSplit[4].split("\\?");
+            }
+            id = secondSplit[0];
+            GetTrackRequest trackRequest = SpotifySourceManager.getSpotify().getTrack(id).build();
+            return trackRequest.execute();
+        } catch (SpotifyWebApiException | IOException | ParseException | NullPointerException exception) {
+            exception.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Creates an {@link AudioTrackInfo} object from a given URL.
+     * @param url The URL to fetch information from.
+     * @return An AudioTrackInfo object.
+     */
+    
+    @Nullable
+    public static AudioTrackInfo getTrackInfoFromUrl(String url) {
+        TrackType type = TrackUtil.determineTrackType(url);
+        switch(type) {
+            case SPOTIFY -> {
+                Track track = TrackUtil.getTrackDataFromSpotifyURL(url);
+                if(track == null)
+                    return null;
+                
+                return new AudioTrackInfo(
+                        track.getName(), track.getArtists()[0].getName(),
+                        TimeUnit.MILLISECONDS.toSeconds(track.getDurationMs()),
+                        track.getId(), false, track.getUri()
+                );
+            }
+            case YOUTUBE -> {
+                YTVideoData searchData = HttpUtil.getVideoData(Utilities.extractVideoId(url));
+                if(searchData == null) return null;
+                
+                YTVideoData.Item.Snippet query = searchData.items.get(0).snippet;
+                return new AudioTrackInfo(
+                        query.title, query.channelTitle, 0,
+                        searchData.items.get(0).id, false,
+                        "https://youtu.be/" + searchData.items.get(0).id
+                );
+            }
+            
+            default -> {
+                return null;
+            }
+        }
     }
 
     /**

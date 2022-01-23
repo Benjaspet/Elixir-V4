@@ -64,8 +64,8 @@ public final class ElixirClient {
     public static void main(String[] args) {
         try {
             new ElixirClient(Config.get("TOKEN"));
-        } catch (LoginException | IllegalArgumentException | IOException ignored) {
-            logger.error("Unable to initiate Elixir Music. Is the token valid?");
+        } catch (LoginException | IllegalArgumentException | IOException exception) {
+            logger.error("Unable to initiate Elixir Music. Is the token valid?", exception);
         }
     }
 

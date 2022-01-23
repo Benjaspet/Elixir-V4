@@ -21,11 +21,11 @@ package dev.benpetrillo.elixir.types;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 
-import java.util.Map;
+import java.util.List;
 
 public final class CustomPlaylist {
     public Info info;
-    public Map<String, CustomPlaylistTrack> tracks;
+    public List<CustomPlaylistTrack> tracks;
     public Options options;
     
     public static class Info {
@@ -33,11 +33,12 @@ public final class CustomPlaylist {
     }
     
     public static class CustomPlaylistTrack {
-        public String url, artist, coverArt;
+        public String title, url, artist, coverArt;
         public long duration;
         
         public static CustomPlaylistTrack from(AudioTrackInfo info) {
             var track = new CustomPlaylistTrack();
+            track.title = info.title;
             track.url = info.uri;
             track.artist = info.author;
             track.coverArt = TrackUtil.getCoverArt(info);
