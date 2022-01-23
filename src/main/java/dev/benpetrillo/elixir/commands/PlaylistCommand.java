@@ -18,6 +18,8 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
@@ -25,10 +27,8 @@ import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.*;
-import net.dv8tion.jda.api.entities.AudioChannel;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -36,10 +36,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class PlaylistCommand implements ApplicationCommand {
@@ -166,9 +163,27 @@ public final class PlaylistCommand implements ApplicationCommand {
                 case "fetch":
                     assert playlist != null;
                     tracks = PlaylistUtil.getTracks(playlist);
-                    
-                    // TODO: Make a fancy queue page.
-                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("¯\\_(ツ)_/¯")).queue();
+                    StringBuilder description = new StringBuilder();
+                    int maxAmount = Math.min(tracks.size(), 12);
+                    for (int i = 0; i < maxAmount; i++) {
+                        final AudioTrack playlistTrack = tracks.get(i);
+                        final AudioTrackInfo info = playlistTrack.getInfo();
+                        String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
+                        String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
+                        description.append(formattedString).append("\n");
+                    }
+                    if (tracks.size() > maxAmount) {
+                        description.append("\n").append(String.format("...and %s more tracks.", tracks.size() - maxAmount));
+                    }
+                    MessageEmbed embed = new EmbedBuilder()
+                            .setTitle(playlist.info.name)
+                            .setColor(EmbedUtil.getDefaultEmbedColor())
+                            .setDescription("Author: " + playlist.info.author)
+                            .addField("Sample Tracks", String.valueOf(description), false)
+                            .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
+                            .setTimestamp(new Date().toInstant())
+                            .build();
+                    hook.editOriginalEmbeds(embed).queue();
                     break;
             }
         });

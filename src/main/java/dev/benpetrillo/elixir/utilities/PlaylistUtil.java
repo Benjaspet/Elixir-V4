@@ -20,7 +20,6 @@ package dev.benpetrillo.elixir.utilities;
 
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;

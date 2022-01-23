@@ -19,8 +19,13 @@
 package dev.benpetrillo.elixir.music.playlist;
 
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
+import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
+import dev.benpetrillo.elixir.music.spotify.SpotifyTrack;
+import dev.benpetrillo.elixir.music.spotify.SpotifyTrackNotFoundException;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.Utilities;
 
@@ -48,9 +53,14 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         if (this.getInfo().uri.contains("youtu")) { // YouTube track.
-            
+            processDelegate(new YoutubeAudioTrack(
+                    this.trackInfo, (YoutubeAudioSourceManager) this.sourceManager
+            ), executor);
         } else { // Spotify track.
-            
+            processDelegate(new SpotifyTrack(
+                    this.trackInfo, Utilities.extractSongId(this.getInfo().uri), getArtworkUrl(),
+                    new SpotifySourceManager(this.sourceManager)
+            ), executor);
         }
     }
 

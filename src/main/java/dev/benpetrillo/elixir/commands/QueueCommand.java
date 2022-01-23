@@ -28,7 +28,6 @@ import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -65,7 +64,7 @@ public final class QueueCommand implements ApplicationCommand {
                 for (int i = 0; i < maxAmount; i++) {
                     final AudioTrack track = arrayQueue.get(i);
                     final AudioTrackInfo info = track.getInfo();
-                    String title = info.title.length() > 60 ? info.title.substring(0, 57) + "..." : info.title;
+                    String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
                     String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
                     description
                             .append(formattedString)
@@ -76,11 +75,14 @@ public final class QueueCommand implements ApplicationCommand {
                             .append("\n")
                             .append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
                 }
-                final String queueData = "• Tracks queued: %s\n• Loop mode: %s".formatted(queue.size(), Utilities.prettyPrint(musicManager.scheduler.repeating.toString()));
+                final String nowPlayingTitle = nowPlaying.getInfo().title;
+                final String nowPlayingTrimmed = nowPlayingTitle.length() > 55 ? nowPlayingTitle.substring(0, 52) + "..." : nowPlayingTitle;
+                final String queueData = "• Tracks queued: %s\n• Loop mode: %s\n• Volume: %s".formatted(
+                        queue.size(), Utilities.prettyPrint(musicManager.scheduler.repeating.toString()), musicManager.audioPlayer.getVolume());
                 MessageEmbed embed = new EmbedBuilder()
                         .setTitle("Guild Queue")
                         .setColor(EmbedUtil.getDefaultEmbedColor())
-                        .setAuthor("Now Playing: " + nowPlaying.getInfo().title, nowPlaying.getInfo().uri)
+                        .setAuthor("Now Playing: " + nowPlayingTrimmed, nowPlaying.getInfo().uri)
                         .setThumbnail(thumbnail)
                         .setDescription(description)
                         .addField("Queue Data", queueData, false)
