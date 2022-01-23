@@ -18,13 +18,12 @@
 
 package dev.benpetrillo.elixir.utilities;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
@@ -32,11 +31,11 @@ import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import net.dv8tion.jda.api.entities.Member;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public final class PlaylistUtil {
 
@@ -46,10 +45,16 @@ public final class PlaylistUtil {
      * @return If the playlist was created.
      */
     
-    public static boolean createPlaylist(String playlistId) {
+    public static boolean createPlaylist(String playlistId, Member member) {
         if(findPlaylist(playlistId) != null)
             return false;
-        // TODO: Create the playlist.
+        
+        MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
+        dbCollection.insertOne(new Document("playlistId", playlistId)
+                .append("creatorId", member.getId())
+                .append("playlistData", Utilities.base64Encode(Utilities.serialize(
+                        CustomPlaylist.create(playlistId, member)
+                ))));
         return true;
     }
     
@@ -62,7 +67,9 @@ public final class PlaylistUtil {
     public static boolean deletePlaylist(String playlistId) {
         if(findPlaylist(playlistId) == null)
             return false;
-        // TODO: Delete the playlist.
+
+        MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
+        dbCollection.deleteOne(new Document("playlistId", playlistId));
         return true;
     }
 
@@ -141,7 +148,7 @@ public final class PlaylistUtil {
      * @param playlist The playlist to remove the track from.
      */
     
-    public static void removeTrackFromList(int index, CustomPlaylist playlist) {
+    public static void removeTrackFromList(int index, CustomPlaylist playlist) throws IndexOutOfBoundsException {
         playlist.tracks.remove(index);
         updatePlaylist(playlist);
     }
@@ -156,11 +163,17 @@ public final class PlaylistUtil {
      */
     
     private static void updatePlaylist(CustomPlaylist playlist) {
-        var newData = Utilities.base64Encode(Utilities.serialize(playlist));
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
-        BasicDBObject object = new BasicDBObject("playlistId", playlist.info.id);
-        Document document = dbCollection.find(object).first();
-        if(document == null) return;
-        document.put("playlistData", newData);
+        Bson dbObject = new BasicDBObject("playlistId", playlist.info.id);
+        Bson playlistObject = dbCollection.find(dbObject).first();
+        if(playlistObject == null)
+            return;
+        
+        var newData = Utilities.base64Encode(Utilities.serialize(playlist));
+        var update = Updates.set("playlistData", newData);
+        
+        try {
+            dbCollection.updateOne(dbObject, update, new UpdateOptions().upsert(true));
+        } catch (MongoException ignored) { }
     }
 }

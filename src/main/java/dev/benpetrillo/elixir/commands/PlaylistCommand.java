@@ -18,18 +18,29 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import dev.benpetrillo.elixir.music.TrackScheduler;
+import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.*;
+import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class PlaylistCommand implements ApplicationCommand {
 
@@ -39,6 +50,8 @@ public final class PlaylistCommand implements ApplicationCommand {
     private final String[] optionDescriptions = {"The playlist ID.", "The track to add.", "The index of the track."};
     private final String[] subCommands = {"addtrack", "removetrack", "queue", "create", "delete", "fetch"};
     private final String[] subCommandDescriptions = {"Add a track to the playlist.", "Remove a track from the playlist.", "Queue a track to the playlist.", "Create a new playlist.", "Delete a playlist.", "Fetch a playlist."};
+    
+    private final List<String> ignore = List.of("create");
 
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
@@ -47,22 +60,24 @@ public final class PlaylistCommand implements ApplicationCommand {
         
         event.deferReply().queue(hook -> {
             CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
+            String track; int index; List<PlaylistTrack> tracks;
 
-            if(playlist == null) {
+            if(playlist == null && !this.ignore.contains(subCommand)) {
                 hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`.")).queue();
                 return;
             }
 
             switch(subCommand) {
                 case "addtrack":
+                    assert playlist != null;
                     if(!PlaylistUtil.isAuthor(playlist, member)) {
                         hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You are not the author of this playlist.")).queue();
                         return;
                     }
 
-                    String track = Objects.requireNonNull(event.getOption("track")).getAsString();
+                    track = Objects.requireNonNull(event.getOption("track")).getAsString();
                     OptionMapping indexMapping = event.getOption("index");
-                    long index = indexMapping == null ? -1 : indexMapping.getAsLong();
+                    index = indexMapping == null ? -1 : (int) indexMapping.getAsLong();
 
                     if(!Utilities.isValidURL(track)) {
                         try {
@@ -70,8 +85,90 @@ public final class PlaylistCommand implements ApplicationCommand {
                         } catch (Exception ignored) { return; }
                     }
 
-                    PlaylistUtil.addTrackToList(TrackUtil.getTrackInfoFromUrl(track), playlist, (int) index);
-                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully added track to playlist.")).queue();
+                    var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
+                    if(trackInfo == null) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Unable to find a track with the URL `" + track + "`.")).queue();
+                        return;
+                    }
+                    PlaylistUtil.addTrackToList(trackInfo, playlist, index);
+                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully added %s to playlist.".formatted(trackInfo.title))).queue();
+                    break;
+                case "removetrack":
+                    assert playlist != null;
+                    if(!PlaylistUtil.isAuthor(playlist, member)) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You are not the author of this playlist.")).queue();
+                        return;
+                    }
+
+                    index = (int) Objects.requireNonNull(event.getOption("index")).getAsLong();
+                    try {
+                        PlaylistUtil.removeTrackFromList(index, playlist);
+                        hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully removed track from playlist.")).queue();
+                    } catch (IndexOutOfBoundsException ignored) { 
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("That track doesn't exist.")).queue();
+                    }
+                    break;
+                case "queue":
+                    final GuildVoiceState memberVoiceState = member.getVoiceState(); assert memberVoiceState != null;
+                    if(!memberVoiceState.inAudioChannel()) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to queue tracks.")).queue();
+                        return;
+                    }
+
+                    final GuildVoiceState voiceState = guild.getSelfMember().getVoiceState(); assert voiceState != null;
+                    final AudioManager audioManager = guild.getAudioManager();
+                    final AudioChannel audioChannel = Objects.requireNonNull(member.getVoiceState()).getChannel();
+                    if (!voiceState.inAudioChannel()) {
+                        audioManager.openAudioConnection(audioChannel);
+                        audioManager.setSelfDeafened(true);
+                    }
+                    
+                    assert playlist != null;
+                    GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
+                    tracks = PlaylistUtil.getTracks(playlist);
+                    
+                    if(
+                            musicManager.scheduler.queue.isEmpty() &&
+                            musicManager.audioPlayer.getPlayingTrack() == null
+                    ) {
+                        musicManager.scheduler.repeating = 
+                                playlist.options.repeat ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
+                        if(playlist.options.shuffle)
+                            Collections.shuffle(tracks);
+                    }
+                    musicManager.scheduler.getQueue().addAll(tracks);
+                    if(musicManager.audioPlayer.getPlayingTrack() == null)
+                        musicManager.scheduler.nextTrack();
+                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully queued %s.".formatted(playlist.info.name))).queue();
+                    break;
+                case "create":
+                    if(!PlaylistUtil.createPlaylist(playlistId, member)) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("A playlist with id `" + playlistId + "` already exists.")).queue();
+                        return;
+                    }
+                    
+                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully created a playlist with id `" + playlistId + "`.")).queue();
+                    break;
+                case "delete":
+                    if(playlist == null) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("A playlist with id `" + playlistId + "` doesn't exist.")).queue();
+                        return;
+                    }
+
+                    if(!PlaylistUtil.isAuthor(playlist, member)) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You are not the author of this playlist.")).queue();
+                        return;
+                    }
+
+                    PlaylistUtil.deletePlaylist(playlistId);
+                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully deleted playlist " + playlist.info.name + ".")).queue();
+                    break;
+                case "fetch":
+                    assert playlist != null;
+                    tracks = PlaylistUtil.getTracks(playlist);
+                    
+                    // TODO: Make a fancy queue page.
+                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("¯\\_(ツ)_/¯")).queue();
                     break;
             }
         });
