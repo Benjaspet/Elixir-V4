@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class OAuthUpdateTask {
 
-    static {
+    public OAuthUpdateTask() {
         new Timer().schedule(new TimerTask() {
             @Override public void run() {
                 try {

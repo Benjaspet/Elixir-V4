@@ -24,6 +24,7 @@ import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.events.ShutdownListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
+import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -64,6 +65,7 @@ public final class ElixirClient {
         AllowedMentions.setDefaultMentionRepliedUser(false);
         applicationCommandManager = ApplicationCommandManager.initialize(jda);
         new DatabaseManager();
+        new OAuthUpdateTask();
     }
 
     public ElixirClient getInstance() {

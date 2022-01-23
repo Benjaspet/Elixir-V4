@@ -19,16 +19,21 @@
 package dev.benpetrillo.elixir.commands;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.TrackUtil;
+import dev.benpetrillo.elixir.utilities.Utilities;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.util.Date;
 import java.util.Objects;
 
 public final class SkipCommand implements ApplicationCommand {
@@ -57,8 +62,30 @@ public final class SkipCommand implements ApplicationCommand {
             MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
             event.replyEmbeds(embed).queue();
         }
+        assert musicManager.scheduler.queue.peek() != null;
+        AudioTrack upNext = musicManager.scheduler.queue.peek();
         musicManager.scheduler.nextTrack();
-        MessageEmbed embed = EmbedUtil.sendDefaultEmbed("Skipping to the next track...");
+        final String title = upNext.getInfo().title.length() > 60 ? upNext.getInfo().title.substring(0, 60) + "..." : upNext.getInfo().title;
+        final String duration = Utilities.formatDuration(upNext.getPosition()) + "/" + Utilities.formatDuration(upNext.getDuration());
+        final String isLive = upNext.getInfo().isStream ? "yes" : "no";
+        final String artist = upNext.getInfo().author;
+        final String url = upNext.getInfo().uri;
+        final String requestedBy = member.getAsMention();
+        final String contents = """
+                            • Artist: %s
+                            • Requested by: %s
+                            • Duration: %s
+                            • Livestream: %s
+                            """.formatted(artist, requestedBy, duration, isLive);
+        MessageEmbed embed = new EmbedBuilder()
+                .setTitle("Up Next")
+                .setDescription("[%s](%s)".formatted(upNext.getInfo().title, upNext.getInfo().uri))
+                .setColor(EmbedUtil.getDefaultEmbedColor())
+                .setThumbnail(TrackUtil.getCoverArt(upNext.getInfo()))
+                .addField("Track Data", contents, false)
+                .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
+                .setTimestamp(new Date().toInstant())
+                .build();
         event.replyEmbeds(embed).queue();
     }
 
