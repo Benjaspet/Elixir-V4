@@ -68,9 +68,12 @@ public final class SkipCommand implements ApplicationCommand {
         final long skipTo = mapping == null ? 1 : mapping.getAsLong();
         assert musicManager.scheduler.queue.peek() != null;
         AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
-        for(int i = 0; i < skipTo; i++) {
+        for (int i = 0; i < skipTo; i++) {
             musicManager.scheduler.nextTrack();
-        }   
+        }
+        if (audioPlayer.getPlayingTrack().getInfo().isStream) {
+            musicManager.forceSkippedLivestream = true;
+        }
         final String title = upNext.getInfo().title.length() > 60 ? upNext.getInfo().title.substring(0, 60) + "..." : upNext.getInfo().title;
         final String duration = Utilities.formatDuration(upNext.getDuration());
         final String isLive = upNext.getInfo().isStream ? "yes" : "no";
