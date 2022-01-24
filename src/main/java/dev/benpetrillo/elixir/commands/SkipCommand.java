@@ -30,6 +30,8 @@ import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -39,9 +41,9 @@ import java.util.Objects;
 public final class SkipCommand implements ApplicationCommand {
 
     private final String name = "skip";
-    private final String description = "Skip to the next track in the queue.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
+    private final String description = "Skip to a specified track in the queue.";
+    private final String[] options = {"track"};
+    private final String[] optionDescriptions = {"The track to skip to."};
 
     @Override
     public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
@@ -62,9 +64,13 @@ public final class SkipCommand implements ApplicationCommand {
             MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
             event.replyEmbeds(embed).queue();
         }
+        final OptionMapping mapping = event.getOption("track");
+        final long skipTo = mapping == null ? 1 : mapping.getAsLong();
         assert musicManager.scheduler.queue.peek() != null;
-        AudioTrack upNext = musicManager.scheduler.queue.peek();
-        musicManager.scheduler.nextTrack();
+        AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
+        for(int i = 0; i < skipTo; i++) {
+            musicManager.scheduler.nextTrack();
+        }   
         final String title = upNext.getInfo().title.length() > 60 ? upNext.getInfo().title.substring(0, 60) + "..." : upNext.getInfo().title;
         final String duration = Utilities.formatDuration(upNext.getDuration());
         final String isLive = upNext.getInfo().isStream ? "yes" : "no";
@@ -101,6 +107,7 @@ public final class SkipCommand implements ApplicationCommand {
 
     @Override
     public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+        return new CommandData(this.name, this.description)
+                .addOption(OptionType.INTEGER, this.options[0], this.optionDescriptions[0], false);
     }
 }
