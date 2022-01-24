@@ -60,7 +60,7 @@ public final class ElixirClient {
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         JDA jda = JDABuilder.createDefault(token)
-                .setActivity(Activity.listening(Config.get("ACTIVITY")))
+                .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
                 .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
                 .setAutoReconnect(true)
@@ -68,7 +68,7 @@ public final class ElixirClient {
                 .setHttpClient(new OkHttpClient())
                 .setVoiceDispatchInterceptor(new ElixirVoiceDispatchInterceptor())
                 .setBulkDeleteSplittingEnabled(true)
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
                         new ApplicationCommandListener(),

@@ -27,6 +27,7 @@ public final class ElixirConstants {
     public static String[] OWNERS = Config.get("OWNERS").split(",");
     public static String[] GUILDS = Config.get("GUILDS").split(",");
     public static String VERSION = Config.get("VERSION");
+    public static String ACTIVITY = Config.get("ACTIVITY");
     public static String YOUTUBE_API_KEY = Config.get("YOUTUBE-API-KEY");
     public static String MONGO_URI = Config.get("MONGO-URI");
     public static String SPOTIFY_CLIENT_ID = Config.get("SPOTIFY-CLIENT-ID");

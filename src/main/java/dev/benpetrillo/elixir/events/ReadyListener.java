@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.events;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -34,8 +35,7 @@ public final class ReadyListener extends ListenerAdapter {
     public void onReady(@NotNull ReadyEvent event) {
         JDA jda = event.getJDA();
         ElixirClient.getLogger().info("{} has logged in.", event.getJDA().getSelfUser().getAsTag());
-        String[] guildIds = Config.get("GUILD-ID").split(",");
-        for (String id : guildIds) {
+        for (String id : ElixirConstants.GUILDS) {
             Guild guild = jda.getGuildById(id);
             if (guild != null) {
                 if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
@@ -45,12 +45,12 @@ public final class ReadyListener extends ListenerAdapter {
                     }
                     commands.queue();
                     ElixirClient.getLogger().info("All guild slash commands have been deployed.");
-                } else if (Boolean.parseBoolean(Config.get("DELETE-GUILD"))) {
+                } else if (Boolean.parseBoolean(Config.get("DELETE-APPLICATION-COMMANDS-GUILD"))) {
                     guild.updateCommands().addCommands().queue();
                     ElixirClient.getLogger().info("All guild slash commands have been deleted.");
                 }
             } else {
-                ElixirClient.logger.error("An error occurred while deploying guild slash commands.");
+                ElixirClient.getLogger().error("An error occurred while deploying guild slash commands.");
             }
         }
     }
