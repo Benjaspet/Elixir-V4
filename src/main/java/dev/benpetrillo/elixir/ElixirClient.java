@@ -62,11 +62,9 @@ public final class ElixirClient {
         JDA jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
-                .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
                 .setAutoReconnect(true)
                 .setIdle(false)
                 .setHttpClient(new OkHttpClient())
-                .setVoiceDispatchInterceptor(new ElixirVoiceDispatchInterceptor())
                 .setBulkDeleteSplittingEnabled(true)
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .setWebsocketFactory(new WebSocketFactory())
@@ -91,6 +89,7 @@ public final class ElixirClient {
         AllowedMentions.setDefaultMentionRepliedUser(false);
         applicationCommandManager = ApplicationCommandManager.initialize(jda);
         OAuthUpdateTask.schedule(); DatabaseManager.create();
+        new ElixirVoiceDispatchInterceptor();
     }
 
     public static Logger getLogger() {
