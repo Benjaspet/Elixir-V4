@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public final class AudioUtil {
 
@@ -38,17 +39,17 @@ public final class AudioUtil {
 
     public static FailureReason simpleAudioCheck(Guild guild, @Nullable Member member) {
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState(); assert selfVoiceState != null;
-        if(member == null) {
+        if (member == null) {
             return selfVoiceState.inAudioChannel() ? FailureReason.PASSED : FailureReason.BOT_NOT_IN_VOICE_CHANNEL;
         } else {
             final GuildVoiceState memberVoiceState = member.getVoiceState(); assert memberVoiceState != null;
-            if(!memberVoiceState.inAudioChannel()) {
+            if (!memberVoiceState.inAudioChannel()) {
                 return FailureReason.MEMBER_NOT_IN_VOICE_CHANNEL;
             }
-            if(!selfVoiceState.inAudioChannel()) {
+            if (!selfVoiceState.inAudioChannel()) {
                 return FailureReason.BOT_NOT_IN_VOICE_CHANNEL;
             }
-            if(!selfVoiceState.getChannel().equals(memberVoiceState.getChannel())) {
+            if (!Objects.equals(selfVoiceState.getChannel(), memberVoiceState.getChannel())) {
                 return FailureReason.BOT_NOT_IN_SAME_VOICE_CHANNEL;
             } return FailureReason.PASSED;
         }

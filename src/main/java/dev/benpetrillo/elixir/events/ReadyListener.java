@@ -33,20 +33,21 @@ public final class ReadyListener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         JDA jda = event.getJDA();
-        ElixirClient.logger.info("{} has logged in.", event.getJDA().getSelfUser().getAsTag());
+        ElixirClient.getLogger().info("{} has logged in.", event.getJDA().getSelfUser().getAsTag());
         String[] guildIds = Config.get("GUILD-ID").split(",");
         for (String id : guildIds) {
             Guild guild = jda.getGuildById(id);
             if (guild != null) {
                 if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
                     CommandListUpdateAction commands = guild.updateCommands();
-                    for(ApplicationCommand command : ElixirClient.applicationCommandManager.commands.values())
+                    for (ApplicationCommand command : ElixirClient.applicationCommandManager.commands.values()) {
                         commands = commands.addCommands(command.getCommandData());
+                    }
                     commands.queue();
-                    ElixirClient.logger.info("All guild slash commands have been deployed.");
+                    ElixirClient.getLogger().info("All guild slash commands have been deployed.");
                 } else if (Boolean.parseBoolean(Config.get("DELETE-GUILD"))) {
                     guild.updateCommands().addCommands().queue();
-                    ElixirClient.logger.info("All guild slash commands have been deleted.");
+                    ElixirClient.getLogger().info("All guild slash commands have been deleted.");
                 }
             } else {
                 ElixirClient.logger.error("An error occurred while deploying guild slash commands.");

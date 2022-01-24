@@ -21,14 +21,12 @@
 package dev.benpetrillo.elixir.utilities;
 
 import com.google.gson.Gson;
-import dev.benpetrillo.elixir.ElixirClient;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Base64;
 
 public final class Utilities {

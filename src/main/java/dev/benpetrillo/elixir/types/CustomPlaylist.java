@@ -19,6 +19,7 @@
 package dev.benpetrillo.elixir.types;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import net.dv8tion.jda.api.entities.Member;
 
@@ -26,16 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class CustomPlaylist {
+
     public static CustomPlaylist create(String playlistId, Member creator) {
         var playlist = new CustomPlaylist();
         playlist.info = new Info();
         playlist.tracks = new ArrayList<>();
         playlist.options = new Options();
-        
         playlist.info.id = playlistId;
         playlist.info.name = creator.getEffectiveName() + "'s Playlist";
         playlist.info.description = "A cool playlist by " + creator.getEffectiveName() + "!";
-        playlist.info.playlistCoverUrl = "https://cdn.discordapp.com/avatars/838118537276031006/e2e3d5f897b833632ecd3e90ab989949.webp?size=512";
+        playlist.info.playlistCoverUrl = Config.get("AVATAR-URL");
         playlist.info.author = creator.getId();
         return playlist;
     }

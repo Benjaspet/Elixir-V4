@@ -32,6 +32,13 @@ import java.io.UnsupportedEncodingException;
 
 public final class HttpUtil {
 
+    /**
+     * Get a YouTube video URL from a search query.
+     * @param query The search query.
+     * @return String
+     * @throws UnsupportedEncodingException If the input isn't encodable.
+     */
+
     public static String getYouTubeURL(String query) throws UnsupportedEncodingException {
         OkHttpClient client = new OkHttpClient();
         String encodedQuery = Utilities.encodeURIComponent(query);
@@ -51,6 +58,12 @@ public final class HttpUtil {
             return "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         }
     }
+
+    /**
+     * Get data on a particular YouTube video by ID.
+     * @param videoId The video ID.
+     * @return YTVideoData
+     */
     
     @Nullable
     public static YTVideoData getVideoData(String videoId) {

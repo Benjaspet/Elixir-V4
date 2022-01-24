@@ -18,19 +18,25 @@
 
 package dev.benpetrillo.elixir;
 
+import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.benpetrillo.elixir.events.ApplicationCommandListener;
 import dev.benpetrillo.elixir.events.MessageListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.events.ShutdownListener;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
+import dev.benpetrillo.elixir.managers.ConfigStartupManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
+import dev.benpetrillo.elixir.audio.ElixirVoiceDispatchInterceptor;
 import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.AllowedMentions;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +50,10 @@ public final class ElixirClient {
 
     public static void main(String[] args) {
         try {
-            new ElixirClient(Config.get("TOKEN"));
+            new ConfigStartupManager();
+            new ElixirClient(ElixirConstants.TOKEN);
         } catch (LoginException | IllegalArgumentException | IOException exception) {
-            logger.error("Unable to initiate Elixir Music. Is the token valid?", exception);
+            logger.error("Unable to initiate Elixir Music.", exception);
             System.exit(0);
         }
     }
@@ -54,18 +61,40 @@ public final class ElixirClient {
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         JDA jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(Config.get("ACTIVITY")))
+                .setStatus(OnlineStatus.ONLINE)
+                .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
+                .setAutoReconnect(true)
+                .setIdle(false)
+                .setHttpClient(new OkHttpClient())
+                .setVoiceDispatchInterceptor(new ElixirVoiceDispatchInterceptor())
+                .setBulkDeleteSplittingEnabled(true)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
                         new ApplicationCommandListener(),
                         new ReadyListener(),
                         new MessageListener(),
                         new ShutdownListener()
                 )
-                .setStatus(OnlineStatus.ONLINE)
-                .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
+                .enableIntents(
+                        GatewayIntent.DIRECT_MESSAGES,
+                        GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+                        GatewayIntent.DIRECT_MESSAGE_TYPING,
+                        GatewayIntent.GUILD_EMOJIS,
+                        GatewayIntent.GUILD_INVITES,
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.GUILD_MESSAGE_TYPING,
+                        GatewayIntent.GUILD_VOICE_STATES,
+                        GatewayIntent.GUILD_WEBHOOKS
+                )
                 .build();
         AllowedMentions.setDefaultMentionRepliedUser(false);
         applicationCommandManager = ApplicationCommandManager.initialize(jda);
         OAuthUpdateTask.schedule(); DatabaseManager.create();
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     public ElixirClient getInstance() {

@@ -34,6 +34,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
 
 import java.util.HashMap;
 import java.util.List;

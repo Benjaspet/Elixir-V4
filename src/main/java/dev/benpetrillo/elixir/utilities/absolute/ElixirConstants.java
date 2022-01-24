@@ -16,15 +16,19 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.types;
+package dev.benpetrillo.elixir.utilities.absolute;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.Config;
 
-public class ExtendedAudioTrackInfo extends AudioTrackInfo {
+public final class ElixirConstants {
 
-    public String isrc;
-    
-    public ExtendedAudioTrackInfo(String title, String author, long length, String identifier, boolean isStream, String uri) {
-        super(title, author, length, identifier, isStream, uri);
-    }
+    public static String TOKEN = Config.get("TOKEN");
+    public static String AVATAR_URL = Config.get("AVATAR-URL");
+    public static String[] OWNERS = Config.get("OWNERS").split(",");
+    public static String[] GUILDS = Config.get("GUILDS").split(",");
+    public static String VERSION = Config.get("VERSION");
+    public static String YOUTUBE_API_KEY = Config.get("YOUTUBE-API-KEY");
+    public static String MONGO_URI = Config.get("MONGO-URI");
+    public static String SPOTIFY_CLIENT_ID = Config.get("SPOTIFY-CLIENT-ID");
+    public static String SPOTIFY_CLIENT_SECRET = Config.get("SPOTIFY-CLIENT-SECRET");
 }

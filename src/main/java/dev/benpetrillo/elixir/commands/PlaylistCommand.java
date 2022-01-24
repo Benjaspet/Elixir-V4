@@ -38,7 +38,6 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static dev.benpetrillo.elixir.utilities.EmbedUtil.getDefaultEmbedColor;
 
