@@ -30,7 +30,7 @@ import dev.benpetrillo.elixir.utilities.Utilities;
 
 public final class PlaylistTrack extends DelegatedAudioTrack {
 
-    private final String artworkUrl;
+    private final String isrc;
     private final AudioSourceManager sourceManager;
     private final CustomPlaylist.CustomPlaylistTrack trackObject;
     
@@ -40,25 +40,21 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
                 from.url.contains("youtu") ? Utilities.extractVideoId(from.url) : Utilities.extractSongId(from.url),
                 false, from.url
         ));
-        this.artworkUrl = from.coverArt;
         this.sourceManager = sourceManager;
         this.trackObject = from;
-    }
-    
-    public String getArtworkUrl() {
-        return this.artworkUrl;
+        this.isrc = from.isrc;
     }
     
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         if (this.getInfo().uri.contains("youtu")) { // YouTube track.
-            processDelegate(new YoutubeAudioTrack(
+            var track = new YoutubeAudioTrack(
                     this.trackInfo, (YoutubeAudioSourceManager) this.sourceManager
-            ), executor);
+            ); track.process(executor);
         } else { // Spotify track.
-            processDelegate(new SpotifyTrack(
-                    this.trackInfo, null, this.trackObject.coverArt, (SpotifySourceManager) this.sourceManager
-            ), executor);
+            var track = new SpotifyTrack(
+                    this.trackInfo, this.isrc, this.trackObject.coverArt, (SpotifySourceManager) this.sourceManager
+            ); track.process(executor);
         }
     }
 

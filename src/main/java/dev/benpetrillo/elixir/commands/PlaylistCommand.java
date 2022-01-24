@@ -33,20 +33,24 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static dev.benpetrillo.elixir.utilities.EmbedUtil.getDefaultEmbedColor;
+
 public final class PlaylistCommand implements ApplicationCommand {
 
     private final String name = "playlist";
     private final String description = "Manage your custom playlists.";
-    private final String[] options = {"id", "track", "index"};
-    private final String[] optionDescriptions = {"The playlist ID.", "The track to add.", "The index of the track."};
-    private final String[] subCommands = {"addtrack", "removetrack", "queue", "create", "delete", "fetch"};
-    private final String[] subCommandDescriptions = {"Add a track to the playlist.", "Remove a track from the playlist.", "Queue a track to the playlist.", "Create a new playlist.", "Delete a playlist.", "Fetch a playlist."};
+    private final String[] options = {"id", "track", "index", "setting", "value"};
+    private final String[] optionDescriptions = {"The playlist ID.", "The track to add.", "The index of the track.", "The setting to change.", "The new value."};
+    private final String[] subCommands = {"addtrack", "removetrack", "queue", "create", "delete", "fetch", "setting"};
+    private final String[] subCommandDescriptions = {"Add a track to the playlist.", "Remove a track from the playlist.", "Queue a track to the playlist.", "Create a new playlist.", "Delete a playlist.", "Fetch a playlist.", "Change playlist settings."};
+    private final String[] choices = {"cover", "name", "description", "shuffle", "repeat"};
     
     private final List<String> ignore = List.of("create");
 
@@ -113,7 +117,7 @@ public final class PlaylistCommand implements ApplicationCommand {
                     }
                     assert playlist != null;
                     GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
-                    tracks = PlaylistUtil.getTracks(playlist);
+                    tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser(member.getId(), tracks);
                     if (musicManager.scheduler.queue.isEmpty() && musicManager.audioPlayer.getPlayingTrack() == null) {
                         musicManager.scheduler.repeating = playlist.options.repeat
                                 ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
@@ -121,7 +125,7 @@ public final class PlaylistCommand implements ApplicationCommand {
                     }
                     musicManager.scheduler.getQueue().addAll(tracks);
                     if (musicManager.audioPlayer.getPlayingTrack() == null) musicManager.scheduler.nextTrack();
-                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Queued **%s** tracks from %s.".formatted(playlist.info.name, playlist.tracks.size()))).queue();
+                    hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Queued **%s** tracks from %s.".formatted(playlist.tracks.size(), playlist.info.name))).queue();
                     break;
                 case "create":
                     if (!PlaylistUtil.createPlaylist(playlistId, member)) {
@@ -158,16 +162,69 @@ public final class PlaylistCommand implements ApplicationCommand {
                     if (tracks.size() > maxAmount) {
                         description.append("\n").append(String.format("...and %s more tracks.", tracks.size() - maxAmount));
                     }
+                    final String settings = """
+                            Shuffle: %s
+                            Repeat: %s
+                            """.formatted(playlist.options.shuffle ? "Yes" : "No", playlist.options.repeat ? "Yes" : "No");
                     MessageEmbed embed = new EmbedBuilder()
                             .setTitle(playlist.info.name)
-                            .setColor(EmbedUtil.getDefaultEmbedColor())
+                            .setColor(getDefaultEmbedColor())
                             .setThumbnail(thumbnail)
                             .setDescription("Author: <@%s>".formatted(playlist.info.author))
+                            .addField("Description", playlist.info.description, false)
+                            .addField("Queue Settings", String.valueOf(settings), false)
                             .addField("Sample Tracks", String.valueOf(description), false)
                             .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
                             .setTimestamp(new Date().toInstant())
                             .build();
                     hook.editOriginalEmbeds(embed).queue();
+                    break;
+                case "setting":
+                    assert playlist != null;
+                    if (!PlaylistUtil.isAuthor(playlist, member)) {
+                        hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You are not the author of this playlist.")).queue();
+                        return;
+                    }
+                    
+                    String toChange = Objects.requireNonNull(event.getOption("setting")).getAsString();
+                    String value = Objects.requireNonNull(event.getOption("value")).getAsString();
+
+                    switch (toChange) {
+                        default -> {
+                            hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Invalid setting `" + toChange + "`.")).queue();
+                            return;
+                        }
+                        case "cover" -> {
+                            if (!Utilities.isValidURL(value)) {
+                                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("That isn't a valid URL!")).queue();
+                                return;
+                            }
+                            PlaylistUtil.setPlaylistCover(playlist, value);
+                            hook.editOriginalEmbeds(new EmbedBuilder()
+                                    .setDescription("Successfully swapped the playlist cover!")
+                                    .setColor(getDefaultEmbedColor())
+                                    .setImage(value).build()).queue();
+                        }
+                        case "name" -> {
+                            PlaylistUtil.setPlaylistName(playlist, value);
+                            hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully changed the playlist name to `" + value + "`.")).queue();
+                        }
+                        case "description" -> {
+                            PlaylistUtil.setPlaylistDescription(playlist, value);
+                            hook.editOriginalEmbeds(new EmbedBuilder()
+                                    .setDescription("Successfully swapped the playlist description!")
+                                    .addField("New Description", value, false)
+                                    .setColor(getDefaultEmbedColor()).build()).queue();
+                        }
+                        case "shuffle" -> {
+                            PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.SHUFFLE, playlist, Utilities.parseBoolean(value));
+                            hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully changed the shuffle setting to `" + value + "`.")).queue();
+                        }
+                        case "repeat" -> {
+                            PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.REPEAT, playlist, Utilities.parseBoolean(value));
+                            hook.editOriginalEmbeds(EmbedUtil.sendDefaultEmbed("Successfully changed the repeat setting to `" + value + "`.")).queue();
+                        }
+                    }
                     break;
             }
         });
@@ -201,7 +258,17 @@ public final class PlaylistCommand implements ApplicationCommand {
                         new SubcommandData(this.subCommands[4], this.subCommandDescriptions[4])
                                 .addOption(OptionType.STRING, this.options[0], this.optionDescriptions[0], true),
                         new SubcommandData(this.subCommands[5], this.subCommandDescriptions[5])
+                                .addOption(OptionType.STRING, this.options[0], this.optionDescriptions[0], true),
+                        new SubcommandData(this.subCommands[6], this.subCommandDescriptions[6])
                                 .addOption(OptionType.STRING, this.options[0], this.optionDescriptions[0], true)
+                                .addOptions(new OptionData(OptionType.STRING, this.options[3], this.optionDescriptions[3], true)
+                                        .addChoice(this.choices[0], this.choices[0])
+                                        .addChoice(this.choices[1], this.choices[1])
+                                        .addChoice(this.choices[2], this.choices[2])
+                                        .addChoice(this.choices[3], this.choices[3])
+                                        .addChoice(this.choices[4], this.choices[4])
+                                )
+                                .addOption(OptionType.STRING, this.options[4], this.optionDescriptions[4], true)
                 );
     }
 }

@@ -18,8 +18,11 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
+import dev.benpetrillo.elixir.types.ExtendedAudioTrackInfo;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -29,6 +32,7 @@ import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public final class TrackUtil {
@@ -103,11 +107,14 @@ public final class TrackUtil {
             case SPOTIFY -> {
                 Track track = TrackUtil.getTrackDataFromSpotifyURL(url);
                 if (track == null) return null;
-                return new AudioTrackInfo(
+                
+                var trackInfo = new ExtendedAudioTrackInfo(
                         track.getName(), track.getArtists()[0].getName(),
                         TimeUnit.MILLISECONDS.toSeconds(track.getDurationMs()),
                         track.getId(), false, track.getUri()
-                );
+                ); 
+                trackInfo.isrc = track.getExternalIds().getExternalIds().getOrDefault("isrc", null);
+                return trackInfo;
             }
             case YOUTUBE -> {
                 YTVideoData searchData = HttpUtil.getVideoData(Utilities.extractVideoId(url));
@@ -124,7 +131,18 @@ public final class TrackUtil {
             }
         }
     }
-
+    
+    /**
+     * Appends a user ID to a track.
+     * @param userId The user ID to add to the track.
+     * @param tracks The track(s) to append the user ID to.
+     */
+    
+    public static void appendUser(String userId, List<PlaylistTrack> tracks) {
+        for(AudioTrack track : tracks)
+            track.setUserData(userId);
+    }
+    
     /**
      * Determines the source for a given URL.
      * @param url The URL to find the source of.

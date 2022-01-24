@@ -97,7 +97,6 @@ public final class Utilities {
     
     public static String extractSongId(String url) {
         String[] segments = url.split("/");
-        ElixirClient.logger.debug(Arrays.toString(segments));
         return segments[4].split("\\?")[0];
     }
 
@@ -115,6 +114,16 @@ public final class Utilities {
             String pass2 = string.substring(0, 1).toUpperCase() + string.substring(1);
             builder.append(pass2).append(" ");
         } return builder.toString();
+    }
+
+    /**
+     * Parses other strings into a boolean value.
+     * @param toParse The string to parse.
+     * @return A boolean, or false if unable to parse.
+     */
+    
+    public static boolean parseBoolean(String toParse) {
+            return toParse.equalsIgnoreCase("true") || toParse.equalsIgnoreCase("yes") || toParse.equalsIgnoreCase("1");
     }
 
     /**

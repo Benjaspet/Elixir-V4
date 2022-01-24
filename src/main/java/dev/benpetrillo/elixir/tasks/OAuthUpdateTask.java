@@ -28,17 +28,18 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public final class OAuthUpdateTask {
+public final class OAuthUpdateTask extends TimerTask {
 
-    public OAuthUpdateTask() {
-        new Timer().schedule(new TimerTask() {
-            @Override public void run() {
-                try {
-                    SpotifySourceManager.authorize();
-                } catch (IOException | ParseException | SpotifyWebApiException e) {
-                    ElixirClient.logger.debug(e.getMessage());
-                }
-            }
-        }, 0L, TimeUnit.MINUTES.toMillis(45));
+    public static void schedule() {
+        new Timer().schedule(new OAuthUpdateTask(), 0L, TimeUnit.MINUTES.toMillis(45));
+    }
+
+    @Override
+    public void run() {
+        try {
+            SpotifySourceManager.authorize();
+        } catch (IOException | ParseException | SpotifyWebApiException e) {
+            ElixirClient.logger.debug(e.getMessage());
+        }
     }
 }

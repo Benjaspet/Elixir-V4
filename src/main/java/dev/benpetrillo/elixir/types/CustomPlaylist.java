@@ -51,6 +51,7 @@ public final class CustomPlaylist {
     public static class CustomPlaylistTrack {
         public String title, url, artist, coverArt;
         public long duration;
+        public String isrc = null;
         
         public static CustomPlaylistTrack from(AudioTrackInfo info) {
             var track = new CustomPlaylistTrack();
@@ -59,6 +60,8 @@ public final class CustomPlaylist {
             track.artist = info.author;
             track.coverArt = TrackUtil.getCoverArt(info);
             track.duration = info.length;
+            if(info instanceof ExtendedAudioTrackInfo)
+                track.isrc = ((ExtendedAudioTrackInfo) info).isrc;
             return track;
         }
     }

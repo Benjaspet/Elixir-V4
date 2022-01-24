@@ -66,7 +66,7 @@ public final class SkipCommand implements ApplicationCommand {
         AudioTrack upNext = musicManager.scheduler.queue.peek();
         musicManager.scheduler.nextTrack();
         final String title = upNext.getInfo().title.length() > 60 ? upNext.getInfo().title.substring(0, 60) + "..." : upNext.getInfo().title;
-        final String duration = Utilities.formatDuration(upNext.getPosition()) + "/" + Utilities.formatDuration(upNext.getDuration());
+        final String duration = Utilities.formatDuration(upNext.getDuration());
         final String isLive = upNext.getInfo().isStream ? "yes" : "no";
         final String artist = upNext.getInfo().author;
         final String url = upNext.getInfo().uri;
@@ -79,7 +79,7 @@ public final class SkipCommand implements ApplicationCommand {
                             """.formatted(artist, requestedBy, duration, isLive);
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Up Next")
-                .setDescription("[%s](%s)".formatted(upNext.getInfo().title, upNext.getInfo().uri))
+                .setDescription("[%s](%s)".formatted(title, url))
                 .setColor(EmbedUtil.getDefaultEmbedColor())
                 .setThumbnail(TrackUtil.getCoverArt(upNext.getInfo()))
                 .addField("Track Data", contents, false)

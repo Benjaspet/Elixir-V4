@@ -27,7 +27,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.Objects;
 
-public class ShutdownListener extends ListenerAdapter {
+public final class ShutdownListener extends ListenerAdapter {
 
     @Override
     public void onShutdown(ShutdownEvent event) {

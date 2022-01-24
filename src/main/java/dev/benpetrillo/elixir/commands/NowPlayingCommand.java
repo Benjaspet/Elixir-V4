@@ -64,7 +64,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                     final String isLive = info.isStream ? "yes" : "no";
                     final String artist = info.author;
                     final String url = info.uri;
-                    final String requestedBy = member.getAsMention();
+                    final String requestedBy = "<@" + track.getUserData(String.class) + ">";
                     final String contents = """
                             • Artist: %s
                             • Requested by: %s

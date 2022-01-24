@@ -30,12 +30,8 @@ public final class DatabaseManager {
     private static MongoClient mongoClient;
     private static MongoDatabase database;
     private static MongoCollection<Document> playlists;
-
-    public DatabaseManager() {
-        this.init();
-    }
-
-    private void init() {
+    
+    public static void create() {
         mongoClient = new MongoClient(new MongoClientURI(Config.get("MONGO-URI")));
         database = mongoClient.getDatabase("Elixir");
         playlists = database.getCollection("playlists");

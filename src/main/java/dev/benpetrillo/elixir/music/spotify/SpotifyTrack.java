@@ -65,7 +65,7 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
     private String getQuery() {
         var query = "ytsearch:" + trackInfo.title;
         if (!trackInfo.author.equals("unknown")) {
-            query += " " + trackInfo.author;
+            query += " " + trackInfo.author + " - topic";
         }
         return query;
     }

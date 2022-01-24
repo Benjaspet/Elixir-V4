@@ -68,7 +68,7 @@ public final class ElixirMusicManager {
 
             @Override
             public void trackLoaded(AudioTrack track) {
-                track.setUserData(hook.getInteraction().getUser().getAsTag());
+                track.setUserData(hook.getInteraction().getUser().getId());
                 musicManager.scheduler.queue(track);
                 final String title = track.getInfo().title;
                 final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
@@ -83,6 +83,7 @@ public final class ElixirMusicManager {
             public void playlistLoaded(AudioPlaylist playlist) {
                 final List<AudioTrack> tracks = playlist.getTracks();
                 if (playlist.isSearchResult()) {
+                    tracks.get(0).setUserData(hook.getInteraction().getUser().getId());
                     final String title = tracks.get(0).getInfo().title;
                     final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
                     MessageEmbed embed = new EmbedBuilder()
@@ -99,7 +100,7 @@ public final class ElixirMusicManager {
                             .build();
                     hook.editOriginalEmbeds(embed).queue();
                     for (final AudioTrack track : tracks) {
-                        track.setUserData(hook.getInteraction().getUser().getAsTag());
+                        track.setUserData(hook.getInteraction().getUser().getId());
                         musicManager.scheduler.queue(track);
                     }
                 }
@@ -116,7 +117,6 @@ public final class ElixirMusicManager {
                 MessageEmbed embed = EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track.");
                 hook.editOriginalEmbeds(embed).queue();
             }
-
         });
     }
 

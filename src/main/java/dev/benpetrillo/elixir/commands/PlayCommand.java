@@ -62,8 +62,8 @@ public final class PlayCommand implements ApplicationCommand {
                 audioManager.openAudioConnection(memberChannel);
                 audioManager.setSelfDeafened(true);
             }
-            if (!Utilities.isValidURL(query)) {
-                try {
+                    if (!Utilities.isValidURL(query)) {
+                        try {
                     ElixirMusicManager.getInstance().loadAndPlay(channel, HttpUtil.getYouTubeURL(query), hook, "https://www.youtube.com/");
                     return;
                 } catch (UnsupportedEncodingException ignored) {

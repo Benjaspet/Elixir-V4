@@ -145,6 +145,53 @@ public final class PlaylistUtil {
     }
 
     /**
+     * Sets the cover of a custom playlist.
+     * @param playlist The playlist to set the cover of.
+     * @param url The URL of the cover image.
+     */
+    
+    public static void setPlaylistCover(CustomPlaylist playlist, String url) {
+        playlist.info.playlistCoverUrl = url;
+        updatePlaylist(playlist);
+    }
+
+    /**
+     * Sets the name of a custom playlist.
+     * @param playlist The playlist to set the name of.
+     * @param name The name to set.
+     */
+    
+    public static void setPlaylistName(CustomPlaylist playlist, String name) {
+        playlist.info.name = name;
+        updatePlaylist(playlist);
+    }
+
+    /**
+     * Sets the description of a custom playlist.
+     * @param playlist The playlist to set the description of.
+     * @param description The description to set.
+     */
+    
+    public static void setPlaylistDescription(CustomPlaylist playlist, String description) {
+        playlist.info.description = description;
+        updatePlaylist(playlist);
+    }
+
+    /**
+     * Sets the author of a custom playlist.
+     * @param setting The author to set.
+     * @param playlist The playlist to set the author of.
+     * @param value The value to set.
+     */
+    
+    public static void setPlaylistSetting(Setting setting, CustomPlaylist playlist, boolean value) {
+        switch(setting) {
+            case SHUFFLE -> playlist.options.shuffle = value;
+            case REPEAT -> playlist.options.repeat = value;
+        } updatePlaylist(playlist);
+    }
+
+    /**
      * Updates a custom playlist.
      * @param playlist The playlist to update.
      */
@@ -159,5 +206,10 @@ public final class PlaylistUtil {
         try {
             dbCollection.updateOne(dbObject, update, new UpdateOptions().upsert(true));
         } catch (MongoException ignored) {}
+    }
+    
+    public enum Setting {
+        SHUFFLE,
+        REPEAT
     }
 }

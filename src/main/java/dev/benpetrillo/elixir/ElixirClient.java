@@ -47,6 +47,7 @@ public final class ElixirClient {
             new ElixirClient(Config.get("TOKEN"));
         } catch (LoginException | IllegalArgumentException | IOException exception) {
             logger.error("Unable to initiate Elixir Music. Is the token valid?", exception);
+            System.exit(0);
         }
     }
 
@@ -64,8 +65,7 @@ public final class ElixirClient {
                 .build();
         AllowedMentions.setDefaultMentionRepliedUser(false);
         applicationCommandManager = ApplicationCommandManager.initialize(jda);
-        new DatabaseManager();
-        new OAuthUpdateTask();
+        OAuthUpdateTask.schedule(); DatabaseManager.create();
     }
 
     public ElixirClient getInstance() {
