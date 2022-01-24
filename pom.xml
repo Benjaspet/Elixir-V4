@@ -19,7 +19,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-alpha.3</version>
+            <version>5.0.0-alpha.4</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>

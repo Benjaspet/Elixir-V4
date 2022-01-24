@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Objects;
 
@@ -62,6 +63,9 @@ public final class VolumeCommand implements ApplicationCommand {
     @Override
     public CommandData getCommandData() {
         return new CommandData(this.name, this.description)
-                .addOption(OptionType.INTEGER, this.options[0], this.optionDescriptions[0], true);
+                .addOptions(
+                        new OptionData(OptionType.INTEGER, this.options[0], this.optionDescriptions[0], true)
+                                .setRequiredRange(0, 150)
+                );
     }
 }
