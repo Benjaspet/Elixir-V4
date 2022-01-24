@@ -24,16 +24,22 @@
 
 - Spotify playlists - fetch artist for each track.
 - Custom playlists (via MongoDB).
-- Track/album thumbnail in nowplaying command.
-- Queue command.
-- Fix loop command.
-- For Spotify playlists with over 100 tracks, use `offset` to make additional requests to queue the rest of the tracks.
 - And more...
 
 ### All Features
 
 - [x] Support for YouTube and Spotify URLs (playlists included).
+- [x] Ability to queue YouTube playlists with up to 600 tracks, Spotify playlists with up to 2,000 tracks. 
 - [x] Fully integrated slash commands.
+- [x] Loop singular tracks & the entire music queue.
+- [x] View the track currently playing, its cover art, artist, duration, etc.
+- [x] Fully functional custom playlist system.
+    - [x] Custom playlist titles, cover art images, descriptions.
+    - [x] Settings (automatically loop, automatic custom volume).
+    - [x] Manually add or remove tracks based on their queue position.
+    - [x] Fetch all tracks in any custom playlist.
+    - [x] Global system (play anyone else's track).
+    - [x] Ability to delete your custom playlists (you cannot delete or modity someone else's).    
 
 ### License
 
