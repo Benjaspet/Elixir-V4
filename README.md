@@ -20,12 +20,6 @@
 
 - Developers: Ben Petrillo (Eerie6560), KingRainbow44 (Magix)
 
-### To-Do List
-
-- Spotify playlists - fetch artist for each track.
-- Custom playlists (via MongoDB).
-- And more...
-
 ### All Features
 
 - [x] Support for YouTube and Spotify URLs (playlists included).
@@ -35,11 +29,15 @@
 - [x] View the track currently playing, its cover art, artist, duration, etc.
 - [x] Fully functional custom playlist system.
     - [x] Custom playlist titles, cover art images, descriptions.
-    - [x] Settings (automatically loop, automatic custom volume).
+    - [x] Settings (automatically loop, automatic custom volume, title, description).
     - [x] Manually add or remove tracks based on their queue position.
     - [x] Fetch all tracks in any custom playlist.
     - [x] Global system (play anyone else's track).
-    - [x] Ability to delete your custom playlists (you cannot delete or modity someone else's).    
+    - [x] Ability to delete your custom playlists (you cannot delete or modity someone else's).
+- [x] Modify player volume.
+- [x] Shuffle the guild queue.
+- [x] View all tracks in the guild queue.
+- [x] Loop a particular track or queue.
 
 ### License
 
