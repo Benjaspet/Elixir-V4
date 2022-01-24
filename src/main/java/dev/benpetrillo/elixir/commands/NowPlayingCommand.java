@@ -24,6 +24,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
