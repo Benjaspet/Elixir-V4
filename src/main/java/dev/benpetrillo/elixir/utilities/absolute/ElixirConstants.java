@@ -24,8 +24,6 @@ public final class ElixirConstants {
 
     public static String TOKEN = Config.get("TOKEN");
     public static String AVATAR_URL = Config.get("AVATAR-URL");
-    public static String[] OWNERS = Config.get("OWNERS").split(",");
-    public static String[] GUILDS = Config.get("GUILDS").split(",");
     public static String VERSION = Config.get("VERSION");
     public static String ACTIVITY = Config.get("ACTIVITY");
     public static String YOUTUBE_API_KEY = Config.get("YOUTUBE-API-KEY");
@@ -34,4 +32,14 @@ public final class ElixirConstants {
     public static String SPOTIFY_CLIENT_SECRET = Config.get("SPOTIFY-CLIENT-SECRET");
     public static String API_ADDRESS = Config.get("API-ADDRESS");
     public static String API_PORT = Config.get("API-PORT");
+    public static String[] OWNERS = Config.get("OWNERS").split(",");
+    public static String[] GUILDS = Config.get("GUILDS").split(",");
+
+    public static class Emojis {
+
+        public static String EMOJI_DEVELOPER = Config.get("EMOJI-DEVELOPER");
+        public static String EMOJI_USER = Config.get("EMOJI-USER");
+        public static String EMOJI_SERVER = Config.get("EMOJI-SERVER");
+
+    }
 }
