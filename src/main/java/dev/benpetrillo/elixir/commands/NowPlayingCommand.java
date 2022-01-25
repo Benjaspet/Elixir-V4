@@ -26,6 +26,7 @@ import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
+import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
@@ -87,6 +88,7 @@ public final class NowPlayingCommand implements ApplicationCommand {
                 hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("I do not have permission to do this.")).queue();
             } catch (Exception exception) {
                 ElixirClient.logger.error("Error occurred while getting the currently playing track.", exception);
+                Utilities.throwThrowable(new ElixirException(guild, member).exception(exception).additionalInformation("Not a permission exception."));
                 hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An unknown error occurred.")).queue();
             }
         });

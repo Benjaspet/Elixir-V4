@@ -151,6 +151,8 @@ public final class PlaylistCommand implements ApplicationCommand {
                     StringBuilder description = new StringBuilder();
                     int maxAmount = Math.min(tracks.size(), 12);
                     final String thumbnail = playlist.info.playlistCoverUrl;
+                    if(tracks.size() == 0)
+                        description.append("This playlist is empty.");
                     for (int i = 0; i < maxAmount; i++) {
                         final AudioTrack playlistTrack = tracks.get(i);
                         final AudioTrackInfo info = playlistTrack.getInfo();
@@ -169,7 +171,7 @@ public final class PlaylistCommand implements ApplicationCommand {
                             .setTitle(playlist.info.name)
                             .setColor(getDefaultEmbedColor())
                             .setThumbnail(thumbnail)
-                            .setDescription("Author: <@%s>".formatted(playlist.info.author))
+                            .setDescription("Author: <@%s>".formatted(playlist.info.author) )
                             .addField("Description", playlist.info.description, false)
                             .addField("Queue Settings", String.valueOf(settings), false)
                             .addField("Sample Tracks", String.valueOf(description), false)

@@ -20,17 +20,52 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.google.gson.Gson;
+import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.types.ElixirException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Base64;
 
 public final class Utilities {
 
+    /**
+     * Throws an exception to a webhook.
+     * @param exception The throwable to throw.
+     */
+    
+    public static void throwThrowable(ElixirException exception) {
+        var webhook = Config.get("DEBUG-WEBHOOK");
+        var description = new StringBuilder();;
+        description.append("Guild ID: ").append(exception.guild.getId()).append("\n");
+        description.append("Member: <@").append(exception.member.getId()).append(">\n");
+        if(exception.stackTrace() != null) {
+            var stackTrace = exception.stackTrace(); assert stackTrace != null;
+            description.append("File: ").append(stackTrace.getFileName()).append("\n");
+            description.append("Line: ").append(stackTrace.getLineNumber()).append("\n");
+            description.append("Method: ").append(stackTrace.getMethodName()).append("\n");
+        }
+        
+        var client = WebhookClient.withUrl(webhook);
+        var embed = new WebhookEmbedBuilder()
+                .setTitle(new WebhookEmbed.EmbedTitle("Exception", ""))
+                .setColor(EmbedUtil.getErrorEmbedColor().getRGB())
+                .setTimestamp(OffsetDateTime.now())
+                .addField(new WebhookEmbed.EmbedField(false, "Message", exception.getMessage()))
+                .setDescription(String.valueOf(description));
+        if(exception.additionalInformation != null)
+            embed.addField(new WebhookEmbed.EmbedField(false, "Additional Information", exception.additionalInformation));
+        client.send(embed.build());
+    }
+    
     /**
      * Determine if a URL is valid.
      * @param input The URL to check.

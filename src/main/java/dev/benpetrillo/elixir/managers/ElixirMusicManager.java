@@ -28,7 +28,9 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
+import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -61,6 +63,10 @@ public final class ElixirMusicManager {
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
             return guildMusicManager;
         });
+    }
+    
+    public GuildMusicManager[] getMusicManagers() {
+        return this.musicManagers.values().toArray(new GuildMusicManager[0]);
     }
 
     public void loadAndPlay(TextChannel channel, String track, InteractionHook hook, String url) {
@@ -114,9 +120,8 @@ public final class ElixirMusicManager {
 
             @Override
             public void loadFailed(FriendlyException exception) {
-                exception.printStackTrace();
-                MessageEmbed embed = EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track.");
-                hook.editOriginalEmbeds(embed).queue();
+                Utilities.throwThrowable(new ElixirException(channel.getGuild(), hook.getInteraction().getMember()).exception(exception));
+                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track.")).queue();
             }
         });
     }

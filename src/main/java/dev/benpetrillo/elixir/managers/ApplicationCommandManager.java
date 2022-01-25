@@ -50,6 +50,7 @@ public final class ApplicationCommandManager {
     
     private ApplicationCommandManager() {
         registerCommand(
+                new InfoCommand(),
                 new JoinCommand(),
                 new LoopCommand(),
                 new NowPlayingCommand(),

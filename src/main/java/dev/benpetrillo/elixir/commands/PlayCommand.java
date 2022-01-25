@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.commands;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
+import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
@@ -62,20 +63,21 @@ public final class PlayCommand implements ApplicationCommand {
                 audioManager.openAudioConnection(memberChannel);
                 audioManager.setSelfDeafened(true);
             }
-                    if (!Utilities.isValidURL(query)) {
-                        try {
+            if (!Utilities.isValidURL(query)) {
+                try {
                     ElixirMusicManager.getInstance().loadAndPlay(channel, HttpUtil.getYouTubeURL(query), hook, "https://www.youtube.com/");
                     return;
-                } catch (UnsupportedEncodingException ignored) {
+                } catch (UnsupportedEncodingException exception) {
                     hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("No search results found.")).queue();
+                    Utilities.throwThrowable(new ElixirException(guild, member).exception(exception).additionalInformation("Encoding was not supported."));
                     return;
                 }
             }
             if (Utilities.isValidURL(query) && query.contains("spotify")) {
                 try {
                     SpotifySourceManager.authorize();
-                } catch (IOException | ParseException | SpotifyWebApiException e) {
-                    e.printStackTrace();
+                } catch (IOException | ParseException | SpotifyWebApiException exception) {
+                    Utilities.throwThrowable(new ElixirException(guild, member).exception(exception).additionalInformation("Spotify authorization exception."));
                 }
             }
             ElixirMusicManager.getInstance().loadAndPlay(channel, query, hook, query);

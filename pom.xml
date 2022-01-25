@@ -52,5 +52,15 @@
             <artifactId>mongodb-driver</artifactId>
             <version>3.12.10</version>
         </dependency>
+        <dependency>
+            <groupId>net.objecthunter</groupId>
+            <artifactId>exp4j</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>discord-webhooks</artifactId>
+            <version>0.7.5</version>
+        </dependency>
     </dependencies>
 </project>

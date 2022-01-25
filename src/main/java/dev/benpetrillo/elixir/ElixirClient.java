@@ -42,16 +42,26 @@ import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 
 public final class ElixirClient {
     
+    private static ElixirClient instance;
+    
     public static ApplicationCommandManager applicationCommandManager;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
+    public static final OffsetDateTime startTime;
+    
+    public JDA jda;
+    
+    static {
+        startTime = OffsetDateTime.now();
+    }
 
     public static void main(String[] args) {
         try {
-            new ConfigStartupManager();
-            new ElixirClient(ElixirConstants.TOKEN);
+            ConfigStartupManager.checkAll();
+            instance = new ElixirClient(ElixirConstants.TOKEN);
         } catch (LoginException | IllegalArgumentException | IOException exception) {
             logger.error("Unable to initiate Elixir Music.", exception);
             System.exit(0);
@@ -59,7 +69,7 @@ public final class ElixirClient {
     }
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
-        JDA jda = JDABuilder.createDefault(token)
+        this.jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
                 .setAutoReconnect(true)
@@ -96,7 +106,7 @@ public final class ElixirClient {
         return logger;
     }
 
-    public ElixirClient getInstance() {
-        return this;
+    public static ElixirClient getInstance() {
+        return instance;
     }
 }

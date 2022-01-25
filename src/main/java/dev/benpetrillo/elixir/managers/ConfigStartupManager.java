@@ -23,11 +23,7 @@ import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 
 public final class ConfigStartupManager {
 
-    public ConfigStartupManager() {
-        this.checkAll();
-    }
-
-    private void checkAll() {
+    public static void checkAll() {
         if (ElixirConstants.TOKEN == null) {
             ElixirClient.logger.error("Invalid bot token provided.");
         } else if (ElixirConstants.YOUTUBE_API_KEY == null) {

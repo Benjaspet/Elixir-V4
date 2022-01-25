@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public final class SpotifyURLConverter {
 
     private static SpotifyURLConverter instance;
