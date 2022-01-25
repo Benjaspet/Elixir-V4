@@ -32,4 +32,6 @@ public final class ElixirConstants {
     public static String MONGO_URI = Config.get("MONGO-URI");
     public static String SPOTIFY_CLIENT_ID = Config.get("SPOTIFY-CLIENT-ID");
     public static String SPOTIFY_CLIENT_SECRET = Config.get("SPOTIFY-CLIENT-SECRET");
+    public static String API_ADDRESS = Config.get("API-ADDRESS");
+    public static String API_PORT = Config.get("API-PORT");
 }

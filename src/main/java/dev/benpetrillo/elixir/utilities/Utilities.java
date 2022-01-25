@@ -45,8 +45,10 @@ public final class Utilities {
     public static void throwThrowable(ElixirException exception) {
         var webhook = Config.get("DEBUG-WEBHOOK");
         var description = new StringBuilder();;
-        description.append("Guild ID: ").append(exception.guild.getId()).append("\n");
-        description.append("Member: <@").append(exception.member.getId()).append(">\n");
+        if(exception.guild != null)
+            description.append("Guild ID: ").append(exception.guild.getId()).append("\n");
+        if(exception.member != null)
+            description.append("Member: <@").append(exception.member.getId()).append(">\n");
         if(exception.stackTrace() != null) {
             var stackTrace = exception.stackTrace(); assert stackTrace != null;
             description.append("File: ").append(stackTrace.getFileName()).append("\n");

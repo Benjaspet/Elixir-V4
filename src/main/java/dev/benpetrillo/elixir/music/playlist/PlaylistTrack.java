@@ -33,6 +33,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
     private final String isrc;
     private final AudioSourceManager sourceManager;
     private final CustomPlaylist.CustomPlaylistTrack trackObject;
+    private long length;
     
     public PlaylistTrack(String title, CustomPlaylist.CustomPlaylistTrack from, AudioSourceManager sourceManager) {
         super(new AudioTrackInfo(
@@ -40,9 +41,10 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
                 from.url.contains("youtu") ? Utilities.extractVideoId(from.url) : Utilities.extractSongId(from.url),
                 false, from.url
         ));
+        this.isrc = from.isrc;
         this.sourceManager = sourceManager;
         this.trackObject = from;
-        this.isrc = from.isrc;
+        this.length = from.duration;
     }
     
     @Override
@@ -50,12 +52,19 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
         if (this.getInfo().uri.contains("youtu")) { // YouTube track.
             var track = new YoutubeAudioTrack(
                     this.trackInfo, (YoutubeAudioSourceManager) this.sourceManager
-            ); track.process(executor);
+            ); this.length = track.getDuration();
+            track.process(executor);
         } else { // Spotify track.
             var track = new SpotifyTrack(
                     this.trackInfo, this.isrc, this.trackObject.coverArt, (SpotifySourceManager) this.sourceManager
-            ); track.process(executor);
+            ); this.length = track.getDuration();
+            track.process(executor);
         }
+    }
+
+    @Override
+    public long getDuration() {
+        return this.length;
     }
 
     @Override

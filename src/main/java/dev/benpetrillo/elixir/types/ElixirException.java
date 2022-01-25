@@ -24,15 +24,27 @@ import net.dv8tion.jda.api.entities.Member;
 import javax.annotation.Nullable;
 
 public class ElixirException extends Exception {
-    public final Guild guild;
-    public final Member member;
-
+    public Guild guild;
+    public Member member;
     public Exception exception;
     public String additionalInformation;
+    
+    public ElixirException() {
+        this.guild = null;
+        this.member = null;
+    }
     
     public ElixirException(Guild guild, Member member) {
         this.guild = guild;
         this.member = member;
+    }
+    
+    public ElixirException guild(Guild guild) {
+        this.guild = guild; return this;
+    }
+    
+    public ElixirException member(Member member) {
+        this.member = member; return this;
     }
     
     public ElixirException exception(Exception exception) {

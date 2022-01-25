@@ -110,8 +110,8 @@ public final class TrackUtil {
                 
                 var trackInfo = new ExtendedAudioTrackInfo(
                         track.getName(), track.getArtists()[0].getName(),
-                        TimeUnit.MILLISECONDS.toSeconds(track.getDurationMs()),
-                        track.getId(), false, track.getUri()
+                        track.getDurationMs(), track.getId(), false, 
+                        track.getHref()
                 ); 
                 trackInfo.isrc = track.getExternalIds().getExternalIds().getOrDefault("isrc", null);
                 return trackInfo;
