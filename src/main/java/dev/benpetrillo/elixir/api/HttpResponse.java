@@ -69,4 +69,13 @@ public class HttpResponse {
             this.statusCode = 200;
         }
     }
+    
+    public static class BadRequest extends HttpResponse {
+        public BadRequest() {
+            this.title("Malformed Request | 400 Bad Request")
+                    .text("The request was malformed.")
+                    .close();
+            this.statusCode = 400;
+        }
+    }
 }

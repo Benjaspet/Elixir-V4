@@ -18,5 +18,41 @@
 
 package dev.benpetrillo.elixir.api.endpoints;
 
-public class PlayerEndpoint {
+import dev.benpetrillo.elixir.api.HttpEndpoint;
+import dev.benpetrillo.elixir.api.HttpResponse;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import dev.benpetrillo.elixir.utilities.Utilities;
+
+import java.io.IOException;
+
+public final class PlayerEndpoint extends HttpEndpoint {
+    private GuildMusicManager musicManager;
+    
+    @Override
+    public void get() throws IOException {
+        var guildId = this.arguments.getOrDefault("guildId", "");
+        var action = this.arguments.getOrDefault("action", "");
+        if(guildId.isEmpty() || action.isEmpty()) {
+            this.respond(new HttpResponse.NotFound()); return;
+        }
+
+        this.musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
+        if(this.musicManager == null) {
+            this.respond(new HttpResponse.NotFound()); return;
+        }
+        
+        switch(action) {
+            default -> this.respond(new HttpResponse.NotFound());
+            case "nowplaying" -> this.nowPlaying();
+            case "pause" -> this.musicManager.audioPlayer.setPaused(true);
+            case "resume" -> this.musicManager.audioPlayer.setPaused(false);
+        }
+    }
+    
+    private void nowPlaying() throws IOException {
+        var track = this.musicManager.audioPlayer.getPlayingTrack();
+        this.statusCode = 301; // Found.
+        this.respond(Utilities.serialize(track.getInfo()));
+    }
 }
