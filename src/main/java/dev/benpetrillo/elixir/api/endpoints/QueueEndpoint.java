@@ -30,22 +30,21 @@ import java.io.IOException;
 import java.util.List;
 
 public final class QueueEndpoint extends HttpEndpoint {
+
     private GuildMusicManager musicManager;
     
     @Override
     public void get() throws IOException {
         var guildId = this.arguments.getOrDefault("guildId", "");
         var action = this.arguments.getOrDefault("action", "");
-        if(guildId.isEmpty() || action.isEmpty()) {
+        if (guildId.isEmpty() || action.isEmpty()) {
             this.respond(new HttpResponse.NotFound()); return;
         }
         this.musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
-        
-        if(this.musicManager == null) {
+        if (this.musicManager == null) {
             this.respond(new HttpResponse.NotFound()); return;
         }
-        
-        switch(action) {
+        switch (action) {
             default -> this.respond(new HttpResponse.NotFound());
             case "queue" -> this.queue();
         }

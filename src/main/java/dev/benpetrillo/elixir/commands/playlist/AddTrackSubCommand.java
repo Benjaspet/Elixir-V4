@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class AddTrackSubCommand extends SubCommand implements Arguments {
+
     public AddTrackSubCommand() {
         super("addtrack", "Add a track to the playlist.");
     }
@@ -37,14 +38,12 @@ public final class AddTrackSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
-        if(playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
+        if (playlist == null) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."));
             return;
         }
-
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."));
             return;

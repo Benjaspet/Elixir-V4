@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class ShuffleCommand extends Command {
+
     public ShuffleCommand() {
         super("shuffle", "Shuffle the current queue.");
     }

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class HttpEndpoint implements HttpHandler {
+
     protected final Map<String, String> arguments = new HashMap<>();
     protected int statusCode = 200;
     protected HttpExchange httpExchange;
@@ -34,7 +35,6 @@ public abstract class HttpEndpoint implements HttpHandler {
     @Override
     public final void handle(HttpExchange exchange) throws IOException {
         this.httpExchange = exchange; this.parseArguments();
-        
         switch (exchange.getRequestMethod()) {
             default -> respond(new HttpResponse.Default().html.toString());
             case "GET" -> this.get();
@@ -46,34 +46,33 @@ public abstract class HttpEndpoint implements HttpHandler {
     
     private void parseArguments() {
         var requestUri = this.httpExchange.getRequestURI().toString();
-        
         try {
             var args = requestUri.split("\\?")[1];
             var argumentPairs = args.split("&");
-
             // Parse the first argument.
             this.arguments.put(args.split("=")[0].strip(), args.split("=")[1].strip());
             // Parse the rest of the arguments.
             for (var pair : argumentPairs) {
                 this.arguments.put(pair.split("=")[0].strip(), pair.split("=")[1].strip());
             }
-        } catch (IndexOutOfBoundsException ignored) { }
+        } catch (IndexOutOfBoundsException ignored) {}
     }
     
-    protected final HttpEndpoint header(String header, String value) {
-        this.httpExchange.getResponseHeaders().add(header, value); return this;
+    protected final HttpEndpoint header() {
+        this.httpExchange.getResponseHeaders().add("Content-Type", "application/json");
+        return this;
     }
     
     protected final void respond(String response) throws IOException {
-        OutputStream output = this.httpExchange.getResponseBody();;
-        
+        OutputStream output = this.httpExchange.getResponseBody();
         this.httpExchange.sendResponseHeaders(this.statusCode, response.length());
         output.write(response.getBytes()); output.flush(); output.close();
     }
     
     protected final void respond(HttpResponse response) throws IOException {
-        if(response.statusCode != -1)
+        if (response.statusCode != -1) {
             this.statusCode = response.statusCode;
+        }
         this.respond(String.valueOf(response.html));
     }
     

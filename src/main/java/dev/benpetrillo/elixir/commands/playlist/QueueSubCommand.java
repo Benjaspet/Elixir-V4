@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 
 public final class QueueSubCommand extends SubCommand implements Arguments {
+
     public QueueSubCommand() {
         super("queue", "Queue a track to the playlist.");
     }
@@ -48,14 +49,12 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
     public void execute(Interaction interaction) {
         interaction.deferReply();
         var member = interaction.getMember(); var guild = interaction.getGuild();
-
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
-        if(playlist == null) {
+        if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
             return;
         }
-        
         final GuildVoiceState memberVoiceState = member.getVoiceState(); assert memberVoiceState != null;
         if (!memberVoiceState.inAudioChannel()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to queue tracks."));

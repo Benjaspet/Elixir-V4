@@ -37,6 +37,7 @@ import tech.xigam.cch.utils.Interaction;
 import java.util.Date;
 
 public final class NowPlayingCommand extends Command {
+
     public NowPlayingCommand() {
         super("nowplaying", "View information on the track currently playing.");
     }
@@ -44,15 +45,12 @@ public final class NowPlayingCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        
         try {
             final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
             final AudioPlayer audioPlayer = musicManager.audioPlayer;
             final AudioTrack track = audioPlayer.getPlayingTrack();
             if (track == null) {
-                interaction.reply(
-                        EmbedUtil.sendErrorEmbed("There is no track playing at the moment.")
-                );
+                interaction.reply(EmbedUtil.sendErrorEmbed("There is no track playing at the moment."));
             } else {
                 final AudioTrackInfo info = track.getInfo();
                 final String thumbnail = TrackUtil.getCoverArt(track.getInfo());

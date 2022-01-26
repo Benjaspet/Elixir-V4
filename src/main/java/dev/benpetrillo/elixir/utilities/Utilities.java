@@ -25,8 +25,10 @@ import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.ElixirException;
 
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -34,6 +36,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Base64;
+import java.util.Objects;
 
 public final class Utilities {
 
@@ -67,7 +70,7 @@ public final class Utilities {
             embed.addField(new WebhookEmbed.EmbedField(false, "Additional Information", exception.additionalInformation));
         client.send(embed.build());
     }
-    
+
     /**
      * Determine if a URL is valid.
      * @param input The URL to check.

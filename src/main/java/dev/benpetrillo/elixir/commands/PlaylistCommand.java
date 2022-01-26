@@ -25,9 +25,9 @@ import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
 public final class PlaylistCommand extends Command implements Baseless {
+
     public PlaylistCommand() {
         super("playlist", "Manage your custom playlists.");
-        
         registerSubCommand(new AddTrackSubCommand());
         registerSubCommand(new RemoveTrackSubCommand());
         registerSubCommand(new QueueSubCommand());

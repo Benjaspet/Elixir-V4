@@ -19,6 +19,7 @@
 package dev.benpetrillo.elixir.api;
 
 public class HttpResponse {
+
     public final StringBuilder html = new StringBuilder();
     public int statusCode = -1;
     
@@ -43,7 +44,7 @@ public class HttpResponse {
         html.append("</html>");
     }
     
-    public static class Default extends HttpResponse { 
+    public static class Default extends HttpResponse {
         public Default() {
             this.title("Elixir Music API")
                     .text("Welcome to the Elixir Music API!")

@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class DeleteSubCommand extends SubCommand implements Arguments {
+
     public DeleteSubCommand() {
         super("delete", "Delete a playlist.");
     }
@@ -38,10 +39,8 @@ public final class DeleteSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
-        
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("A playlist with id `" + playlistId + "` doesn't exist."));
             return;

@@ -27,13 +27,14 @@ import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
 public final class ResumeCommand extends Command {
+
     public ResumeCommand() {
         super("resume", "Resume the queue playback.");
     }
     
     @Override
     public void execute(Interaction interaction) {
-        if(!AudioUtil.audioCheck(interaction)) return;
+        if (!AudioUtil.audioCheck(interaction)) return;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         MessageEmbed embed; if (musicManager.scheduler.player.isPaused()) {
             musicManager.scheduler.player.setPaused(false);

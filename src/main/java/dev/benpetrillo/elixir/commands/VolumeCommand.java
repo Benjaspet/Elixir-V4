@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class VolumeCommand extends Command implements Arguments {
+
     public VolumeCommand() {
         super("volume", "Set the volume of the player.");
     }
@@ -41,8 +42,7 @@ public final class VolumeCommand extends Command implements Arguments {
         if(!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         if(!AudioUtil.audioCheck(interaction)) return;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        final int volume = Math.min(150, Math.max(0,
-                (int) interaction.getArguments().getOrDefault("volume", musicManager.audioPlayer.getVolume())));
+        final int volume = (int) interaction.getArguments().getOrDefault("volume", musicManager.audioPlayer.getVolume());
         musicManager.audioPlayer.setVolume(volume);
         interaction.reply(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**."));
     }
@@ -50,7 +50,7 @@ public final class VolumeCommand extends Command implements Arguments {
     @Override
     public Collection<Argument> getArguments() {
         return List.of(
-                Argument.create("volume", "The volume (out of 150) for the player.", "volume", OptionType.INTEGER, true, 0)
+                Argument.create("volume", "Set the volume of the player.", "volume", OptionType.INTEGER, true, 0)
         );
     }
 }

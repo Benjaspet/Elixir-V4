@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public final class QueueCommand extends Command {
+
     public QueueCommand() {
         super("queue", "View all songs in the queue.");
     }
@@ -49,7 +50,6 @@ public final class QueueCommand extends Command {
             interaction.reply(EmbedUtil.sendErrorEmbed("There are no songs in the queue."));
             return;
         }
-        
         interaction.deferReply();
         try {
             final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;

@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class RemoveTrackSubCommand extends SubCommand implements Arguments {
+
     public RemoveTrackSubCommand() {
         super("remove", "Remove a track from the playlist.");
     }
@@ -38,14 +39,12 @@ public final class RemoveTrackSubCommand extends SubCommand implements Arguments
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
-        if(playlist == null) {
+        if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
             return;
         }
-
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."));
             return;

@@ -32,19 +32,23 @@ import tech.xigam.cch.utils.Interaction;
 import java.time.OffsetDateTime;
 
 public final class InfoCommand extends Command {
+
     public InfoCommand() {
         super("info", "Get information about Elixir.");
     }
     
     @Override
     public void execute(Interaction interaction) {
-        var streams = 0; for(GuildMusicManager musicManager : ElixirMusicManager.getInstance().getMusicManagers())
-            streams += musicManager.audioPlayer.getPlayingTrack() != null ? 1 : 0;
+        var streams = 0;
+        var users = 0;
         var servers = ElixirClient.getInstance().jda.getGuilds().size();
-        var users = 0; for(Guild server : ElixirClient.getInstance().jda.getGuilds())
+        for (GuildMusicManager musicManager : ElixirMusicManager.getInstance().getMusicManagers()) {
+            streams += musicManager.audioPlayer.getPlayingTrack() != null ? 1 : 0;
+        }
+        for (Guild server : ElixirClient.getInstance().jda.getGuilds()) {
             users += server.getMemberCount();
+        }
         var uptime = Utilities.formatDuration(1000 * (OffsetDateTime.now().toEpochSecond() - ElixirClient.startTime.toEpochSecond()));
-
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(EmbedUtil.getDefaultEmbedColor())
                 .setAuthor("Total Playing Streams: " + streams)

@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class CreateSubCommand extends SubCommand implements Arguments {
+
     public CreateSubCommand() {
         super("create", "Create a new playlist.");
     }
@@ -38,7 +39,6 @@ public final class CreateSubCommand extends SubCommand implements Arguments {
     public void execute(Interaction interaction) {
         interaction.deferReply();
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "");
-        
         if (!PlaylistUtil.createPlaylist(playlistId, interaction.getMember())) {
             interaction.reply(EmbedUtil.sendErrorEmbed("A playlist with id `" + playlistId + "` already exists."));
             return;

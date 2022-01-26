@@ -29,8 +29,6 @@ import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.managers.AudioManager;
 import tech.xigam.cch.command.Arguments;
@@ -43,6 +41,7 @@ import java.util.Date;
 import java.util.List;
 
 public final class SkipCommand extends Command implements Arguments {
+
     public SkipCommand() {
         super("skip", "Skip to a specified track in the queue.");
     }

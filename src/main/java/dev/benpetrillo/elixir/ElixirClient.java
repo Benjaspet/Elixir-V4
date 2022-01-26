@@ -28,6 +28,7 @@ import dev.benpetrillo.elixir.managers.ConfigStartupManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
 import dev.benpetrillo.elixir.audio.ElixirVoiceDispatchInterceptor;
 import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
+import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -74,7 +75,6 @@ public final class ElixirClient {
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         commandHandler = new ComplexCommandHandler(false);
         applicationCommandManager = ApplicationCommandManager.initialize();
-        
         this.jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)

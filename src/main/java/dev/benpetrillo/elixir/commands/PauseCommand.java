@@ -27,6 +27,7 @@ import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
 public final class PauseCommand extends Command {
+
     public PauseCommand() {
         super("pause", "Pause the track currently playing.");
     }

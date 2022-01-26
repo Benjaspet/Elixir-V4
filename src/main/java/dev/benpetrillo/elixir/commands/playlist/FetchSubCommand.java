@@ -39,6 +39,7 @@ import java.util.List;
 import static dev.benpetrillo.elixir.utilities.EmbedUtil.getDefaultEmbedColor;
 
 public final class FetchSubCommand extends SubCommand implements Arguments {
+
     public FetchSubCommand() {
         super("fetch", "Fetch a playlist.");
     }
@@ -46,20 +47,17 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
-        if(playlist == null) {
+        if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
             return;
         }
-
         var tracks = PlaylistUtil.getTracks(playlist);
         StringBuilder description = new StringBuilder();
         int maxAmount = Math.min(tracks.size(), 12);
         final String thumbnail = playlist.info.playlistCoverUrl;
-        if(tracks.size() == 0)
-            description.append("This playlist is empty.");
+        if (tracks.size() == 0) description.append("This playlist is empty.");
         for (int i = 0; i < maxAmount; i++) {
             final AudioTrack playlistTrack = tracks.get(i);
             final AudioTrackInfo info = playlistTrack.getInfo();

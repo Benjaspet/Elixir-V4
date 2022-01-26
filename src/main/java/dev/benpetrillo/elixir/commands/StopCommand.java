@@ -28,6 +28,7 @@ import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
 public final class StopCommand extends Command {
+
     public StopCommand() {
         super("stop", "Stop the current track & clear the queue.");
     }

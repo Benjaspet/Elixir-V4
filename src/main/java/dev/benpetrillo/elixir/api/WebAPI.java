@@ -34,20 +34,19 @@ public final class WebAPI {
     public static void create() {
         try {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(ElixirConstants.API_ADDRESS, Integer.parseInt(ElixirConstants.API_PORT)), 0);
-            
             httpServer.setExecutor(Executors.newFixedThreadPool(10));
             httpServer.createContext("/", new Index());
             httpServer.createContext("/playlist", new Playlist());
             httpServer.createContext("/player", new Player());
             httpServer.createContext("/queue", new QueueEndpoint());
-            
-            httpServer.start(); // Start the server.
+            httpServer.start();
         } catch (IOException exception) {
             Utilities.throwThrowable(new ElixirException().exception(exception));
         }
     }
     
     public static class Index extends HttpEndpoint {
+
         @Override
         public void get() throws IOException {
             this.respond(new HttpResponse.Default());
@@ -55,13 +54,13 @@ public final class WebAPI {
     }
     
     public static class Playlist extends HttpEndpoint {
+
         @Override
         public void get() throws IOException {
             var playlistId = this.arguments.getOrDefault("playlist", "");
-            if(playlistId.isEmpty()) {
+            if (playlistId.isEmpty()) {
                 this.respond(new HttpResponse.NotFound()); return;
             }
-            
             var playlist = PlaylistUtil.findPlaylist(playlistId);
             if(playlist == null) {
                 this.respond(new HttpResponse.NotFound()); return;
@@ -71,19 +70,18 @@ public final class WebAPI {
     }
     
     public static class Player extends HttpEndpoint {
+
         @Override
         public void get() throws IOException {
             var guildId = this.arguments.getOrDefault("guildId", "");
             var action = this.arguments.getOrDefault("action", "");
-            if(guildId.isEmpty() || action.isEmpty()) {
+            if (guildId.isEmpty() || action.isEmpty()) {
                 this.respond(new HttpResponse.NotFound()); return;
             }
-
             var musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
-            if(musicManager == null) {
+            if (musicManager == null) {
                 this.respond(new HttpResponse.NotFound()); return;
             }
-            
             switch(action) {
                 default -> this.respond(new HttpResponse.NotFound());
                 case "pause" -> musicManager.audioPlayer.setPaused(true);

@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.Member;
 import javax.annotation.Nullable;
 
 public class ElixirException extends Exception {
+
     public Guild guild;
     public Member member;
     public Exception exception;
@@ -65,8 +66,10 @@ public class ElixirException extends Exception {
      */
     
     public String getMessage() {
-        if(this.exception != null)
+        if (this.exception != null) {
             return this.exception.getMessage();
-        else return "There was no message attached.";
+        } else {
+            return "There was no message attached.";
+        }
     }
 }

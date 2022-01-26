@@ -27,6 +27,7 @@ import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
 public final class JoinCommand extends Command {
+
     public JoinCommand() {
         super("join", "Bind Elixir to your voice channel.");
     }

@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class PlayCommand extends Command implements Arguments {
+
     public PlayCommand() {
         super("play", "Play a track with a link or query.");
     }
@@ -52,7 +53,6 @@ public final class PlayCommand extends Command implements Arguments {
         final GuildVoiceState voiceState = interaction.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();
-
         if (!memberVoiceState.inAudioChannel()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."));
             return;

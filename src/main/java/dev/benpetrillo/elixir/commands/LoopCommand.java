@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class LoopCommand extends Command implements Arguments {
+
     public LoopCommand() {
         super("loop", "Loop a song or queue.");
     }
