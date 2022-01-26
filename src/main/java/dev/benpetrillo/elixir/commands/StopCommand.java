@@ -20,49 +20,30 @@ package dev.benpetrillo.elixir.commands;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.managers.AudioManager;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Interaction;
 
-public final class StopCommand implements ApplicationCommand {
-
-    private final String name = "stop";
-    private final String description = "Stop the current track & clear the queue.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
+public final class StopCommand extends Command {
+    public StopCommand() {
+        super("stop", "Stop the current track & clear the queue.");
+    }
 
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        final TextChannel channel = event.getTextChannel();
-        final GuildVoiceState selfVoiceState = member.getVoiceState();
+    public void execute(Interaction interaction) {
+        final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
         assert selfVoiceState != null;
-        if (!AudioUtil.audioCheck(event, guild, member)) return;
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        final AudioManager audioManager = channel.getGuild().getAudioManager();
+        if (!AudioUtil.audioCheck(interaction)) return;
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
+        final AudioManager audioManager = interaction.getGuild().getAudioManager();
         if (selfVoiceState.inAudioChannel()) {
             audioManager.closeAudioConnection();
         }
         musicManager.scheduler.queue.clear();
         musicManager.audioPlayer.destroy();
-        event.replyEmbeds(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped.")).queue();
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+        interaction.reply(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped."));
     }
 }

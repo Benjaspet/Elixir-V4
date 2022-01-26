@@ -20,48 +20,27 @@ package dev.benpetrillo.elixir.commands;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Interaction;
 
-import java.util.Objects;
-
-public final class ResumeCommand implements ApplicationCommand {
-
-    private final String name = "resume";
-    private final String description = "Resume the queue playback.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
-
+public final class ResumeCommand extends Command {
+    public ResumeCommand() {
+        super("resume", "Resume the queue playback.");
+    }
+    
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        if(!AudioUtil.audioCheck(event, guild, member)) return;
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        if (musicManager.scheduler.player.isPaused()) {
+    public void execute(Interaction interaction) {
+        if(!AudioUtil.audioCheck(interaction)) return;
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
+        MessageEmbed embed; if (musicManager.scheduler.player.isPaused()) {
             musicManager.scheduler.player.setPaused(false);
-            MessageEmbed embed = EmbedUtil.sendDefaultEmbed("Successfully resumed the queue.");
-            event.replyEmbeds(embed).queue();
+            embed = EmbedUtil.sendDefaultEmbed("Successfully resumed the queue.");
         } else {
-            MessageEmbed embed = EmbedUtil.sendErrorEmbed("The queue is already playing.");
-            event.replyEmbeds(embed).queue();
+            embed = EmbedUtil.sendErrorEmbed("The queue is already playing.");
         }
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+        interaction.reply(embed);
     }
 }

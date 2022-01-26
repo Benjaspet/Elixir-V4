@@ -37,6 +37,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
+import tech.xigam.cch.utils.Interaction;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,13 +70,13 @@ public final class ElixirMusicManager {
         return this.musicManagers.values().toArray(new GuildMusicManager[0]);
     }
 
-    public void loadAndPlay(TextChannel channel, String track, InteractionHook hook, String url) {
-        final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
+    public void loadAndPlay(String track, Interaction interaction, String url) {
+        final GuildMusicManager musicManager = this.getMusicManager(interaction.getGuild());
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 
             @Override
             public void trackLoaded(AudioTrack track) {
-                track.setUserData(hook.getInteraction().getUser().getId());
+                track.setUserData(interaction.getMember().getId());
                 musicManager.scheduler.queue(track);
                 final String title = track.getInfo().title;
                 final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
@@ -83,21 +84,21 @@ public final class ElixirMusicManager {
                         .setColor(EmbedUtil.getDefaultEmbedColor())
                         .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, track.getInfo().uri))
                         .build();
-                hook.editOriginalEmbeds(embed).queue();
+                interaction.reply(embed);
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
                 final List<AudioTrack> tracks = playlist.getTracks();
                 if (playlist.isSearchResult()) {
-                    tracks.get(0).setUserData(hook.getInteraction().getUser().getId());
+                    tracks.get(0).setUserData(interaction.getMember().getId());
                     final String title = tracks.get(0).getInfo().title;
                     final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
                     MessageEmbed embed = new EmbedBuilder()
                             .setColor(EmbedUtil.getDefaultEmbedColor())
                             .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, tracks.get(0).getInfo().uri))
                             .build();
-                    hook.editOriginalEmbeds(embed).queue();
+                    interaction.reply(embed);
                     musicManager.scheduler.queue(tracks.get(0));
                 } else {
                     final String success = String.format("Queued **%s** tracks from [%s](%s).", tracks.size(), playlist.getName(), url);
@@ -105,9 +106,9 @@ public final class ElixirMusicManager {
                             .setColor(EmbedUtil.getDefaultEmbedColor())
                             .setDescription(success)
                             .build();
-                    hook.editOriginalEmbeds(embed).queue();
+                    interaction.reply(embed);
                     for (final AudioTrack track : tracks) {
-                        track.setUserData(hook.getInteraction().getUser().getId());
+                        track.setUserData(interaction.getMember().getId());
                         musicManager.scheduler.queue(track);
                     }
                 }
@@ -115,13 +116,13 @@ public final class ElixirMusicManager {
 
             @Override
             public void noMatches() {
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("Nothing found by that search term.")).queue();
+                interaction.reply(EmbedUtil.sendErrorEmbed("Nothing found by that search term."));
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
-                Utilities.throwThrowable(new ElixirException(channel.getGuild(), hook.getInteraction().getMember()).exception(exception));
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track.")).queue();
+                Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception));
+                interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track."));
             }
         });
     }

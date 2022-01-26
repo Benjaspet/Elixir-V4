@@ -21,48 +21,28 @@ package dev.benpetrillo.elixir.commands;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Interaction;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class ShuffleCommand implements ApplicationCommand {
-
-    private final String name = "shuffle";
-    private final String description = "Shuffle the current queue.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
+public final class ShuffleCommand extends Command {
+    public ShuffleCommand() {
+        super("shuffle", "Shuffle the current queue.");
+    }
 
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        if (!AudioUtil.audioCheck(event, guild, member)) return;
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
+    public void execute(Interaction interaction) {
+        if (!AudioUtil.audioCheck(interaction)) return;
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
         Collections.shuffle(tracks);
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.queue.addAll(tracks);
-        event.replyEmbeds(EmbedUtil.sendDefaultEmbed("Shuffled the queue.")).queue();
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Shuffled the queue."));
     }
 }

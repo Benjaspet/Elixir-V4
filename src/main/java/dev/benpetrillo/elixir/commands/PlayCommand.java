@@ -20,83 +20,71 @@ package dev.benpetrillo.elixir.commands;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import tech.xigam.cch.command.Arguments;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Argument;
+import tech.xigam.cch.utils.Interaction;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Objects;
+import java.util.Collection;
 
-public final class PlayCommand implements ApplicationCommand {
-
-    private final String name = "play";
-    private final String description = "Play a track with a link or query.";
-    private final String[] options = {"query"};
-    private final String[] optionDescriptions = {"The track to play, by URL or query."};
+public final class PlayCommand extends Command implements Arguments {
+    public PlayCommand() {
+        super("play", "Play a track with a link or query.");
+    }
 
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        final TextChannel channel = event.getTextChannel();
-        final GuildVoiceState voiceState = channel.getGuild().getSelfMember().getVoiceState();
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
-        assert memberVoiceState != null;
-        event.deferReply().queue(hook -> {
-            if (!memberVoiceState.inAudioChannel()) {
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command.")).queue();
+    public void execute(Interaction interaction) {
+        final MessageChannel channel = interaction.getChannel();
+        final GuildVoiceState voiceState = interaction.getGuild().getSelfMember().getVoiceState();
+        final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
+        assert memberVoiceState != null; interaction.deferReply();
+
+        if (!memberVoiceState.inAudioChannel()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."));
+            return;
+        }
+        String query = (String) interaction.getArguments().getOrDefault("query", "https://youtube.com/watch?v=dQw4w9WgXcQ");
+        final AudioManager audioManager = interaction.getGuild().getAudioManager();
+        final AudioChannel memberChannel = memberVoiceState.getChannel();
+        assert voiceState != null;
+        if (!voiceState.inAudioChannel()) {
+            audioManager.openAudioConnection(memberChannel);
+            audioManager.setSelfDeafened(true);
+        }
+        if (!Utilities.isValidURL(query)) {
+            try {
+                ElixirMusicManager.getInstance().loadAndPlay(HttpUtil.getYouTubeURL(query), interaction, "https://www.youtube.com/");
+                return;
+            } catch (UnsupportedEncodingException exception) {
+                interaction.reply(EmbedUtil.sendErrorEmbed("No search results found."));
+                Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception).additionalInformation("Encoding was not supported."));
                 return;
             }
-            String query = Objects.requireNonNull(event.getOption("query")).getAsString();
-            final AudioManager audioManager = channel.getGuild().getAudioManager();
-            final AudioChannel memberChannel = memberVoiceState.getChannel();
-            assert voiceState != null;
-            if (!voiceState.inAudioChannel()) {
-                audioManager.openAudioConnection(memberChannel);
-                audioManager.setSelfDeafened(true);
+        }
+        if (Utilities.isValidURL(query) && query.contains("spotify")) {
+            try {
+                SpotifySourceManager.authorize();
+            } catch (IOException | ParseException | SpotifyWebApiException exception) {
+                Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception).additionalInformation("Spotify authorization exception."));
             }
-            if (!Utilities.isValidURL(query)) {
-                try {
-                    ElixirMusicManager.getInstance().loadAndPlay(channel, HttpUtil.getYouTubeURL(query), hook, "https://www.youtube.com/");
-                    return;
-                } catch (UnsupportedEncodingException exception) {
-                    hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("No search results found.")).queue();
-                    Utilities.throwThrowable(new ElixirException(guild, member).exception(exception).additionalInformation("Encoding was not supported."));
-                    return;
-                }
-            }
-            if (Utilities.isValidURL(query) && query.contains("spotify")) {
-                try {
-                    SpotifySourceManager.authorize();
-                } catch (IOException | ParseException | SpotifyWebApiException exception) {
-                    Utilities.throwThrowable(new ElixirException(guild, member).exception(exception).additionalInformation("Spotify authorization exception."));
-                }
-            }
-            ElixirMusicManager.getInstance().loadAndPlay(channel, query, hook, query);
-        });
+        }
+        ElixirMusicManager.getInstance().loadAndPlay(query, interaction, query);
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description)
-                .addOption(OptionType.STRING, this.options[0], this.optionDescriptions[0], true);
+    public Collection<Argument> getArguments() {
+        return null;
     }
 }

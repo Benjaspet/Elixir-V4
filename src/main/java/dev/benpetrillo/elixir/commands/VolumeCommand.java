@@ -20,52 +20,37 @@ package dev.benpetrillo.elixir.commands;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import tech.xigam.cch.command.Arguments;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Argument;
+import tech.xigam.cch.utils.Interaction;
 
-import java.util.Objects;
+import java.util.Collection;
+import java.util.List;
 
-public final class VolumeCommand implements ApplicationCommand {
-
-    private final String name = "volume";
-    private final String description = "Set the volume of the player.";
-    private final String[] options = {"volume"}; 
-    private final String[] optionDescriptions = {"The volume (out of 150) for the player."};
+public final class VolumeCommand extends Command implements Arguments {
+    public VolumeCommand() {
+        super("volume", "Set the volume of the player.");
+    }
 
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        if(!AudioUtil.playerCheck(event, guild, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
-        if(!AudioUtil.audioCheck(event, guild, member)) return;
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        final int volume = Math.min(150, Math.max(0, 
-                (int) Objects.requireNonNull(event.getOption("volume")).getAsLong()));
+    public void execute(Interaction interaction) {
+        if(!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
+        if(!AudioUtil.audioCheck(interaction)) return;
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
+        final int volume = Math.min(150, Math.max(0,
+                (int) interaction.getArguments().getOrDefault("volume", musicManager.audioPlayer.getVolume())));
         musicManager.audioPlayer.setVolume(volume);
-        event.replyEmbeds(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**.")).queue();
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**."));
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description)
-                .addOptions(
-                        new OptionData(OptionType.INTEGER, this.options[0], this.optionDescriptions[0], true)
-                                .setRequiredRange(0, 150)
-                );
+    public Collection<Argument> getArguments() {
+        return List.of(
+                Argument.create("volume", "The volume (out of 150) for the player.", "volume", OptionType.INTEGER, true, 0)
+        );
     }
 }

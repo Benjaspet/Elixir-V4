@@ -27,6 +27,12 @@
             <version>1.3.77</version>
         </dependency>
         <dependency>
+            <groupId>tech.xigam</groupId>
+            <artifactId>CCH</artifactId>
+            <version>2.1.0</version>
+            <scope>system</scope> <systemPath>${basedir}/libs/Complex Command Handler.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>java-dotenv</artifactId>
             <version>5.2.2</version>

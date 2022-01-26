@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.xigam.cch.ComplexCommandHandler;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -49,11 +50,13 @@ public final class ElixirClient {
     
     private static ElixirClient instance;
     
-    public static ApplicationCommandManager applicationCommandManager;
+    @Deprecated public static ApplicationCommandManager applicationCommandManager;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
     public static final OffsetDateTime startTime;
     
     public JDA jda;
+    public ComplexCommandHandler commandHandler;
+    public ElixirVoiceDispatchInterceptor dispatchInterceptor;
     
     static {
         startTime = OffsetDateTime.now();
@@ -70,6 +73,8 @@ public final class ElixirClient {
     }
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
+        this.commandHandler = new ComplexCommandHandler(false);
+        
         this.jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
@@ -80,7 +85,7 @@ public final class ElixirClient {
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
-                        new ApplicationCommandListener(),
+                        this.commandHandler,
                         new ReadyListener(),
                         new MessageListener(),
                         new ShutdownListener()
@@ -98,13 +103,17 @@ public final class ElixirClient {
                 )
                 .build();
         AllowedMentions.setDefaultMentionRepliedUser(false);
-        applicationCommandManager = ApplicationCommandManager.initialize(jda);
+        applicationCommandManager = ApplicationCommandManager.initialize();
         OAuthUpdateTask.schedule(); DatabaseManager.create();
-        new ElixirVoiceDispatchInterceptor();
+        this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();
     }
-
+    
     public static Logger getLogger() {
         return logger;
+    }
+    
+    public static JDA getJda() {
+        return instance.jda;
     }
 
     public static ElixirClient getInstance() {

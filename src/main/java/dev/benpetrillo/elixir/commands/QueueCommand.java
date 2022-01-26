@@ -20,94 +20,75 @@ package dev.benpetrillo.elixir.commands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Interaction;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public final class QueueCommand implements ApplicationCommand {
-    
-    private final String name = "queue";
-    private final String description = "View all songs in the queue.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
+public final class QueueCommand extends Command {
+    public QueueCommand() {
+        super("queue", "View all songs in the queue.");
+    }
 
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
+    public void execute(Interaction interaction) {
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         if (musicManager.scheduler.queue.isEmpty()) {
-            event.replyEmbeds(EmbedUtil.sendErrorEmbed("There are no songs in the queue.")).queue();
+            interaction.reply(EmbedUtil.sendErrorEmbed("There are no songs in the queue."));
             return;
         }
-        event.deferReply().queue(hook -> {
-            try {
-                final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
-                final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
-                final AudioTrack nowPlaying = musicManager.audioPlayer.getPlayingTrack();
-                final String thumbnail = TrackUtil.getCoverArt(nowPlaying.getInfo());
-                StringBuilder description = new StringBuilder();
-                int maxAmount = Math.min(arrayQueue.size(), 12);
-                for (int i = 0; i < maxAmount; i++) {
-                    final AudioTrack track = arrayQueue.get(i);
-                    final AudioTrackInfo info = track.getInfo();
-                    String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
-                    String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
-                    description
-                            .append(formattedString)
-                            .append("\n");
-                }
-                if (arrayQueue.size() > maxAmount) {
-                    description
-                            .append("\n")
-                            .append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
-                }
-                final String nowPlayingTitle = nowPlaying.getInfo().title;
-                final String nowPlayingTrimmed = nowPlayingTitle.length() > 55 ? nowPlayingTitle.substring(0, 52) + "..." : nowPlayingTitle;
-                final String queueData = "• Tracks queued: %s\n• Loop mode: %s\n• Volume: %s".formatted(
-                        queue.size(), Utilities.prettyPrint(musicManager.scheduler.repeating.toString()), musicManager.audioPlayer.getVolume());
-                MessageEmbed embed = new EmbedBuilder()
-                        .setTitle("Guild Queue")
-                        .setColor(EmbedUtil.getDefaultEmbedColor())
-                        .setAuthor("Now Playing: " + nowPlayingTrimmed, nowPlaying.getInfo().uri)
-                        .setThumbnail(thumbnail)
-                        .setDescription(description)
-                        .addField("Queue Data", queueData, false)
-                        .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
-                        .setTimestamp(new Date().toInstant())
-                        .build();
-                hook.editOriginalEmbeds(embed).queue();
-            } catch (PermissionException ignored) {
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("An error occurred while running this command.")).queue();
+        
+        interaction.deferReply();
+        try {
+            final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
+            final List<AudioTrack> arrayQueue = new ArrayList<>(queue);
+            final AudioTrack nowPlaying = musicManager.audioPlayer.getPlayingTrack();
+            final String thumbnail = TrackUtil.getCoverArt(nowPlaying.getInfo());
+            StringBuilder description = new StringBuilder();
+            int maxAmount = Math.min(arrayQueue.size(), 12);
+            for (int i = 0; i < maxAmount; i++) {
+                final AudioTrack track = arrayQueue.get(i);
+                final AudioTrackInfo info = track.getInfo();
+                String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
+                String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
+                description
+                        .append(formattedString)
+                        .append("\n");
             }
-        });
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+            if (arrayQueue.size() > maxAmount) {
+                description
+                        .append("\n")
+                        .append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
+            }
+            final String nowPlayingTitle = nowPlaying.getInfo().title;
+            final String nowPlayingTrimmed = nowPlayingTitle.length() > 55 ? nowPlayingTitle.substring(0, 52) + "..." : nowPlayingTitle;
+            final String queueData = "• Tracks queued: %s\n• Loop mode: %s\n• Volume: %s".formatted(
+                    queue.size(), Utilities.prettyPrint(musicManager.scheduler.repeating.toString()), musicManager.audioPlayer.getVolume());
+            MessageEmbed embed = new EmbedBuilder()
+                    .setTitle("Guild Queue")
+                    .setColor(EmbedUtil.getDefaultEmbedColor())
+                    .setAuthor("Now Playing: " + nowPlayingTrimmed, nowPlaying.getInfo().uri)
+                    .setThumbnail(thumbnail)
+                    .setDescription(description)
+                    .addField("Queue Data", queueData, false)
+                    .setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getAvatarUrl())
+                    .setTimestamp(new Date().toInstant())
+                    .build();
+            interaction.reply(embed);
+        } catch (PermissionException ignored) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while running this command."));
+        }
     }
 }

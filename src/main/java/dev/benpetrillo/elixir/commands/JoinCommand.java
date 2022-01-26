@@ -18,57 +18,38 @@
 
 package dev.benpetrillo.elixir.commands;
 
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.managers.AudioManager;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Interaction;
 
-public final class JoinCommand implements ApplicationCommand {
-
-    private final String name = "join";
-    private final String description = "Bind Elixir to your voice channel.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
-
-    @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        final TextChannel channel = event.getTextChannel();
-        final GuildVoiceState voiceState = channel.getGuild().getSelfMember().getVoiceState();
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
-        assert memberVoiceState != null;
-        event.deferReply().queue(hook -> {
-            if (!memberVoiceState.inAudioChannel()) {
-                hook.editOriginalEmbeds(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command.")).queue();
-                return;
-            }
-            final AudioManager audioManager = channel.getGuild().getAudioManager();
-            final AudioChannel memberChannel = memberVoiceState.getChannel();
-            assert voiceState != null;
-            if (!voiceState.inAudioChannel()) {
-                audioManager.openAudioConnection(memberChannel);
-                audioManager.setSelfDeafened(true);
-                assert memberChannel != null;
-                String name = memberChannel.getName();
-                MessageEmbed embed = EmbedUtil.sendDefaultEmbed(String.format("I've connected to **%s** successfully.", name));
-                hook.editOriginalEmbeds(embed).queue();
-            }
-        });
+public final class JoinCommand extends Command {
+    public JoinCommand() {
+        super("join", "Bind Elixir to your voice channel.");
     }
-
+    
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+    public void execute(Interaction interaction) {
+        final GuildVoiceState voiceState = interaction.getGuild().getSelfMember().getVoiceState();
+        final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
+        assert memberVoiceState != null; interaction.deferReply();
+        if (!memberVoiceState.inAudioChannel()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."));
+            return;
+        }
+        final AudioManager audioManager = interaction.getGuild().getAudioManager();
+        final AudioChannel memberChannel = memberVoiceState.getChannel();
+        assert voiceState != null;
+        if (!voiceState.inAudioChannel()) {
+            audioManager.openAudioConnection(memberChannel);
+            audioManager.setSelfDeafened(true);
+            assert memberChannel != null;
+            String name = memberChannel.getName();
+            MessageEmbed embed = EmbedUtil.sendDefaultEmbed(String.format("I've connected to **%s** successfully.", name));
+            interaction.reply(embed);
+        }
     }
 }

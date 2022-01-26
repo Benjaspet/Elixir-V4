@@ -20,52 +20,52 @@ package dev.benpetrillo.elixir.commands;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.managers.AudioManager;
+import tech.xigam.cch.command.Arguments;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Argument;
+import tech.xigam.cch.utils.Interaction;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.Objects;
+import java.util.List;
 
-public final class SkipCommand implements ApplicationCommand {
-
-    private final String name = "skip";
-    private final String description = "Skip to a specified track in the queue.";
-    private final String[] options = {"track"};
-    private final String[] optionDescriptions = {"The track to skip to."};
+public final class SkipCommand extends Command implements Arguments {
+    public SkipCommand() {
+        super("skip", "Skip to a specified track in the queue.");
+    }
 
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        final TextChannel channel = event.getTextChannel();
-        if (!AudioUtil.audioCheck(event, guild, member)) return;
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(member.getGuild());
-        final AudioManager audioManager = channel.getGuild().getAudioManager();
+    public void execute(Interaction interaction) {
+        if (!AudioUtil.audioCheck(interaction)) return;
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
+        final AudioManager audioManager = interaction.getGuild().getAudioManager();
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
         if (musicManager.scheduler.queue.isEmpty()) {
             audioManager.closeAudioConnection();
             musicManager.scheduler.queue.clear();
             musicManager.audioPlayer.destroy();
             MessageEmbed embed = EmbedUtil.sendDefaultEmbed("There were no tracks left in the queue, so I left.");
-            event.replyEmbeds(embed).queue();
+            interaction.reply(embed);
             return;
         }
         if (audioPlayer.getPlayingTrack() == null) {
             MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
-            event.replyEmbeds(embed).queue();
+            interaction.reply(embed);
         }
-        final OptionMapping mapping = event.getOption("track");
-        final long skipTo = mapping == null ? 1 : mapping.getAsLong();
+        final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1);
         assert musicManager.scheduler.queue.peek() != null;
         AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
         for (int i = 0; i < skipTo; i++) {
@@ -79,7 +79,7 @@ public final class SkipCommand implements ApplicationCommand {
         final String isLive = upNext.getInfo().isStream ? "yes" : "no";
         final String artist = upNext.getInfo().author;
         final String url = upNext.getInfo().uri;
-        final String requestedBy = member.getAsMention();
+        final String requestedBy = "<@" + upNext.getUserData(String.class) + ">";
         final String contents = """
                             • Artist: %s
                             • Requested by: %s
@@ -92,25 +92,16 @@ public final class SkipCommand implements ApplicationCommand {
                 .setColor(EmbedUtil.getDefaultEmbedColor())
                 .setThumbnail(TrackUtil.getCoverArt(upNext.getInfo()))
                 .addField("Track Data", contents, false)
-                .setFooter("Elixir Music", event.getJDA().getSelfUser().getAvatarUrl())
+                .setFooter("Elixir Music", ElixirClient.getJda().getSelfUser().getAvatarUrl())
                 .setTimestamp(new Date().toInstant())
                 .build();
-        event.replyEmbeds(embed).queue();
+        interaction.reply(embed);
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description)
-                .addOption(OptionType.INTEGER, this.options[0], this.optionDescriptions[0], false);
+    public Collection<Argument> getArguments() {
+        return List.of(
+                Argument.create("track", "The track to skip to.", "track", OptionType.INTEGER, false, 0)
+        );
     }
 }

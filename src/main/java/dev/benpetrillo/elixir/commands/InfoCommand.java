@@ -22,33 +22,29 @@ import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Interaction;
 
 import java.time.OffsetDateTime;
 
-public final class InfoCommand implements ApplicationCommand {
-
-    private final String name = "info";
-    private final String description = "Get information about Elixir.";
-    private final String[] options = {};
-    private final String[] optionDescriptions = {};
+public final class InfoCommand extends Command {
+    public InfoCommand() {
+        super("info", "Get information about Elixir.");
+    }
     
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
+    public void execute(Interaction interaction) {
         var streams = 0; for(GuildMusicManager musicManager : ElixirMusicManager.getInstance().getMusicManagers())
             streams += musicManager.audioPlayer.getPlayingTrack() != null ? 1 : 0;
-        var servers = event.getJDA().getGuilds().size();
-        var users = 0; for(Guild server : event.getJDA().getGuilds()) 
+        var servers = ElixirClient.getInstance().jda.getGuilds().size();
+        var users = 0; for(Guild server : ElixirClient.getInstance().jda.getGuilds())
             users += server.getMemberCount();
         var uptime = Utilities.formatDuration(1000 * (OffsetDateTime.now().toEpochSecond() - ElixirClient.startTime.toEpochSecond()));
-        
+
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(EmbedUtil.getDefaultEmbedColor())
                 .setAuthor("Total Playing Streams: " + streams)
@@ -61,23 +57,8 @@ public final class InfoCommand implements ApplicationCommand {
                         Config.get("EMOJI-LIBRARIES"), Config.get("EMOJI-SERVERS"), servers,
                         Config.get("EMOJI-USERS"), users, Config.get("EMOJI-UPTIME"), uptime
                 ), false)
-                .setFooter("Elixir Music", event.getJDA().getSelfUser().getEffectiveAvatarUrl())
+                .setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl())
                 .setTimestamp(OffsetDateTime.now());
-        event.replyEmbeds(embed.build()).queue();
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description);
+        interaction.reply(embed.build());
     }
 }

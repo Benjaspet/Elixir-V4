@@ -1,0 +1,32 @@
+{
+  "info": {
+    "id": "(playlist id)",
+    "name": "(playlist name)",
+    "description": "(playlist description)",
+    "playlistCoverUrl": "https://i.ytimg.com/vi/tntOCGkgt98/hqdefault.jpg",
+    "author": "(discord snowflake)"
+  },
+  
+  "tracks": [
+    {
+      "title": "(track title)",
+      "url": "https://www.youtube.com/watch?v=tntOCGkgt98",
+      "artist": "(track artist)",
+      "coverArt": "https://i.ytimg.com/vi/tntOCGkgt98/hqdefault.jpg",
+      "duration": 0
+    },
+    {
+      "title": "(track title)",
+      "url": "https://www.youtube.com/watch?v=tntOCGkgt98",
+      "artist": "(track artist)",
+      "coverArt": "https://i.ytimg.com/vi/tntOCGkgt98/hqdefault.jpg",
+      "duration": 0,
+      "isrc": "(track isrc)"
+    }
+  ],
+  
+  "options": {
+    "shuffle": true,
+    "repeat": true
+  }
+}

@@ -21,33 +21,30 @@ package dev.benpetrillo.elixir.commands;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import tech.xigam.cch.command.Arguments;
+import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Argument;
+import tech.xigam.cch.utils.Interaction;
 
-import java.util.Objects;
+import java.util.Collection;
+import java.util.List;
 
-public final class LoopCommand implements ApplicationCommand {
+public final class LoopCommand extends Command implements Arguments {
+    public LoopCommand() {
+        super("loop", "Loop a song or queue.");
+    }
 
-    private final String name = "loop";
-    private final String description = "Loop a song or queue.";
-    private final String[] options = {"mode"}; 
-    private final String[] optionDescriptions = {"The type of loop to apply."};
-    
     @Override
-    public void runCommand(SlashCommandEvent event, Member member, Guild guild) {
-        if (!AudioUtil.audioCheck(event, guild, member)) return;
-        if (!AudioUtil.playerCheck(event, guild, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
+    public void execute(Interaction interaction) {
+        var mode = (String) interaction.getArguments().getOrDefault("mode", "Disable Loop");
+        if (!AudioUtil.audioCheck(interaction)) return;
+        if (!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final TrackScheduler scheduler = musicManager.scheduler;
-        String loop = Objects.requireNonNull(event.getOption("mode")).getAsString(); String mode;
-        switch(loop) {
+        switch(mode) {
             case "Track Loop":
                 scheduler.repeating = TrackScheduler.LoopMode.TRACK; mode = "track";
                 break;
@@ -56,30 +53,22 @@ public final class LoopCommand implements ApplicationCommand {
                 break;
             case "Disable Loop":
                 scheduler.repeating = TrackScheduler.LoopMode.NONE;
-                event.replyEmbeds(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode.")).queue();
+                interaction.reply(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode."));
                 return;
             default:
                 return;
         }
-        event.replyEmbeds(EmbedUtil.sendDefaultEmbed("Set the loop mode to **%s**.".formatted(mode))).queue();
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Set the loop mode to **%s**.".formatted(mode)));
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(this.name, this.description)
-                .addOptions(new OptionData(OptionType.STRING, this.options[0], this.optionDescriptions[0], true)
-                        .addChoice("Track Loop", "Track Loop")
-                        .addChoice("Queue Loop", "Queue Loop")
-                        .addChoice("Disable Loop", "Disable Loop"));
+    public Collection<Argument> getArguments() {
+        return List.of(
+                Argument.createWithChoices(
+                        "mode", "Loop mode", "mode", 
+                        OptionType.STRING, true, 0,
+                        "Song Loop", "Queue Loop", "Disable Loop"
+                )
+        );
     }
 }

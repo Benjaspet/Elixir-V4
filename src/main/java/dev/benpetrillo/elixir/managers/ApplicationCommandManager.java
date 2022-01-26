@@ -22,8 +22,8 @@ import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.*;
 import dev.benpetrillo.elixir.types.ApplicationCommand;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import tech.xigam.cch.ComplexCommandHandler;
+import tech.xigam.cch.command.BaseCommand;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,24 +32,23 @@ public final class ApplicationCommandManager {
 
     public final Map<String, ApplicationCommand> commands = new ConcurrentHashMap<>();
 
-    public static ApplicationCommandManager initialize(JDA jda) {
-        ApplicationCommandManager manager = new ApplicationCommandManager();
+    public static ApplicationCommandManager initialize() {
+        var elixirClient = ElixirClient.getInstance();
+        
+        ApplicationCommandManager manager = new ApplicationCommandManager(elixirClient.commandHandler);
         if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GLOBAL"))) {
-            CommandListUpdateAction commands = jda.updateCommands();
-            for (ApplicationCommand command : manager.commands.values()) {
-                commands.addCommands(command.getCommandData()).queue();
-            }
+            elixirClient.commandHandler.deployAll(null);
             ElixirClient.logger.info("All global slash commands have been deployed.");
         } else if (Boolean.parseBoolean(Config.get("DELETE-APPLICATION-COMMANDS-GLOBAL"))) {
-            CommandListUpdateAction commands = jda.updateCommands();
-            commands.addCommands().queue();
+            elixirClient.commandHandler.downsert(null);
             ElixirClient.logger.info("All global slash commands have been deleted.");
         }
+        
         return manager;
     }
     
-    private ApplicationCommandManager() {
-        registerCommand(
+    private ApplicationCommandManager(ComplexCommandHandler handler) {
+        registerCommand(handler, 
                 new InfoCommand(),
                 new JoinCommand(),
                 new LoopCommand(),
@@ -59,16 +58,16 @@ public final class ApplicationCommandManager {
                 new PlaylistCommand(),
                 new QueueCommand(),
                 new ResumeCommand(),
+                new ShuffleCommand(),
                 new SkipCommand(),
                 new StopCommand(),
-                new ShuffleCommand(),
                 new VolumeCommand()
         );
     }
     
-    private void registerCommand(ApplicationCommand... commands) {
-        for (ApplicationCommand cmd : commands) {
-            this.commands.put(cmd.getCommandData().getName(), cmd);
+    private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {
+        for(BaseCommand command : commands) {
+            handler.registerCommand(command);
         }
     }
 }
