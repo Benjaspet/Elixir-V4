@@ -20,7 +20,6 @@ package dev.benpetrillo.elixir;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.benpetrillo.elixir.api.WebAPI;
-import dev.benpetrillo.elixir.events.ApplicationCommandListener;
 import dev.benpetrillo.elixir.events.MessageListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.events.ShutdownListener;

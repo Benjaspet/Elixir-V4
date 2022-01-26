@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import org.jetbrains.annotations.Nullable;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
 import tech.xigam.cch.utils.Interaction;
 
@@ -64,6 +65,11 @@ public final class ElixirMusicManager {
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
             return guildMusicManager;
         });
+    }
+    
+    @Nullable
+    public GuildMusicManager getMusicManager(String guildId) {
+        return this.musicManagers.getOrDefault(guildId, null);
     }
     
     public GuildMusicManager[] getMusicManagers() {

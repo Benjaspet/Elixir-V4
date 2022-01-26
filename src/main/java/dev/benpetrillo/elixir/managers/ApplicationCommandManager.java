@@ -21,16 +21,10 @@ package dev.benpetrillo.elixir.managers;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.*;
-import dev.benpetrillo.elixir.types.ApplicationCommand;
 import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 public final class ApplicationCommandManager {
-
-    public final Map<String, ApplicationCommand> commands = new ConcurrentHashMap<>();
 
     public static ApplicationCommandManager initialize() {
         ApplicationCommandManager manager = new ApplicationCommandManager(ElixirClient.getCommandHandler());

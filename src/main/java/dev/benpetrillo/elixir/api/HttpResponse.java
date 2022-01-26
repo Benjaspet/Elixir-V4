@@ -59,4 +59,13 @@ public class HttpResponse {
             this.statusCode = 404;
         }
     }
+    
+    public static class Success extends HttpResponse {
+        public Success() {
+            this.title("Success | 200 OK")
+                    .text("The request was successful.")
+                    .close();
+            this.statusCode = 200;
+        }
+    }
 }

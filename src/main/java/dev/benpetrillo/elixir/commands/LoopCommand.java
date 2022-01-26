@@ -67,7 +67,7 @@ public final class LoopCommand extends Command implements Arguments {
                 Argument.createWithChoices(
                         "mode", "Loop mode", "mode", 
                         OptionType.STRING, true, 0,
-                        "Song Loop", "Queue Loop", "Disable Loop"
+                        "Track Loop", "Queue Loop", "Disable Loop"
                 )
         );
     }

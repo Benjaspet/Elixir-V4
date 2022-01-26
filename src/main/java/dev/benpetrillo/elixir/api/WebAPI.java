@@ -19,12 +19,12 @@
 package dev.benpetrillo.elixir.api;
 
 import com.sun.net.httpserver.*;
-import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.api.endpoints.*;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
-import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -38,6 +38,8 @@ public final class WebAPI {
             httpServer.setExecutor(Executors.newFixedThreadPool(10));
             httpServer.createContext("/", new Index());
             httpServer.createContext("/playlist", new Playlist());
+            httpServer.createContext("/player", new Player());
+            httpServer.createContext("/queue", new QueueEndpoint());
             
             httpServer.start(); // Start the server.
         } catch (IOException exception) {
@@ -64,8 +66,35 @@ public final class WebAPI {
             if(playlist == null) {
                 this.respond(new HttpResponse.NotFound()); return;
             }
-            var serialized = Utilities.serialize(playlist);
-            this.header("Content-Type", "application/json").respond(serialized);
+            this.respond(Utilities.base64Encode(Utilities.serialize(playlist)));
+        }
+    }
+    
+    public static class Player extends HttpEndpoint {
+        @Override
+        public void get() throws IOException {
+            var guildId = this.arguments.getOrDefault("guildId", "");
+            var action = this.arguments.getOrDefault("action", "");
+            if(guildId.isEmpty() || action.isEmpty()) {
+                this.respond(new HttpResponse.NotFound()); return;
+            }
+
+            var musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
+            if(musicManager == null) {
+                this.respond(new HttpResponse.NotFound()); return;
+            }
+            
+            switch(action) {
+                default -> this.respond(new HttpResponse.NotFound());
+                case "pause" -> musicManager.audioPlayer.setPaused(true);
+                case "resume" -> musicManager.audioPlayer.setPaused(false);
+                case "nowplaying" -> {
+                    var track = musicManager.audioPlayer.getPlayingTrack();
+                    this.statusCode = 301; // Found.
+                    this.respond(Utilities.serialize(track.getInfo())); return;
+                }
+            }
+            this.respond(new HttpResponse.Success());
         }
     }
 }
