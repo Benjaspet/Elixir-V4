@@ -39,10 +39,10 @@ public final class ReadyListener extends ListenerAdapter {
             Guild guild = jda.getGuildById(id);
             if (guild != null) {
                 if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
-                    ElixirClient.getInstance().commandHandler.deployAll(guild);
+                    ElixirClient.getCommandHandler().deployAll(guild);
                     ElixirClient.getLogger().info("All guild slash commands have been deployed.");
                 } else if (Boolean.parseBoolean(Config.get("DELETE-APPLICATION-COMMANDS-GUILD"))) {
-                    ElixirClient.getInstance().commandHandler.downsert(guild);
+                    ElixirClient.getCommandHandler().downsert(guild);
                     ElixirClient.getLogger().info("All guild slash commands have been deleted.");
                 }
             } else {

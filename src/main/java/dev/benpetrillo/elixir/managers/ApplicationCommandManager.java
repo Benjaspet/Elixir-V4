@@ -33,14 +33,12 @@ public final class ApplicationCommandManager {
     public final Map<String, ApplicationCommand> commands = new ConcurrentHashMap<>();
 
     public static ApplicationCommandManager initialize() {
-        var elixirClient = ElixirClient.getInstance();
-        
-        ApplicationCommandManager manager = new ApplicationCommandManager(elixirClient.commandHandler);
+        ApplicationCommandManager manager = new ApplicationCommandManager(ElixirClient.getCommandHandler());
         if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GLOBAL"))) {
-            elixirClient.commandHandler.deployAll(null);
+            ElixirClient.getCommandHandler().deployAll(null);
             ElixirClient.logger.info("All global slash commands have been deployed.");
         } else if (Boolean.parseBoolean(Config.get("DELETE-APPLICATION-COMMANDS-GLOBAL"))) {
-            elixirClient.commandHandler.downsert(null);
+            ElixirClient.getCommandHandler().downsert(null);
             ElixirClient.logger.info("All global slash commands have been deleted.");
         }
         

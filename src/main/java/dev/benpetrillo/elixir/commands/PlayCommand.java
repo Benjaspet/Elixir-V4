@@ -27,6 +27,7 @@ import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -38,6 +39,7 @@ import tech.xigam.cch.utils.Interaction;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
+import java.util.List;
 
 public final class PlayCommand extends Command implements Arguments {
     public PlayCommand() {
@@ -85,6 +87,8 @@ public final class PlayCommand extends Command implements Arguments {
 
     @Override
     public Collection<Argument> getArguments() {
-        return null;
+        return List.of(
+                Argument.create("query", "The track to play, by URL or query.", "query", OptionType.STRING, true, 0)
+        );
     }
 }

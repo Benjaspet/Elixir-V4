@@ -51,11 +51,11 @@ public final class ElixirClient {
     private static ElixirClient instance;
     
     @Deprecated public static ApplicationCommandManager applicationCommandManager;
+    public static ComplexCommandHandler commandHandler;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
     public static final OffsetDateTime startTime;
     
     public JDA jda;
-    public ComplexCommandHandler commandHandler;
     public ElixirVoiceDispatchInterceptor dispatchInterceptor;
     
     static {
@@ -73,7 +73,8 @@ public final class ElixirClient {
     }
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
-        this.commandHandler = new ComplexCommandHandler(false);
+        commandHandler = new ComplexCommandHandler(false);
+        applicationCommandManager = ApplicationCommandManager.initialize();
         
         this.jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
@@ -85,7 +86,7 @@ public final class ElixirClient {
                 .setMemberCachePolicy(MemberCachePolicy.VOICE)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
-                        this.commandHandler,
+                        commandHandler,
                         new ReadyListener(),
                         new MessageListener(),
                         new ShutdownListener()
@@ -103,7 +104,6 @@ public final class ElixirClient {
                 )
                 .build();
         AllowedMentions.setDefaultMentionRepliedUser(false);
-        applicationCommandManager = ApplicationCommandManager.initialize();
         OAuthUpdateTask.schedule(); DatabaseManager.create();
         this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();
     }
@@ -114,6 +114,10 @@ public final class ElixirClient {
     
     public static JDA getJda() {
         return instance.jda;
+    }
+    
+    public static ComplexCommandHandler getCommandHandler() {
+        return commandHandler;
     }
 
     public static ElixirClient getInstance() {
