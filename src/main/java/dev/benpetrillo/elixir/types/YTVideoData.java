@@ -29,6 +29,7 @@ public final class YTVideoData {
     public static class Item {
         public String kind, etag, id;
         public Snippet snippet;
+        public ContentDetails contentDetails;
 
         public static class Snippet {
             public String publishedAt, channelId, title, description;
@@ -36,6 +37,10 @@ public final class YTVideoData {
             public List<String> tags;
             public String channelTitle, liveBroadcastContent;
             public Map<String, String> localized;
+        }
+        
+        public static class ContentDetails {
+            public String duration, dimension, definition, caption, licensedContent, contentRating, projection;
         }
     }
 }

@@ -70,7 +70,7 @@ public final class HttpUtil {
         OkHttpClient client = new OkHttpClient();
         String url = "https://www.googleapis.com/youtube/v3/videos?key=" +
                 Config.get("YOUTUBE-API-KEY") +
-                "&part=snippet&id=" +
+                "&part=snippet%2CcontentDetails&id=" +
                 videoId;
         Request request = new Request.Builder()
                 .url(url)
