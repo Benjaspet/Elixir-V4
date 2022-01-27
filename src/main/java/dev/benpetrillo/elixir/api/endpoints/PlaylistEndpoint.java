@@ -21,7 +21,9 @@ package dev.benpetrillo.elixir.api.endpoints;
 import dev.benpetrillo.elixir.api.HttpEndpoint;
 import dev.benpetrillo.elixir.api.HttpResponse;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
+import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
+import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 
 import java.io.IOException;
@@ -55,11 +57,20 @@ public final class PlaylistEndpoint extends HttpEndpoint {
     
     private void addTrack() throws IOException {
         var track = this.arguments.getOrDefault("track", "");
-        var position = Integer.parseInt(this.arguments.getOrDefault("position", "1"));
+        var position = Integer.parseInt(this.arguments.getOrDefault("position", "-1"));
         if(track.isEmpty()) {
             this.respond(new HttpResponse.BadRequest()); return;
         }
         
-//        PlaylistUtil.addTrackToList();
+        if(!Utilities.isValidURL(track)) {
+            track = HttpUtil.getYouTubeURL(track);
+        }
+        var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
+        if(trackInfo == null) {
+            this.respond(new HttpResponse.BadRequest()); return;
+        }
+        
+        PlaylistUtil.addTrackToList(trackInfo, this.playlist, position);
+        this.respond(new HttpResponse.Success());
     }
 }

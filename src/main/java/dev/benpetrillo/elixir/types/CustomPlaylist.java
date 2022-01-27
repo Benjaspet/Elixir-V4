@@ -58,7 +58,8 @@ public final class CustomPlaylist {
         public static CustomPlaylistTrack from(AudioTrackInfo info) {
             var track = new CustomPlaylistTrack();
             track.title = info.title;
-            track.url = info.uri.contains("spotify") ? "https://open.spotify.com/track/" + info.uri.split(":")[2] : info.uri;
+            System.out.println(info.uri);
+            track.url = info.uri.contains("spotify") ? "https://open.spotify.com/track/" + info.uri.split("/")[5] : info.uri;
             track.artist = info.author;
             track.coverArt = TrackUtil.getCoverArt(info);
             track.duration = info.length;

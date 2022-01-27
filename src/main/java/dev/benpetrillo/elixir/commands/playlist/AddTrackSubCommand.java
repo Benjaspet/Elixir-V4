@@ -49,7 +49,7 @@ public final class AddTrackSubCommand extends SubCommand implements Arguments {
             return;
         }
         var track = (String) interaction.getArguments().getOrDefault("track", "https://youtube.com/watch?v=dQw4w9WgXcQ");
-        var index = (long) interaction.getArguments().getOrDefault("index", -1);
+        var index = (long) interaction.getArguments().getOrDefault("index", -1L);
         if (!Utilities.isValidURL(track)) {
             try {
                 track = HttpUtil.getYouTubeURL(track);

@@ -22,6 +22,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
+import dev.benpetrillo.elixir.utilities.DJUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
@@ -39,6 +40,11 @@ public final class ShuffleCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         if (!AudioUtil.audioCheck(interaction)) return;
+
+        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more person is required to continue.")); return;
+        }
+        
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
         Collections.shuffle(tracks);

@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import dev.benpetrillo.elixir.utilities.DJUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -41,6 +42,11 @@ public final class JoinCommand extends Command {
             interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."));
             return;
         }
+        
+        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more person is required to continue.")); return;
+        }
+        
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
         final AudioChannel memberChannel = memberVoiceState.getChannel();
         assert voiceState != null;

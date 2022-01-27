@@ -47,6 +47,7 @@ public final class PlayerEndpoint extends HttpEndpoint {
             case "nowplaying" -> this.nowPlaying();
             case "pause" -> this.musicManager.audioPlayer.setPaused(true);
             case "resume" -> this.musicManager.audioPlayer.setPaused(false);
+            case "skip" -> this.musicManager.scheduler.nextTrack();
         }
     }
     

@@ -23,10 +23,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.utilities.AudioUtil;
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import dev.benpetrillo.elixir.utilities.TrackUtil;
-import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utilities.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -64,7 +61,12 @@ public final class SkipCommand extends Command implements Arguments {
             MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
             interaction.reply(embed);
         }
-        final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1);
+
+        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more person is required to continue.")); return;
+        }
+        
+        final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1L);
         assert musicManager.scheduler.queue.peek() != null;
         AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
         for (int i = 0; i < skipTo; i++) {
