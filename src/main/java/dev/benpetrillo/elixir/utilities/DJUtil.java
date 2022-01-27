@@ -40,38 +40,41 @@ public final class DJUtil {
      */
     
     public static int continueExecution(Guild guild, Member member) {
-        var cache = DJUtil.roleCache.computeIfAbsent(guild.getId(), guildId -> {
-            var collection = DatabaseManager.getDjRoleCollection();
-            Bson dbObject = new BasicDBObject("guildId", guildId);
-            Document roleObject = collection.find(dbObject).first();
-            
-            if(roleObject == null) {
-                guild.createRole().setName("DJ").queue(role -> {
-                    collection.insertOne(new Document("guildId", guildId)
-                            .append("djRole", role.getId())
-                            .append("maxContinues", 3)
-                            .append("useDjRole", true));
-                    roleCache.get(guildId).djRole = role;
-                });
-                
-                return new DJInformation();
-            }
-            
-            var information = new DJInformation();
-            information.djRole = guild.getRoleById(roleObject.getString("djRole"));
-            information.maxContinue = roleObject.getInteger("maxContinues");
-            information.useDjRole = roleObject.getBoolean("useDjRole");
-            return information;
-        }); if(!cache.useDjRole) return -1;
+        return -1;
         
-        boolean alone = member.getVoiceState().getChannel().getMembers().size() != 3;
-        if(cache.djRole != null && !member.getRoles().contains(cache.djRole) && !alone) {
-            if(cache.currentContinue >= cache.maxContinue)
-                return -1;
-            cache.currentContinue++;
-        } else return -1;
-        
-        return cache.maxContinue - cache.currentContinue;
+//        var cache = DJUtil.roleCache.computeIfAbsent(guild.getId(), guildId -> {
+//            var collection = DatabaseManager.getDjRoleCollection();
+//            Bson dbObject = new BasicDBObject("guildId", guildId);
+//            Document roleObject = collection.find(dbObject).first();
+//            
+//            if(roleObject == null) {
+//                guild.createRole().setName("DJ").queue(role -> {
+//                    collection.insertOne(new Document("guildId", guildId)
+//                            .append("djRole", role.getId())
+//                            .append("maxContinues", 3)
+//                            .append("useDjRole", true));
+//                    roleCache.get(guildId).djRole = role;
+//                });
+//                
+//                return new DJInformation();
+//            }
+//            
+//            var information = new DJInformation();
+//            information.djRole = guild.getRoleById(roleObject.getString("djRole"));
+//            information.maxContinue = roleObject.getInteger("maxContinues");
+//            information.useDjRole = roleObject.getBoolean("useDjRole");
+//            return information;
+//        }); if(!cache.useDjRole) return -1;
+//        
+//        boolean alone = member.getVoiceState().getChannel().getMembers().size() != 3;
+//        if(cache.djRole != null && !member.getRoles().contains(cache.djRole) && !alone) {
+//            cache.currentContinue++;
+//            if(cache.currentContinue >= cache.maxContinue) {
+//                cache.currentContinue = 0; return -1;
+//            }
+//        } else return -1;
+//        
+//        return cache.maxContinue - cache.currentContinue;
     }
     
     private static class DJInformation {

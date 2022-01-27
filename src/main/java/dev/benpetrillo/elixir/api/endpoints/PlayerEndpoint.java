@@ -53,6 +53,12 @@ public final class PlayerEndpoint extends HttpEndpoint {
     
     private void nowPlaying() throws IOException {
         var track = this.musicManager.audioPlayer.getPlayingTrack();
+        if(track == null) {
+            this.statusCode = 404;
+            this.respond(new HttpResponse.NotFound());
+            return;
+        }
+        
         this.statusCode = 301; // Found.
         this.respond(Utilities.serialize(track.getInfo()));
     }

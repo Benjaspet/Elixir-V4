@@ -18,8 +18,10 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ExtendedAudioTrackInfo;
@@ -32,8 +34,9 @@ import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public final class TrackUtil {
 
@@ -120,8 +123,9 @@ public final class TrackUtil {
                 YTVideoData searchData = HttpUtil.getVideoData(Utilities.extractVideoId(url));
                 if (searchData == null) return null;
                 YTVideoData.Item.Snippet query = searchData.items.get(0).snippet;
+                long length = Utilities.cleanYouTubeFormat(searchData.items.get(0).contentDetails.duration);
                 return new AudioTrackInfo(
-                        query.title, query.channelTitle, 0,
+                        query.title, query.channelTitle, length,
                         searchData.items.get(0).id, false,
                         "https://youtu.be/" + searchData.items.get(0).id
                 );

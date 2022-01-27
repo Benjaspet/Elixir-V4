@@ -117,6 +117,38 @@ public final class Utilities {
     }
 
     /**
+     * Formats the funky ISO 8601 timestamp into seconds.
+     * @param duration The ISO 8601 timestamp.
+     * @return long
+     */
+    
+    public static long cleanYouTubeFormat(String duration) {
+        duration = duration.replace("PT", "").replace("H", ":")
+                .replace("M", ":").replace("S", "");
+        
+        var split = duration.split(":");
+        long length = 0;
+        switch(split.length) {
+            default -> {
+                return Long.parseLong(duration) * 1000;
+            }
+            
+            case 3 -> {
+                length += Long.parseLong(split[0]) * 60 * 60 * 1000;
+                length += Long.parseLong(split[1]) * 60 * 1000;
+                return length + Long.parseLong(split[2]) * 1000;
+            }
+            case 2 -> {
+                length += Long.parseLong(split[0]) * 60 * 1000;
+                return length + Long.parseLong(split[1]) * 1000;
+            }
+            case 1 -> {
+                return Long.parseLong(split[0]) * 1000;
+            }
+        }
+    }
+
+    /**
      * Extracts the video ID from a given URL.
      * @param url The YouTube URL to extract the video ID from.
      * @return A video ID.

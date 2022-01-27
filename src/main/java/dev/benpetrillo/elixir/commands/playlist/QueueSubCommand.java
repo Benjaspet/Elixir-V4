@@ -51,7 +51,7 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
         interaction.deferReply();
         var member = interaction.getMember(); var guild = interaction.getGuild();
         int continueExec; if((continueExec = DJUtil.continueExecution(guild, member)) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more person is required to continue.")); return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
         
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");

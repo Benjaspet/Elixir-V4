@@ -63,7 +63,7 @@ public final class SkipCommand extends Command implements Arguments {
         }
 
         int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more person is required to continue.")); return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
         
         final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1L);

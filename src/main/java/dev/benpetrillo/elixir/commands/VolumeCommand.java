@@ -44,7 +44,7 @@ public final class VolumeCommand extends Command implements Arguments {
         if(!AudioUtil.audioCheck(interaction)) return;
 
         int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more person is required to continue.")); return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
         
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());

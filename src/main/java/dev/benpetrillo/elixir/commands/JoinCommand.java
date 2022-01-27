@@ -44,7 +44,7 @@ public final class JoinCommand extends Command {
         }
         
         int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more person is required to continue.")); return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
         
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
