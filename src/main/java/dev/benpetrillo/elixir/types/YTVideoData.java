@@ -18,6 +18,8 @@
 
 package dev.benpetrillo.elixir.types;
 
+import com.google.gson.JsonObject;
+
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +42,9 @@ public final class YTVideoData {
         }
         
         public static class ContentDetails {
-            public String duration, dimension, definition, caption, licensedContent, contentRating, projection;
+            public String duration, dimension, definition, caption, licensedContent;
+            public JsonObject contentRating;
+            public String projection;
         }
     }
 }
