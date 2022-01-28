@@ -30,7 +30,7 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
     private final SpotifySourceManager spotifySourceManager;
 
     public SpotifyTrack(String title, String identifier, String isrc, Image[] images, String uri, ArtistSimplified[] artists, Integer trackDuration, SpotifySourceManager spotifySourceManager) {
-        this(new AudioTrackInfo(title,
+        this (new AudioTrackInfo(title,
                 artists.length == 0 ? "unknown" : artists[0].getName(),
                 trackDuration.longValue(),
                 identifier,
@@ -79,7 +79,6 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
         if (track == null) {
             track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference(getQuery(), null));
         }
-
         if (track instanceof AudioPlaylist) {
             track = ((AudioPlaylist) track).getTracks().get(0);
         }

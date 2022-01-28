@@ -63,8 +63,9 @@ public final class CustomPlaylist {
             track.artist = info.author;
             track.coverArt = TrackUtil.getCoverArt(info);
             track.duration = info.length;
-            if (info instanceof ExtendedAudioTrackInfo)
+            if (info instanceof ExtendedAudioTrackInfo) {
                 track.isrc = ((ExtendedAudioTrackInfo) info).isrc;
+            }
             return track;
         }
     }

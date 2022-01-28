@@ -18,10 +18,8 @@
 
 package dev.benpetrillo.elixir.utilities;
 
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ExtendedAudioTrackInfo;
@@ -34,8 +32,6 @@ import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public final class TrackUtil {
@@ -110,7 +106,6 @@ public final class TrackUtil {
             case SPOTIFY -> {
                 Track track = TrackUtil.getTrackDataFromSpotifyURL(url);
                 if (track == null) return null;
-                
                 var trackInfo = new ExtendedAudioTrackInfo(
                         track.getName(), track.getArtists()[0].getName(),
                         track.getDurationMs(), track.getId(), false, 
@@ -143,8 +138,9 @@ public final class TrackUtil {
      */
     
     public static void appendUser(String userId, List<PlaylistTrack> tracks) {
-        for(AudioTrack track : tracks)
+        for (AudioTrack track : tracks) {
             track.setUserData(userId);
+        }
     }
     
     /**

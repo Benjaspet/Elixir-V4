@@ -185,7 +185,7 @@ public final class PlaylistUtil {
      */
     
     public static void setPlaylistSetting(Setting setting, CustomPlaylist playlist, boolean value) {
-        switch(setting) {
+        switch (setting) {
             case SHUFFLE -> playlist.options.shuffle = value;
             case REPEAT -> playlist.options.repeat = value;
         } updatePlaylist(playlist);

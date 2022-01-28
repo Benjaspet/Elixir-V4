@@ -23,7 +23,6 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import tech.xigam.cch.utils.Interaction;
 
 import javax.annotation.Nullable;

@@ -18,18 +18,15 @@
 
 package dev.benpetrillo.elixir.utilities;
 
-import com.mongodb.BasicDBObject;
-import dev.benpetrillo.elixir.managers.DatabaseManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class DJUtil {
+
     private static final Map<String, DJInformation> roleCache = new HashMap<>();
 
     /**
