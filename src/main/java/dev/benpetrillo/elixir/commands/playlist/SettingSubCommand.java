@@ -24,6 +24,7 @@ import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.SubCommand;
 import tech.xigam.cch.utils.Argument;
@@ -87,6 +88,13 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
                 PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.REPEAT, playlist, Utilities.parseBoolean(value));
                 interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the repeat setting to `" + value + "`."));
             }
+            case "volume" -> {
+                int volume = Integer.parseInt(value);
+                if (volume < 0 || volume > 150)
+                    volume = 100;
+                PlaylistUtil.setPlaylistVolume(playlist, volume);
+                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the volume to `" + volume + "`%."));
+            }
         }
     }
 
@@ -94,7 +102,7 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
     public Collection<Argument> getArguments() {
         return List.of(
                 Argument.create("id", "The playlist ID.", "id", OptionType.STRING, true, 0),
-                Argument.createWithChoices("setting", "The setting to change.", "setting", OptionType.STRING, true, 1, "shuffle", "repeat", "volume", "name", "description", "cover"),
+                Argument.createWithChoices("setting", "The setting to change.", "setting", OptionType.STRING, true, 1, "shuffle", "repeat", "volume", "name", "description", "cover", "volume"),
                 Argument.create("value", "The new value.", "value", OptionType.STRING, true, 2)
         );
     }

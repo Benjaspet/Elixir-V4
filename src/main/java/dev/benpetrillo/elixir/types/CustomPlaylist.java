@@ -47,6 +47,7 @@ public final class CustomPlaylist {
     
     public static class Info {
         public String id, name, description, playlistCoverUrl, author;
+        public int volume = 100;
     }
     
     public static class CustomPlaylistTrack {

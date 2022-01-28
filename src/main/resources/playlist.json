@@ -4,7 +4,8 @@
     "name": "(playlist name)",
     "description": "(playlist description)",
     "playlistCoverUrl": "https://i.ytimg.com/vi/tntOCGkgt98/hqdefault.jpg",
-    "author": "(discord snowflake)"
+    "author": "(discord snowflake)",
+    "volume": 100
   },
   
   "tracks": [

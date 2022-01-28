@@ -178,6 +178,17 @@ public final class PlaylistUtil {
     }
 
     /**
+     * Sets the volume to set the player to on startup. (for a custom playlist)
+     * @param playlist
+     * @param volume
+     */
+    
+    public static void setPlaylistVolume(CustomPlaylist playlist, int volume) {
+        playlist.info.volume = volume;
+        updatePlaylist(playlist);
+    }
+
+    /**
      * Sets the author of a custom playlist.
      * @param setting The author to set.
      * @param playlist The playlist to set the author of.
