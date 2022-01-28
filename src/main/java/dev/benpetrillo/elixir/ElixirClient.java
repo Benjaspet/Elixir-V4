@@ -20,6 +20,7 @@ package dev.benpetrillo.elixir;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.benpetrillo.elixir.api.WebAPI;
+import dev.benpetrillo.elixir.events.GuildListener;
 import dev.benpetrillo.elixir.events.MessageListener;
 import dev.benpetrillo.elixir.events.ReadyListener;
 import dev.benpetrillo.elixir.events.ShutdownListener;
@@ -83,6 +84,7 @@ public final class ElixirClient {
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
                         commandHandler,
+                        new GuildListener(),
                         new ReadyListener(),
                         new MessageListener(),
                         new ShutdownListener()

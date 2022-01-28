@@ -23,6 +23,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -34,9 +35,11 @@ public final class GuildListener extends ListenerAdapter {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(event.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
         final AudioTrack track = audioPlayer.getPlayingTrack();
+        final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         if (!audioPlayer.isPaused() || !musicManager.scheduler.getQueue().isEmpty()) {
             musicManager.scheduler.queue.clear();
             musicManager.audioPlayer.destroy();
         }
+        ElixirMusicManager.getInstance().removeGuildMusicManager(guild);
     }
 }
