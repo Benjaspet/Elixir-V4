@@ -42,11 +42,11 @@ public final class VolumeCommand extends Command implements Arguments {
     public void execute(Interaction interaction) {
         if (!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         if (!AudioUtil.audioCheck(interaction)) return;
-        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+        int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        final int volume = (int) interaction.getArguments().getOrDefault("volume", musicManager.audioPlayer.getVolume());
+        final int volume = ((Number) interaction.getArguments().get("volume")).intValue();
         musicManager.audioPlayer.setVolume(volume);
         interaction.reply(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**."));
     }
