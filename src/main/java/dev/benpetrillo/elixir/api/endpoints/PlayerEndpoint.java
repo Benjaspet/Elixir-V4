@@ -27,22 +27,21 @@ import dev.benpetrillo.elixir.utilities.Utilities;
 import java.io.IOException;
 
 public final class PlayerEndpoint extends HttpEndpoint {
+
     private GuildMusicManager musicManager;
     
     @Override
     public void get() throws IOException {
         var guildId = this.arguments.getOrDefault("guildId", "");
         var action = this.arguments.getOrDefault("action", "");
-        if(guildId.isEmpty() || action.isEmpty()) {
+        if (guildId.isEmpty() || action.isEmpty()) {
             this.respond(new HttpResponse.NotFound()); return;
         }
-
         this.musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
-        if(this.musicManager == null) {
+        if (this.musicManager == null) {
             this.respond(new HttpResponse.NotFound()); return;
         }
-        
-        switch(action) {
+        switch (action) {
             default -> this.respond(new HttpResponse.NotFound());
             case "nowplaying" -> this.nowPlaying();
             case "pause" -> this.musicManager.audioPlayer.setPaused(true);
@@ -53,13 +52,12 @@ public final class PlayerEndpoint extends HttpEndpoint {
     
     private void nowPlaying() throws IOException {
         var track = this.musicManager.audioPlayer.getPlayingTrack();
-        if(track == null) {
+        if (track == null) {
             this.statusCode = 404;
             this.respond(new HttpResponse.NotFound());
             return;
         }
-        
-        this.statusCode = 301; // Found.
+        this.statusCode = 301;
         this.respond(Utilities.serialize(track.getInfo()));
     }
 }

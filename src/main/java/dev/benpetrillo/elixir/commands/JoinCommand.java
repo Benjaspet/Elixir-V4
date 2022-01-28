@@ -42,11 +42,9 @@ public final class JoinCommand extends Command {
             interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."));
             return;
         }
-        
         int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
-        
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
         final AudioChannel memberChannel = memberVoiceState.getChannel();
         assert voiceState != null;

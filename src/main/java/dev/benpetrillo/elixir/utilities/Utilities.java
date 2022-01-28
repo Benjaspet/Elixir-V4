@@ -25,10 +25,8 @@ import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.ElixirException;
 
-import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -36,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Base64;
-import java.util.Objects;
 
 public final class Utilities {
 
@@ -47,18 +44,15 @@ public final class Utilities {
     
     public static void throwThrowable(ElixirException exception) {
         var webhook = Config.get("DEBUG-WEBHOOK");
-        var description = new StringBuilder();;
-        if(exception.guild != null)
-            description.append("Guild ID: ").append(exception.guild.getId()).append("\n");
-        if(exception.member != null)
-            description.append("Member: <@").append(exception.member.getId()).append(">\n");
-        if(exception.stackTrace() != null) {
+        var description = new StringBuilder();
+        if(exception.guild != null) description.append("Guild ID: ").append(exception.guild.getId()).append("\n");
+        if(exception.member != null) description.append("Member: <@").append(exception.member.getId()).append(">\n");
+        if (exception.stackTrace() != null) {
             var stackTrace = exception.stackTrace(); assert stackTrace != null;
             description.append("File: ").append(stackTrace.getFileName()).append("\n");
             description.append("Line: ").append(stackTrace.getLineNumber()).append("\n");
             description.append("Method: ").append(stackTrace.getMethodName()).append("\n");
         }
-        
         var client = WebhookClient.withUrl(webhook);
         var embed = new WebhookEmbedBuilder()
                 .setTitle(new WebhookEmbed.EmbedTitle("Exception", ""))
@@ -66,8 +60,9 @@ public final class Utilities {
                 .setTimestamp(OffsetDateTime.now())
                 .addField(new WebhookEmbed.EmbedField(false, "Message", exception.getMessage()))
                 .setDescription(String.valueOf(description));
-        if(exception.additionalInformation != null)
+        if (exception.additionalInformation != null) {
             embed.addField(new WebhookEmbed.EmbedField(false, "Additional Information", exception.additionalInformation));
+        }
         client.send(embed.build());
     }
 
@@ -82,7 +77,7 @@ public final class Utilities {
             new URL(input);
             return true;
         }
-        catch (MalformedURLException e){
+        catch (MalformedURLException e) {
             return false;
         }
     }
@@ -125,14 +120,12 @@ public final class Utilities {
     public static long cleanYouTubeFormat(String duration) {
         duration = duration.replace("PT", "").replace("H", ":")
                 .replace("M", ":").replace("S", "");
-        
         var split = duration.split(":");
         long length = 0;
         switch(split.length) {
             default -> {
                 return Long.parseLong(duration) * 1000;
             }
-            
             case 3 -> {
                 length += Long.parseLong(split[0]) * 60 * 60 * 1000;
                 length += Long.parseLong(split[1]) * 60 * 1000;

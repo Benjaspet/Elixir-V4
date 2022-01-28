@@ -35,7 +35,6 @@ public final class ApplicationCommandManager {
             ElixirClient.getCommandHandler().downsert(null);
             ElixirClient.logger.info("All global slash commands have been deleted.");
         }
-        
         return manager;
     }
     
@@ -53,12 +52,13 @@ public final class ApplicationCommandManager {
                 new ShuffleCommand(),
                 new SkipCommand(),
                 new StopCommand(),
-                new VolumeCommand()
+                new VolumeCommand(),
+                new UserInfoCommand()
         );
     }
     
     private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {
-        for(BaseCommand command : commands) {
+        for (BaseCommand command : commands) {
             handler.registerCommand(command);
         }
     }

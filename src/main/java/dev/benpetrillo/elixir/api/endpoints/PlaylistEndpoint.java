@@ -29,22 +29,21 @@ import dev.benpetrillo.elixir.utilities.Utilities;
 import java.io.IOException;
 
 public final class PlaylistEndpoint extends HttpEndpoint {
+
     private CustomPlaylist playlist;
     
     @Override
     public void get() throws IOException {
         var playlistId = this.arguments.getOrDefault("playlistId", "");
         var action = this.arguments.getOrDefault("action", "");
-        if(playlistId.isEmpty() || action.isEmpty()) {
+        if (playlistId.isEmpty() || action.isEmpty()) {
             this.respond(new HttpResponse.NotFound()); return;
         }
-
         this.playlist = PlaylistUtil.findPlaylist(playlistId);
-        if(this.playlist == null) {
+        if (this.playlist == null) {
             this.respond(new HttpResponse.NotFound()); return;
         }
-        
-        switch(action) {
+        switch (action) {
             default -> this.respond(new HttpResponse.NotFound());
             case "fetch" -> this.fetch();
             case "addtrack" -> this.addTrack();
@@ -58,18 +57,16 @@ public final class PlaylistEndpoint extends HttpEndpoint {
     private void addTrack() throws IOException {
         var track = this.arguments.getOrDefault("track", "");
         var position = Integer.parseInt(this.arguments.getOrDefault("position", "-1"));
-        if(track.isEmpty()) {
+        if (track.isEmpty()) {
             this.respond(new HttpResponse.BadRequest()); return;
         }
-        
-        if(!Utilities.isValidURL(track)) {
+        if (!Utilities.isValidURL(track)) {
             track = HttpUtil.getYouTubeURL(track);
         }
         var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
-        if(trackInfo == null) {
+        if (trackInfo == null) {
             this.respond(new HttpResponse.BadRequest()); return;
         }
-        
         PlaylistUtil.addTrackToList(trackInfo, this.playlist, position);
         this.respond(new HttpResponse.Success());
     }

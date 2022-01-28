@@ -48,8 +48,7 @@ import java.time.OffsetDateTime;
 public final class ElixirClient {
     
     private static ElixirClient instance;
-    
-    @Deprecated public static ApplicationCommandManager applicationCommandManager;
+
     public static ComplexCommandHandler commandHandler;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
     public static final OffsetDateTime startTime;
@@ -73,7 +72,6 @@ public final class ElixirClient {
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         commandHandler = new ComplexCommandHandler(false);
-        applicationCommandManager = ApplicationCommandManager.initialize();
         this.jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
@@ -102,6 +100,7 @@ public final class ElixirClient {
                 )
                 .build();
         commandHandler.setJda(this.jda);
+        ApplicationCommandManager.initialize();
         AllowedMentions.setDefaultMentionRepliedUser(false);
         OAuthUpdateTask.schedule(); DatabaseManager.create();
         this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();

@@ -29,6 +29,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
 public final class WebAPI {
+
     public static void create() {
         try {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(ElixirConstants.API_ADDRESS, Integer.parseInt(ElixirConstants.API_PORT)), 0);
