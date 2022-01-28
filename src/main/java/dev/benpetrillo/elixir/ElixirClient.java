@@ -101,6 +101,7 @@ public final class ElixirClient {
                         GatewayIntent.GUILD_WEBHOOKS
                 )
                 .build();
+        commandHandler.setJda(this.jda);
         AllowedMentions.setDefaultMentionRepliedUser(false);
         OAuthUpdateTask.schedule(); DatabaseManager.create();
         this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();
