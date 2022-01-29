@@ -20,18 +20,25 @@ package dev.benpetrillo.elixir.utilities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ExtendedAudioTrackInfo;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.IPlaylistItem;
 import se.michaelthelin.spotify.model_objects.specification.Image;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public final class TrackUtil {
@@ -94,6 +101,31 @@ public final class TrackUtil {
     }
 
     /**
+     * Get playlist data from a Spotify URL.
+     * @param url The Spotify URL.
+     * @return Playlist
+     */
+    
+    public static List<se.michaelthelin.spotify.model_objects.specification.PlaylistTrack> getPlaylistDataFromSpotifyUrl(String url) {
+        try {
+            String[] firstSplit = url.split("/");
+            String[] secondSplit; String id;
+            if (firstSplit.length > 5) {
+                secondSplit = firstSplit[6].split("\\?");
+            } else {
+                secondSplit = firstSplit[4].split("\\?");
+            }
+            id = secondSplit[0];
+            GetPlaylistsItemsRequest playlistRequest = SpotifySourceManager.getSpotify().getPlaylistsItems(id).build();
+            Paging<se.michaelthelin.spotify.model_objects.specification.PlaylistTrack> tracks = playlistRequest.execute();
+            return List.of(tracks.getItems());
+        } catch (SpotifyWebApiException | IOException | ParseException | NullPointerException exception) {
+            exception.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Creates an {@link AudioTrackInfo} object from a given URL.
      * @param url The URL to fetch information from.
      * @return An AudioTrackInfo object.
@@ -116,7 +148,7 @@ public final class TrackUtil {
             }
             case YOUTUBE -> {
                 YTVideoData searchData = HttpUtil.getVideoData(Utilities.extractVideoId(url));
-                if (searchData == null) return null;
+                if(searchData == null) return null;
                 YTVideoData.Item.Snippet query = searchData.items.get(0).snippet;
                 long length = Utilities.cleanYouTubeFormat(searchData.items.get(0).contentDetails.duration);
                 return new AudioTrackInfo(
@@ -130,7 +162,50 @@ public final class TrackUtil {
             }
         }
     }
+
+    /**
+     * Creates a collection of {@link AudioTrackInfo} objects from a given URL.
+     * @param url The URL to fetch information from.
+     * @return A collection of AudioTrackInfo objects.
+     */
     
+    public static Collection<AudioTrackInfo> getPlaylistInfoFromUrl(String url) {
+        TrackType type = TrackUtil.determineTrackType(url);
+        Collection<AudioTrackInfo> trackInfoCollection = new ArrayList<>();
+        switch (type) {
+            case SPOTIFY -> {
+                var tracks = TrackUtil.getPlaylistDataFromSpotifyUrl(url);
+                if (tracks == null) return null;
+                for(var track : tracks) {
+                    Track playlistItem = (Track) track.getTrack();
+                    var trackInfo = new ExtendedAudioTrackInfo(
+                            playlistItem.getName(), playlistItem.getArtists()[0].getName(),
+                            playlistItem.getDurationMs(), playlistItem.getId(), false,
+                            playlistItem.getHref()
+                    );
+                    trackInfo.isrc = playlistItem.getExternalIds().getExternalIds().getOrDefault("isrc", null);
+                    trackInfoCollection.add(trackInfo);
+                }
+            }
+            case YOUTUBE -> {
+                YTVideoData searchData = HttpUtil.getPlaylistData(Utilities.extractPlaylistId(url));
+                for(var video : searchData.items) {
+                    YTVideoData.Item.Snippet query = video.snippet;
+                    long length = Utilities.cleanYouTubeFormat(video.contentDetails.duration);
+                    trackInfoCollection.add(new AudioTrackInfo(
+                            query.title, query.channelTitle, length,
+                            video.id, false,
+                            "https://youtu.be/" + video.id
+                    ));
+                }
+            }
+            default -> {
+                return null;
+            }
+        }
+        return trackInfoCollection;
+    }
+
     /**
      * Appends a user ID to a track.
      * @param userId The user ID to add to the track.

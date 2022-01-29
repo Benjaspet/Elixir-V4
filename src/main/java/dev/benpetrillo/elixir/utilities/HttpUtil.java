@@ -20,6 +20,8 @@ package dev.benpetrillo.elixir.utilities;
 
 import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.types.YTPlaylistData;
 import dev.benpetrillo.elixir.types.YTSearchData;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import okhttp3.OkHttpClient;
@@ -29,6 +31,9 @@ import okhttp3.Response;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public final class HttpUtil {
 
@@ -81,5 +86,47 @@ public final class HttpUtil {
         } catch (IOException ex) {
             ex.printStackTrace(); return null;
         }
+    }
+
+    /**
+     * Get data from a YouTube playlist by its ID.
+     * @param playlistId The playlist ID.
+     * @return YTVideoData
+     */
+    
+    public static YTVideoData getPlaylistData(String playlistId) {
+        boolean lastPage = false; String nextPageToken = null;
+        List<YTPlaylistData> totalData = new ArrayList<>();
+
+        while(!lastPage) {
+            OkHttpClient client = new OkHttpClient();
+            String url = "https://www.googleapis.com/youtube/v3/playlistItems?key=" +
+                    Config.get("YOUTUBE-API-KEY") +
+                    "&part=snippet%2CcontentDetails&maxResults=50&playlistId=" +
+                    playlistId;
+            if(nextPageToken != null) url += "&pageToken=" + nextPageToken;
+            Request request = new Request.Builder()
+                    .url(url).build();
+            try (Response response = client.newCall(request).execute()) {
+                assert response.body() != null;
+                var playlistData = new Gson().fromJson(response.body().string(), YTPlaylistData.class);
+                totalData.add(playlistData);
+                if(playlistData.nextPageToken != null) {
+                    nextPageToken = playlistData.nextPageToken;
+                } else lastPage = true;
+            } catch (IOException ignored) { lastPage = true; }
+        }
+
+        var videoData = new YTVideoData();
+        videoData.items = new ArrayList<>();
+        for(var playlistData : totalData) {
+            for(var playlistItem : playlistData.items) {
+                //noinspection ConstantConditions
+                videoData.items.add(HttpUtil.getVideoData(
+                        playlistItem.snippet.resourceId.get("videoId"))
+                        .items.get(0));
+            }
+        }
+        return videoData;
     }
 }

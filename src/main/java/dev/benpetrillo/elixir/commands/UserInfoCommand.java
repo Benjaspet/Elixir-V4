@@ -42,7 +42,7 @@ public final class UserInfoCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        User user = (User) interaction.getArguments().get("member");
+        User user = interaction.getArgument("member", User.class);
         Member member = interaction.getGuild().getMember(user);
         if (member != null) {
             final long epoc = member.getTimeJoined().toInstant().getEpochSecond();
@@ -58,7 +58,6 @@ public final class UserInfoCommand extends Command implements Arguments {
                     .build();
             interaction.reply(embed);
         }
-
     }
 
     @Override

@@ -80,7 +80,7 @@ public final class ElixirClient {
                 .setIdle(false)
                 .setHttpClient(new OkHttpClient())
                 .setBulkDeleteSplittingEnabled(true)
-                .setMemberCachePolicy(MemberCachePolicy.VOICE)
+                .setMemberCachePolicy(MemberCachePolicy.DEFAULT)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
                         commandHandler,

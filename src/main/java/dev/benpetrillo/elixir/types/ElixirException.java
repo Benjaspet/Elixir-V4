@@ -61,6 +61,11 @@ public class ElixirException extends Exception {
         return this.exception == null ? null : this.exception.getStackTrace()[0];
     }
     
+    @Nullable 
+    public StackTraceElement[] fullStackTrace() {
+        return this.exception.getStackTrace();
+    }
+    
     /*
      * Overwritten Methods
      */

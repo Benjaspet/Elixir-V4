@@ -153,6 +153,17 @@ public final class Utilities {
     }
 
     /**
+     * Extracts the playlist ID from a given URL.
+     * @param url The YouTube URL to extract the playlist ID from.
+     * @return A playlist ID.
+     */
+    
+    public static String extractPlaylistId(String url) {
+        String[] segments = url.split("/");
+        return url.contains("youtu.be") ? segments[3] : segments[3].split("list=")[1];
+    }
+
+    /**
      * Extracts the song ID from a given URL.
      * @param url The Spotify URL to extract the song ID from.
      * @return A song ID.

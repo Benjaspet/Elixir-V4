@@ -28,6 +28,7 @@ import dev.benpetrillo.elixir.managers.DatabaseManager;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
+import dev.benpetrillo.elixir.types.ExtendedAudioTrackInfo;
 import net.dv8tion.jda.api.entities.Member;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -122,6 +123,14 @@ public final class PlaylistUtil {
      */
     
     public static void addTrackToList(AudioTrackInfo track, CustomPlaylist playlist, int index) {
+        if(track.uri == null) {
+            try {
+                track = new ExtendedAudioTrackInfo(
+                        track.title, track.author, track.length, track.identifier, track.isStream,
+                        HttpUtil.getYouTubeURL(track.title)
+                );
+            } catch (Exception ignored) { return; }
+        }
         var newTrack = CustomPlaylist.CustomPlaylistTrack.from(track);
         if (index == -1) {
             playlist.tracks.add(newTrack);
