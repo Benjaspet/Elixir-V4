@@ -57,6 +57,8 @@ public final class UserInfoCommand extends Command implements Arguments {
                     .setTimestamp(new Date().toInstant())
                     .build();
             interaction.reply(embed);
+        } else {
+            interaction.reply("Due to Discord's API limitations, I cannot get information about this user.");
         }
     }
 
