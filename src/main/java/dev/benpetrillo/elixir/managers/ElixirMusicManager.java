@@ -150,10 +150,11 @@ public final class ElixirMusicManager {
                 final List<AudioTrack> tracks = audioPlaylist.getTracks();
                 if(audioPlaylist.isSearchResult()) {
                     this.trackLoaded(tracks.get(0));
-                    callback.accept(track);
                 } else {
-                    for(final AudioTrack track : tracks)
-                        this.trackLoaded(track);
+                    for(final AudioTrack audioTrack : tracks) {
+                        audioTrack.setUserData("838118537276031006");
+                        musicManager.scheduler.queue(audioTrack);
+                    }
                     callback.accept(tracks);
                 }
             }
