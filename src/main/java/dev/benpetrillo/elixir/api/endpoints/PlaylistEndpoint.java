@@ -60,6 +60,7 @@ public final class PlaylistEndpoint extends HttpEndpoint {
         if (track.isEmpty()) {
             this.respond(new HttpResponse.BadRequest()); return;
         }
+        track = Utilities.base64Decode(track);
         if (!Utilities.isValidURL(track)) {
             track = HttpUtil.getYouTubeURL(track);
         }

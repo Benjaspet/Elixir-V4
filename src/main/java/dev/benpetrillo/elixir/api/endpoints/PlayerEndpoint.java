@@ -18,6 +18,8 @@
 
 package dev.benpetrillo.elixir.api.endpoints;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.HttpEndpoint;
 import dev.benpetrillo.elixir.api.HttpResponse;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
@@ -25,9 +27,10 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.Utilities;
 
 import java.io.IOException;
+import java.util.List;
 
 public final class PlayerEndpoint extends HttpEndpoint {
-
+    
     private GuildMusicManager musicManager;
     
     @Override
@@ -43,21 +46,55 @@ public final class PlayerEndpoint extends HttpEndpoint {
         }
         switch (action) {
             default -> this.respond(new HttpResponse.NotFound());
-            case "nowplaying" -> this.nowPlaying();
+            case "nowplaying" -> {
+                this.nowPlaying(); return;
+            }
             case "pause" -> this.musicManager.audioPlayer.setPaused(true);
             case "resume" -> this.musicManager.audioPlayer.setPaused(false);
             case "skip" -> this.musicManager.scheduler.nextTrack();
+            case "play" -> {
+                this.play(); return;
+            }
         }
+        this.respond(new HttpResponse.Success());
     }
     
     private void nowPlaying() throws IOException {
         var track = this.musicManager.audioPlayer.getPlayingTrack();
         if (track == null) {
-            this.statusCode = 404;
             this.respond(new HttpResponse.NotFound());
             return;
         }
         this.statusCode = 301;
         this.respond(Utilities.serialize(track.getInfo()));
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void play() throws IOException {
+        var query = this.arguments.getOrDefault("query", "");
+        var guild = this.arguments.getOrDefault("guild", "");
+        if(query.isEmpty() || guild.isEmpty()) {
+            this.respond(new HttpResponse.NotFound());
+            return;
+        }
+        
+        ElixirMusicManager.getInstance().loadAndPlay(ElixirClient.getJda().getGuildById(guild), query, object -> {
+            try {
+                if(object == null) {
+                    this.respond(new HttpResponse.NotFound());
+                } else if(object instanceof AudioTrack) {
+                    this.respond(Utilities.base64Encode(
+                            Utilities.serialize(((AudioTrack) object).getInfo())
+                    ));
+                } else if(object instanceof List<?>) {
+                    List<AudioTrack> tracks = (List<AudioTrack>) object;
+                    this.respond(Utilities.base64Encode(
+                            Utilities.serialize(tracks.stream().map(AudioTrack::getInfo).toArray())
+                    ));
+                } else if(object instanceof Throwable) {
+                    this.respond(new HttpResponse.BadRequest());
+                }
+            } catch (IOException ignored) { }
+        });
     }
 }
