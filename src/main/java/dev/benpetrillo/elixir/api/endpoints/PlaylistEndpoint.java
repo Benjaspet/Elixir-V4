@@ -18,15 +18,23 @@
 
 package dev.benpetrillo.elixir.api.endpoints;
 
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.HttpEndpoint;
 import dev.benpetrillo.elixir.api.HttpResponse;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 
 import java.io.IOException;
+import java.util.Collections;
 
 public final class PlaylistEndpoint extends HttpEndpoint {
 
@@ -47,6 +55,7 @@ public final class PlaylistEndpoint extends HttpEndpoint {
             default -> this.respond(new HttpResponse.NotFound());
             case "fetch" -> this.fetch();
             case "addtrack" -> this.addTrack();
+            case "queue" -> this.queue();
         }
     }
     
@@ -69,6 +78,41 @@ public final class PlaylistEndpoint extends HttpEndpoint {
             this.respond(new HttpResponse.BadRequest()); return;
         }
         PlaylistUtil.addTrackToList(trackInfo, this.playlist, position);
+        this.respond(new HttpResponse.Success());
+    }
+    
+    private void queue() throws IOException {
+        var guildId = this.arguments.getOrDefault("guildId", "");
+        var channelId = this.arguments.getOrDefault("channelId", "");
+        if(guildId.isEmpty() || channelId.isEmpty()) {
+            this.respond(new HttpResponse.BadRequest()); return;
+        }
+        final Guild guild = ElixirClient.getJda().getGuildById(guildId);
+        if(guild == null) {
+            this.respond(new HttpResponse.BadRequest()); return;
+        }
+        final AudioChannel voiceChannel = guild.getVoiceChannelById(channelId);
+        if(voiceChannel == null) {
+            this.respond(new HttpResponse.BadRequest()); return;
+        }
+        final GuildVoiceState voiceState = guild.getSelfMember().getVoiceState();
+        assert voiceState != null;
+        if(!voiceState.inAudioChannel()) {
+            guild.getAudioManager()
+                    .openAudioConnection(voiceChannel);
+            guild.getAudioManager()
+                    .setSelfDeafened(true);
+        }
+        GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
+        var tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser("838118537276031006", tracks);
+        if (playlist.options.shuffle) Collections.shuffle(tracks);
+        if (musicManager.scheduler.queue.isEmpty() && musicManager.audioPlayer.getPlayingTrack() == null) {
+            musicManager.scheduler.repeating = playlist.options.repeat
+                    ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
+            musicManager.audioPlayer.setVolume(playlist.info.volume);
+        }
+        musicManager.scheduler.getQueue().addAll(tracks);
+        if (musicManager.audioPlayer.getPlayingTrack() == null) musicManager.scheduler.nextTrack();
         this.respond(new HttpResponse.Success());
     }
 }
