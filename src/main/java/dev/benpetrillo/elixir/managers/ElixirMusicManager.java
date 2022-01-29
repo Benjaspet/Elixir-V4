@@ -64,6 +64,10 @@ public final class ElixirMusicManager {
             return guildMusicManager;
         });
     }
+
+    public void removeGuildMusicManager(Guild guild) {
+        this.musicManagers.remove(guild.getId());
+    }
     
     @Nullable
     public GuildMusicManager getMusicManager(String guildId) {
