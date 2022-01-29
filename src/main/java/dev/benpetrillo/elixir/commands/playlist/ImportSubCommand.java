@@ -18,7 +18,6 @@
 
 package dev.benpetrillo.elixir.commands.playlist;
 
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
@@ -34,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class ImportSubCommand extends SubCommand implements Arguments {
+
     public ImportSubCommand() {
         super("import", "Import a playlist from Spotify or YouTube.");
     }
@@ -52,12 +52,12 @@ public final class ImportSubCommand extends SubCommand implements Arguments {
             return;
         }
         var sourcePlaylist = interaction.getArgument("playlist", String.class);
-        if(!Utilities.isValidURL(sourcePlaylist)) {
+        if (!Utilities.isValidURL(sourcePlaylist)) {
             interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid playlist!"));
             return;
         }
         var playlistInfo = TrackUtil.getPlaylistInfoFromUrl(sourcePlaylist);
-        if(playlistInfo == null) {
+        if (playlistInfo == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to get playlist info from that URL."));
             return;
         }
