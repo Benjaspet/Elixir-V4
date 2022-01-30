@@ -22,6 +22,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.HttpEndpoint;
 import dev.benpetrillo.elixir.api.HttpResponse;
+import dev.benpetrillo.elixir.api.objects.NowPlayingObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.Utilities;
@@ -70,7 +71,9 @@ public final class PlayerEndpoint extends HttpEndpoint {
             return;
         }
         this.statusCode = 301;
-        this.respond(Utilities.serialize(track.getInfo()));
+        this.respond(Utilities.serialize(
+                NowPlayingObject.create(track)
+        ));
     }
     
     @SuppressWarnings("unchecked")

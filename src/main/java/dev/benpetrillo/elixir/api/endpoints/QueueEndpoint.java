@@ -27,6 +27,8 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.Utilities;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class QueueEndpoint extends HttpEndpoint {
@@ -47,12 +49,24 @@ public final class QueueEndpoint extends HttpEndpoint {
         switch (action) {
             default -> this.respond(new HttpResponse.NotFound());
             case "queue" -> this.queue();
+            case "shuffle" -> this.shuffle();
         }
     }
     
     private void queue() throws IOException {
         List<AudioTrack> tracks = this.musicManager.scheduler.queue.stream().toList();
         List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
+        
+        this.statusCode = 200;
+        this.respond(Utilities.base64Encode(Utilities.serialize(trackInfo)));
+    }
+    
+    private void shuffle() throws IOException {
+        List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
+        Collections.shuffle(tracks); musicManager.scheduler.queue.clear();
+        musicManager.scheduler.queue.addAll(tracks);
+        List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
+        
         this.statusCode = 200;
         this.respond(Utilities.base64Encode(Utilities.serialize(trackInfo)));
     }

@@ -55,14 +55,16 @@ public final class TrackScheduler extends AudioEventAdapter {
     }
 
     public void nextTrack() {
-        if (queue.isEmpty()) {
-            player.stopTrack();
+        if (this.queue.isEmpty()) {
+            this.player.stopTrack();
             return;
         }
-        if (player.getPlayingTrack() != null) {
-            player.stopTrack();
+        if (this.player.getPlayingTrack() != null) {
+            if(this.repeating == LoopMode.QUEUE)
+                this.queue.add(player.getPlayingTrack().makeClone());
+            this.player.stopTrack();
         }
-        player.startTrack(queue.poll(), false);
+        this.player.startTrack(queue.poll(), false);
     }
 
     @Override
