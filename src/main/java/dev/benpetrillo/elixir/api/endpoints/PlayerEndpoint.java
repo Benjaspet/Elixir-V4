@@ -30,7 +30,11 @@ import java.io.IOException;
 import java.util.List;
 
 public final class PlayerEndpoint extends HttpEndpoint {
-    
+
+    /**
+     * TODO: If the bot isn't in a voice channel, throw an error on pause, resume, nowplaying, etc.
+     */
+
     private GuildMusicManager musicManager;
     
     @Override
@@ -78,7 +82,7 @@ public final class PlayerEndpoint extends HttpEndpoint {
             return;
         }
         
-        ElixirMusicManager.getInstance().loadAndPlay(ElixirClient.getJda().getGuildById(guild), query, object -> {
+        ElixirMusicManager.getInstance().loadAndPlay(ElixirClient.getJda().getGuildById(guild), Utilities.base64Decode(query), object -> {
             try {
                 if(object == null) {
                     this.respond(new HttpResponse.NotFound());

@@ -71,7 +71,7 @@ public final class ElixirMusicManager {
     
     @Nullable
     public GuildMusicManager getMusicManager(String guildId) {
-        return this.musicManagers.getOrDefault(guildId, null);
+        return this.musicManagers.get(guildId);
     }
     
     public GuildMusicManager[] getMusicManagers() {

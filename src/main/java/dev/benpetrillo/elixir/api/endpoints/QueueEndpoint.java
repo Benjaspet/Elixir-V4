@@ -53,6 +53,7 @@ public final class QueueEndpoint extends HttpEndpoint {
     private void queue() throws IOException {
         List<AudioTrack> tracks = this.musicManager.scheduler.queue.stream().toList();
         List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
+        this.statusCode = 200;
         this.respond(Utilities.base64Encode(Utilities.serialize(trackInfo)));
     }
 }
