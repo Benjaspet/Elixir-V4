@@ -39,6 +39,10 @@
 - [x] View all tracks in the guild queue.
 - [x] Loop a particular track or queue.
 
+### API Usage
+
+Elixir Music has its own public API! To view its documentation, [click here](https://docs.ponjo.club).
+
 ### License
 
 © Copyright 2021-2022 Ben Petrillo, KingRainbow44. All rights reserved.
