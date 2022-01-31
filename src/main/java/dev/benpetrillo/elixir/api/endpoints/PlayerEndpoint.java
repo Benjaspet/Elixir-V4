@@ -86,7 +86,12 @@ public final class PlayerEndpoint extends HttpEndpoint {
             return;
         }
         
-        ElixirMusicManager.getInstance().loadAndPlay(ElixirClient.getJda().getGuildById(guild), Utilities.base64Decode(query), object -> {
+        var decodedQuery = Utilities.base64Decode(query);
+        if(!Utilities.isValidURL(decodedQuery)) {
+            decodedQuery = "ytsearch:" + decodedQuery;
+        }
+        
+        ElixirMusicManager.getInstance().loadAndPlay(ElixirClient.getJda().getGuildById(guild), decodedQuery, object -> {
             try {
                 if(object == null) {
                     this.statusCode = 404;
