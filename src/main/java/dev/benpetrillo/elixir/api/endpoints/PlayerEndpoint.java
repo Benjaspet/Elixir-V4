@@ -26,15 +26,12 @@ import dev.benpetrillo.elixir.api.objects.NowPlayingObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import net.dv8tion.jda.api.entities.Guild;
 
 import java.io.IOException;
 import java.util.List;
 
 public final class PlayerEndpoint extends HttpEndpoint {
-
-    /**
-     * TODO: If the bot isn't in a voice channel, throw an error on pause, resume, nowplaying, etc.
-     */
 
     private GuildMusicManager musicManager;
     
@@ -45,10 +42,14 @@ public final class PlayerEndpoint extends HttpEndpoint {
         if (guildId.isEmpty() || action.isEmpty()) {
             this.respond(new HttpResponse.NotFound()); return;
         }
-        this.musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
-        if (this.musicManager == null) {
+        final Guild guild = ElixirClient.getJda().getGuildById(guildId);
+        if(guild == null) {
             this.respond(new HttpResponse.NotFound()); return;
         }
+        if(!guild.getAudioManager().isConnected()) {
+            this.respond(new HttpResponse.NotFound()); return;
+        }
+        this.musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
         switch (action) {
             default -> this.respond(new HttpResponse.NotFound());
             case "nowplaying" -> {
@@ -79,7 +80,7 @@ public final class PlayerEndpoint extends HttpEndpoint {
     @SuppressWarnings("unchecked")
     private void play() throws IOException {
         var query = this.arguments.getOrDefault("query", "");
-        var guild = this.arguments.getOrDefault("guild", "");
+        var guild = this.arguments.getOrDefault("guildId", "");
         if(query.isEmpty() || guild.isEmpty()) {
             this.respond(new HttpResponse.NotFound());
             return;
@@ -88,7 +89,8 @@ public final class PlayerEndpoint extends HttpEndpoint {
         ElixirMusicManager.getInstance().loadAndPlay(ElixirClient.getJda().getGuildById(guild), Utilities.base64Decode(query), object -> {
             try {
                 if(object == null) {
-                    this.respond(new HttpResponse.NotFound());
+                    this.statusCode = 404;
+                    this.respond("Unable to find track.");
                 } else if(object instanceof AudioTrack) {
                     this.respond(Utilities.base64Encode(
                             Utilities.serialize(((AudioTrack) object).getInfo())

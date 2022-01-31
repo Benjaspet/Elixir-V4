@@ -34,8 +34,6 @@ public final class GuildListener extends ListenerAdapter {
         Guild guild = event.getGuild();
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(event.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
-        final AudioTrack track = audioPlayer.getPlayingTrack();
-        final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         if (!audioPlayer.isPaused() || !musicManager.scheduler.getQueue().isEmpty()) {
             musicManager.scheduler.queue.clear();
             musicManager.audioPlayer.destroy();
