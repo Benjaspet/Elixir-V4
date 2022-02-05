@@ -53,7 +53,7 @@ public final class InfoCommand extends Command {
                 .setDescription("[Invite Elixir to your server!](" + ElixirConstants.INVITE + ")")
                 .addField("Bot Information", """
                         • Powered by: JDA 5.0.0-alpha.3
-                        • Developers: **Eerie$6560** & **Magix#7070**
+                        • Developed by: Ponjo Studios
                         • Server count: %s
                         • User count: %s
                         • Uptime: %s
