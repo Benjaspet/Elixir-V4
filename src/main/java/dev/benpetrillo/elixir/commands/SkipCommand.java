@@ -24,6 +24,7 @@ import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.*;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -70,9 +71,6 @@ public final class SkipCommand extends Command implements Arguments {
         for (int i = 0; i < skipTo; i++) {
             musicManager.scheduler.nextTrack();
         }
-        if (audioPlayer.getPlayingTrack().getInfo().isStream) {
-            musicManager.forceSkippedLivestream = true;
-        }
         final String title = upNext.getInfo().title.length() > 60 ? upNext.getInfo().title.substring(0, 60) + "..." : upNext.getInfo().title;
         final String duration = Utilities.formatDuration(upNext.getDuration());
         final String isLive = upNext.getInfo().isStream ? "yes" : "no";
@@ -88,7 +86,7 @@ public final class SkipCommand extends Command implements Arguments {
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Up Next")
                 .setDescription("[%s](%s)".formatted(title, url))
-                .setColor(EmbedUtil.getDefaultEmbedColor())
+                .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setThumbnail(TrackUtil.getCoverArt(upNext.getInfo()))
                 .addField("Track Data", contents, false)
                 .setFooter("Elixir Music", ElixirClient.getJda().getSelfUser().getAvatarUrl())

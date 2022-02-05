@@ -26,10 +26,12 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -89,7 +91,7 @@ public final class ElixirMusicManager {
                 final String title = track.getInfo().title;
                 final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
                 MessageEmbed embed = new EmbedBuilder()
-                        .setColor(EmbedUtil.getDefaultEmbedColor())
+                        .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                         .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, track.getInfo().uri))
                         .build();
                 interaction.reply(embed);
@@ -103,7 +105,7 @@ public final class ElixirMusicManager {
                     final String title = tracks.get(0).getInfo().title;
                     final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
                     MessageEmbed embed = new EmbedBuilder()
-                            .setColor(EmbedUtil.getDefaultEmbedColor())
+                            .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                             .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, tracks.get(0).getInfo().uri))
                             .build();
                     interaction.reply(embed);
@@ -111,7 +113,7 @@ public final class ElixirMusicManager {
                 } else {
                     final String success = String.format("Queued **%s** tracks from [%s](%s).", tracks.size(), playlist.getName(), url);
                     MessageEmbed embed = new EmbedBuilder()
-                            .setColor(EmbedUtil.getDefaultEmbedColor())
+                            .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                             .setDescription(success)
                             .build();
                     interaction.reply(embed);
@@ -138,21 +140,24 @@ public final class ElixirMusicManager {
     @Internal public void loadAndPlay(Guild guild, String track, Consumer<Object> callback) {
         final GuildMusicManager musicManager = this.getMusicManager(guild);
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
+
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
-                audioTrack.setUserData("838118537276031006");
+                ElixirClient.logger.debug("Track loaded: " + audioTrack.getInfo().title);
+                audioTrack.setUserData(ElixirConstants.BOT_ID);
                 musicManager.scheduler.queue(audioTrack);
                 callback.accept(audioTrack);
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist audioPlaylist) {
+                ElixirClient.logger.debug("Playlist loaded: " + audioPlaylist.getName());
                 final List<AudioTrack> tracks = audioPlaylist.getTracks();
-                if(audioPlaylist.isSearchResult()) {
+                if (audioPlaylist.isSearchResult()) {
                     this.trackLoaded(tracks.get(0));
                 } else {
-                    for(final AudioTrack audioTrack : tracks) {
-                        audioTrack.setUserData("838118537276031006");
+                    for (final AudioTrack audioTrack : tracks) {
+                        audioTrack.setUserData(ElixirConstants.BOT_ID);
                         musicManager.scheduler.queue(audioTrack);
                     }
                     callback.accept(tracks);
@@ -161,11 +166,13 @@ public final class ElixirMusicManager {
 
             @Override
             public void noMatches() {
+                ElixirClient.logger.debug("No matches found for: " + track);
                 callback.accept(null);
             }
 
             @Override
             public void loadFailed(FriendlyException e) {
+                ElixirClient.logger.debug("Failed to load: " + track);
                 callback.accept(e);
                 Utilities.throwThrowable(new ElixirException().guild(guild).exception(e));
             }

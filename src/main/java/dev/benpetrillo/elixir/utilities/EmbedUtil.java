@@ -18,32 +18,23 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.awt.*;
-
 public final class EmbedUtil {
-
-    public static Color getErrorEmbedColor() {
-        return Color.decode("#fc5f53");
-    }
-
-    public static Color getDefaultEmbedColor() {
-        return Color.decode("#a043de");
-    }
 
     public static MessageEmbed sendErrorEmbed(String description) {
         return new EmbedBuilder()
                 .setDescription(description)
-                .setColor(getErrorEmbedColor())
+                .setColor(ElixirConstants.ERROR_EMBED_COLOR)
                 .build();
     }
 
     public static MessageEmbed sendDefaultEmbed(String description) {
         return new EmbedBuilder()
                 .setDescription(description)
-                .setColor(getDefaultEmbedColor())
+                .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .build();
     }
 }

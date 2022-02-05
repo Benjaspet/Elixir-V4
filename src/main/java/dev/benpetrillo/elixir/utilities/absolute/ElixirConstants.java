@@ -20,12 +20,16 @@ package dev.benpetrillo.elixir.utilities.absolute;
 
 import dev.benpetrillo.elixir.Config;
 
+import java.awt.*;
+
 public final class ElixirConstants {
 
     public static String TOKEN = Config.get("TOKEN");
     public static String AVATAR_URL = Config.get("AVATAR-URL");
     public static String VERSION = Config.get("VERSION");
     public static String ACTIVITY = Config.get("ACTIVITY");
+    public static String BOT_ID = Config.get("BOT-ID");
+    public static String INVITE = Config.get("INVITE");
     public static String YOUTUBE_API_KEY = Config.get("YOUTUBE-API-KEY");
     public static String MONGO_URI = Config.get("MONGO-URI");
     public static String SPOTIFY_CLIENT_ID = Config.get("SPOTIFY-CLIENT-ID");
@@ -34,6 +38,8 @@ public final class ElixirConstants {
     public static String API_PORT = Config.get("API-PORT");
     public static String[] OWNERS = Config.get("OWNERS").split(",");
     public static String[] GUILDS = Config.get("GUILDS").split(",");
+    public static Color DEFAULT_EMBED_COLOR = Color.decode(Config.get("DEFAULT-EMBED-COLOR"));
+    public static Color ERROR_EMBED_COLOR = Color.decode(Config.get("ERROR-EMBED-COLOR"));
 
     public static class Emojis {
 

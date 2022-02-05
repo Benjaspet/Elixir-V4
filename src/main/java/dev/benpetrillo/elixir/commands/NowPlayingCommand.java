@@ -28,6 +28,7 @@ import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -69,7 +70,7 @@ public final class NowPlayingCommand extends Command {
                 MessageEmbed embed = new EmbedBuilder()
                         .setTitle("Currently Playing")
                         .setDescription(String.format("[%s](%s)", title, url))
-                        .setColor(EmbedUtil.getDefaultEmbedColor())
+                        .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                         .addField("Track Data", contents, false)
                         .setFooter("Elixir Music", ElixirClient.getJda().getSelfUser().getAvatarUrl())
                         .setTimestamp(new Date().toInstant())
@@ -80,7 +81,7 @@ public final class NowPlayingCommand extends Command {
         } catch (PermissionException ignored) {
             interaction.reply(EmbedUtil.sendErrorEmbed("I do not have permission to do this."));
         } catch (Exception exception) {
-            ElixirClient.logger.error("Error occurred while getting the currently playing track.", exception);
+            ElixirClient.logger.error("An error occurred while getting the currently playing track.", exception);
             Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception).additionalInformation("Not a permission exception."));
             interaction.reply(EmbedUtil.sendErrorEmbed("An unknown error occurred."));
         }
