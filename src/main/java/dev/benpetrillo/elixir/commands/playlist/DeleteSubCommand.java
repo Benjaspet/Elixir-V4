@@ -42,7 +42,7 @@ public final class DeleteSubCommand extends SubCommand implements Arguments {
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("A playlist with id `" + playlistId + "` doesn't exist."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("A playlist with ID `" + playlistId + "` doesn't exist."));
             return;
         }
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {

@@ -26,6 +26,7 @@ import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.types.ElixirException;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,8 +46,8 @@ public final class Utilities {
     public static void throwThrowable(ElixirException exception) {
         var webhook = Config.get("DEBUG-WEBHOOK");
         var description = new StringBuilder();
-        if(exception.guild != null) description.append("Guild ID: ").append(exception.guild.getId()).append("\n");
-        if(exception.member != null) description.append("Member: <@").append(exception.member.getId()).append(">\n");
+        if (exception.guild != null) description.append("Guild ID: ").append(exception.guild.getId()).append("\n");
+        if (exception.member != null) description.append("Member: <@").append(exception.member.getId()).append(">\n");
         if (exception.stackTrace() != null) {
             var stackTrace = exception.stackTrace(); assert stackTrace != null;
             description.append("File: ").append(stackTrace.getFileName()).append("\n");
@@ -56,7 +57,7 @@ public final class Utilities {
         var client = WebhookClient.withUrl(webhook);
         var embed = new WebhookEmbedBuilder()
                 .setTitle(new WebhookEmbed.EmbedTitle("Exception", ""))
-                .setColor(EmbedUtil.getErrorEmbedColor().getRGB())
+                .setColor(ElixirConstants.ERROR_EMBED_COLOR.getRGB())
                 .setTimestamp(OffsetDateTime.now())
                 .addField(new WebhookEmbed.EmbedField(false, "Message", exception.getMessage()))
                 .setDescription(String.valueOf(description));

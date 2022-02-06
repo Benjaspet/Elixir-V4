@@ -20,6 +20,7 @@ package dev.benpetrillo.elixir.commands;
 
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -48,7 +49,7 @@ public final class UserInfoCommand extends Command implements Arguments {
             final long epoc = member.getTimeJoined().toInstant().getEpochSecond();
             final long createdAt = member.getUser().getTimeCreated().toInstant().getEpochSecond();
             MessageEmbed embed = new EmbedBuilder()
-                    .setColor(EmbedUtil.getDefaultEmbedColor())
+                    .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                     .setAuthor(member.getUser().getAsTag())
                     .setThumbnail(member.getUser().getAvatarUrl())
                     .setDescription("Created: <t:" + createdAt + ":R>" + "\n" + "Joined: " + "<t:" + epoc + ":R>")

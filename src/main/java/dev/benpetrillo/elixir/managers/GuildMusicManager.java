@@ -28,7 +28,6 @@ public final class GuildMusicManager {
 
     public final AudioPlayer audioPlayer;
     public final TrackScheduler scheduler;
-    public boolean forceSkippedLivestream = false;
 
     public GuildMusicManager(AudioPlayerManager manager, Guild guild) {
         this.audioPlayer = manager.createPlayer();

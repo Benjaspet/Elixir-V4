@@ -57,7 +57,7 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of ID `" + playlistId + "`."));
             return;
         }
         final GuildVoiceState memberVoiceState = member.getVoiceState(); assert memberVoiceState != null;
@@ -76,8 +76,7 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
         var tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser(member.getId(), tracks);
         if (playlist.options.shuffle) Collections.shuffle(tracks);
         if (musicManager.scheduler.queue.isEmpty() && musicManager.audioPlayer.getPlayingTrack() == null) {
-            musicManager.scheduler.repeating = playlist.options.repeat
-                    ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
+            musicManager.scheduler.repeating = playlist.options.repeat ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
             musicManager.audioPlayer.setVolume(playlist.info.volume);
         }
         musicManager.scheduler.getQueue().addAll(tracks);

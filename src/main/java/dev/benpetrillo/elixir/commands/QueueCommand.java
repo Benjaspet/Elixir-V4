@@ -26,6 +26,7 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -78,7 +79,7 @@ public final class QueueCommand extends Command {
                     queue.size(), Utilities.prettyPrint(musicManager.scheduler.repeating.toString()), musicManager.audioPlayer.getVolume());
             MessageEmbed embed = new EmbedBuilder()
                     .setTitle("Guild Queue")
-                    .setColor(EmbedUtil.getDefaultEmbedColor())
+                    .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                     .setAuthor("Now Playing: " + nowPlayingTrimmed, nowPlaying.getInfo().uri)
                     .setThumbnail(thumbnail)
                     .setDescription(description)

@@ -20,10 +20,10 @@ package dev.benpetrillo.elixir.utilities;
 
 import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.YTPlaylistData;
 import dev.benpetrillo.elixir.types.YTSearchData;
 import dev.benpetrillo.elixir.types.YTVideoData;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public final class HttpUtil {
 
@@ -97,14 +96,11 @@ public final class HttpUtil {
     public static YTVideoData getPlaylistData(String playlistId) {
         boolean lastPage = false; String nextPageToken = null;
         List<YTPlaylistData> totalData = new ArrayList<>();
-
-        while(!lastPage) {
+        while (!lastPage) {
             OkHttpClient client = new OkHttpClient();
-            String url = "https://www.googleapis.com/youtube/v3/playlistItems?key=" +
-                    Config.get("YOUTUBE-API-KEY") +
-                    "&part=snippet%2CcontentDetails&maxResults=50&playlistId=" +
-                    playlistId;
-            if(nextPageToken != null) url += "&pageToken=" + nextPageToken;
+            String url = "https://www.googleapis.com/youtube/v3/playlistItems?key=" + ElixirConstants.YOUTUBE_API_KEY +
+                    "&part=snippet%2CcontentDetails&maxResults=50&playlistId=" + playlistId;
+            if (nextPageToken != null) url += "&pageToken=" + nextPageToken;
             Request request = new Request.Builder()
                     .url(url).build();
             try (Response response = client.newCall(request).execute()) {

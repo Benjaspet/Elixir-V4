@@ -61,7 +61,7 @@ public final class ImportSubCommand extends SubCommand implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to get playlist info from that URL."));
             return;
         }
-        for(var track : playlistInfo) {
+        for (var track : playlistInfo) {
             PlaylistUtil.addTrackToList(track, playlist, -1);
         }
         interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully imported `" + playlistInfo.size() + "` tracks from playlist."));

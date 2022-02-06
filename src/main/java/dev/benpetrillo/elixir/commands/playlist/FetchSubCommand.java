@@ -24,6 +24,7 @@ import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -35,8 +36,6 @@ import tech.xigam.cch.utils.Interaction;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
-import static dev.benpetrillo.elixir.utilities.EmbedUtil.getDefaultEmbedColor;
 
 public final class FetchSubCommand extends SubCommand implements Arguments {
 
@@ -74,7 +73,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
                             """.formatted(playlist.options.shuffle ? "Yes" : "No", playlist.options.repeat ? "Yes" : "No");
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle(playlist.info.name)
-                .setColor(getDefaultEmbedColor())
+                .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setThumbnail(thumbnail)
                 .setDescription("Author: <@%s>".formatted(playlist.info.author) )
                 .addField("Description", playlist.info.description, false)

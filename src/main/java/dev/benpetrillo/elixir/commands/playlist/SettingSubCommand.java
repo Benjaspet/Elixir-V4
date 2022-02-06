@@ -22,9 +22,9 @@ import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.SubCommand;
 import tech.xigam.cch.utils.Argument;
@@ -32,8 +32,6 @@ import tech.xigam.cch.utils.Interaction;
 
 import java.util.Collection;
 import java.util.List;
-
-import static dev.benpetrillo.elixir.utilities.EmbedUtil.getDefaultEmbedColor;
 
 public final class SettingSubCommand extends SubCommand implements Arguments {
 
@@ -66,7 +64,7 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
                 PlaylistUtil.setPlaylistCover(playlist, value);
                 interaction.reply(new EmbedBuilder()
                         .setDescription("Successfully swapped the playlist cover!")
-                        .setColor(getDefaultEmbedColor())
+                        .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                         .setImage(value).build());
             }
             case "name" -> {
@@ -78,7 +76,7 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
                 interaction.reply(new EmbedBuilder()
                         .setDescription("Successfully swapped the playlist description!")
                         .addField("New Description", value, false)
-                        .setColor(getDefaultEmbedColor()).build());
+                        .setColor(ElixirConstants.DEFAULT_EMBED_COLOR).build());
             }
             case "shuffle" -> {
                 PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.SHUFFLE, playlist, Utilities.parseBoolean(value));
