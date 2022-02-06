@@ -71,10 +71,10 @@ public final class PlayerEndpoint extends HttpEndpoint {
             this.respond(new HttpResponse.NotFound());
             return;
         }
-        this.statusCode = 301;
-        this.respond(Utilities.serialize(
-                NowPlayingObject.create(track)
-        ));
+        this.statusCode = 200;
+        this.respond(Utilities.base64Encode(
+                Utilities.serialize(NowPlayingObject.create(track)
+        )));
     }
     
     @SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public final class PlayerEndpoint extends HttpEndpoint {
         var query = this.arguments.getOrDefault("query", "");
         var guild = this.arguments.getOrDefault("guildId", "");
         if(query.isEmpty() || guild.isEmpty()) {
-            this.respond(new HttpResponse.NotFound());
+            this.respond(new HttpResponse.NotFound());  
             return;
         }
         
