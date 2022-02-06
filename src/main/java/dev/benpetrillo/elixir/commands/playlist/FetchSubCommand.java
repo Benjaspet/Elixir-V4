@@ -54,7 +54,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
         }
         var tracks = PlaylistUtil.getTracks(playlist);
         StringBuilder description = new StringBuilder();
-        int maxAmount = Math.min(tracks.size(), 12);
+        int maxAmount = Math.min(tracks.size(), 8);
         final String thumbnail = playlist.info.playlistCoverUrl;
         if (tracks.size() == 0) description.append("This playlist is empty.");
         for (int i = 0; i < maxAmount; i++) {
