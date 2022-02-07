@@ -46,7 +46,5 @@ Elixir Music has its own public API! To view its documentation, [click here](htt
 ### License
 
 © Copyright 2021-2022 Ben Petrillo, KingRainbow44. All rights reserved.
-- Unauthorized reproduction or use of this project, via any medium, is strictly prohibitted.
-- This project is to remain proprietary and confidential.
 
 Elixir is licensed under the [MIT License](https://www.mit.edu/~amini/LICENSE.md), and modification is permitted provided that proper credit is given to the original author(s). Under no circumstances should this repository be redistributed withount permission from the original author. 
