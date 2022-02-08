@@ -20,10 +20,7 @@ package dev.benpetrillo.elixir;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.benpetrillo.elixir.api.WebAPI;
-import dev.benpetrillo.elixir.events.GuildListener;
-import dev.benpetrillo.elixir.events.MessageListener;
-import dev.benpetrillo.elixir.events.ReadyListener;
-import dev.benpetrillo.elixir.events.ShutdownListener;
+import dev.benpetrillo.elixir.events.*;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.managers.ConfigStartupManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
@@ -85,7 +82,8 @@ public final class ElixirClient {
                         new GuildListener(),
                         new ReadyListener(),
                         new MessageListener(),
-                        new ShutdownListener()
+                        new ShutdownListener(),
+                        new VoiceStateListener()
                 )
                 .enableIntents(
                         GatewayIntent.DIRECT_MESSAGES,

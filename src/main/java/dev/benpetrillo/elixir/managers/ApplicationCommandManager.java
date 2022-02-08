@@ -24,10 +24,12 @@ import dev.benpetrillo.elixir.commands.*;
 import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;
 
+import java.util.ArrayList;
+
 public final class ApplicationCommandManager {
 
-    public static ApplicationCommandManager initialize() {
-        ApplicationCommandManager manager = new ApplicationCommandManager(ElixirClient.getCommandHandler());
+    public static void initialize() {
+        new ApplicationCommandManager(ElixirClient.getCommandHandler());
         if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GLOBAL"))) {
             ElixirClient.getCommandHandler().deployAll(null);
             ElixirClient.logger.info("All global slash commands have been deployed.");
@@ -35,7 +37,6 @@ public final class ApplicationCommandManager {
             ElixirClient.getCommandHandler().downsert(null);
             ElixirClient.logger.info("All global slash commands have been deleted.");
         }
-        return manager;
     }
     
     private ApplicationCommandManager(ComplexCommandHandler handler) {
@@ -58,8 +59,12 @@ public final class ApplicationCommandManager {
     }
     
     private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {
+        ArrayList<String> commandNames = new ArrayList<>();
         for (BaseCommand command : commands) {
             handler.registerCommand(command);
+            commandNames.add(command.getLabel());
         }
+        String commandNamesString = String.join(", ", commandNames);
+        ElixirClient.logger.info("Registered commands: " + commandNamesString);
     }
 }
