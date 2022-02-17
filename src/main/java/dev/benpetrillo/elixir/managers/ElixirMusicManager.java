@@ -100,6 +100,10 @@ public final class ElixirMusicManager {
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
                 final List<AudioTrack> tracks = playlist.getTracks();
+                if (tracks.size() > 300) {
+                    interaction.reply(EmbedUtil.sendErrorEmbed("Playlists that exceed 300 tracks cannot be played."));
+                    return;
+                }
                 if (playlist.isSearchResult()) {
                     tracks.get(0).setUserData(interaction.getMember().getId());
                     final String title = tracks.get(0).getInfo().title;
