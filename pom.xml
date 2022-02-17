@@ -14,6 +14,10 @@
             <name>m2-dv8tion</name>
             <url>https://m2.dv8tion.net/releases</url>
         </repository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://s01.oss.sonatype.org/content/groups/public/</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -29,8 +33,7 @@
         <dependency>
             <groupId>tech.xigam</groupId>
             <artifactId>CCH</artifactId>
-            <version>2.1.0</version>
-            <scope>system</scope> <systemPath>${basedir}/libs/Complex Command Handler.jar</systemPath>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>io.github.cdimascio</groupId>

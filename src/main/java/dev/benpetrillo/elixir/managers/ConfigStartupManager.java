@@ -26,6 +26,7 @@ public final class ConfigStartupManager {
     public static void checkAll() {
         if (ElixirConstants.TOKEN == null) {
             ElixirClient.logger.error("Invalid bot token provided.");
+            System.exit(0);
         } else if (ElixirConstants.YOUTUBE_API_KEY == null) {
             ElixirClient.logger.error("Invalid YouTube API key provided.");
             System.exit(0);
