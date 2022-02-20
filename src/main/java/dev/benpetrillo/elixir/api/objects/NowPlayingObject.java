@@ -28,7 +28,7 @@ public final class NowPlayingObject {
     public final boolean isStream;
     public final String uri;
     public final long position;
-    
+
     private NowPlayingObject(String title, String author, long length, String identifier, boolean isStream, String uri, long position) {
         this.title = title;
         this.author = author;
@@ -38,14 +38,14 @@ public final class NowPlayingObject {
         this.uri = uri;
         this.position = position;
     }
-    
+
     public static NowPlayingObject create(AudioTrack track) {
         var position = track.getPosition();
         var trackInfo = track.getInfo();
-        
+
         return new NowPlayingObject(
-            trackInfo.title, trackInfo.author, trackInfo.length, 
-            trackInfo.identifier, trackInfo.isStream, trackInfo.uri, position
+                trackInfo.title, trackInfo.author, trackInfo.length,
+                trackInfo.identifier, trackInfo.isStream, trackInfo.uri, position
         );
     }
 }

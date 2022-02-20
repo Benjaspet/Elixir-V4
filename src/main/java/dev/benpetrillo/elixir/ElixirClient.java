@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
-import dev.benpetrillo.elixir.api.WebAPI;
+import dev.benpetrillo.elixir.api.APIHandler;
 import dev.benpetrillo.elixir.events.*;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.managers.ConfigStartupManager;
@@ -59,7 +59,7 @@ public final class ElixirClient {
 
     public static void main(String[] args) {
         try {
-            ConfigStartupManager.checkAll(); WebAPI.create();
+            ConfigStartupManager.checkAll(); APIHandler.initialize();
             instance = new ElixirClient(ElixirConstants.TOKEN);
         } catch (LoginException | IllegalArgumentException | IOException exception) {
             logger.error("Unable to initiate Elixir Music.", exception);

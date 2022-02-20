@@ -76,5 +76,10 @@
             <artifactId>commons-text</artifactId>
             <version>1.9</version>
         </dependency>
+        <dependency>
+            <groupId>tech.xigam</groupId>
+            <artifactId>Express.Java</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 </project>
