@@ -18,14 +18,25 @@
 
 package dev.benpetrillo.elixir.managers;
 
+import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
+import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
+import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ElixirException;
@@ -39,6 +50,7 @@ import org.apache.hc.core5.annotation.Internal;
 import org.jetbrains.annotations.Nullable;
 import tech.xigam.cch.utils.Interaction;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +67,23 @@ public final class ElixirMusicManager {
 
     public ElixirMusicManager() {
         this.audioPlayerManager.registerSourceManager(this.spotifySource);
-        AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
+        this.audioPlayerManager.registerSourceManager(this.youtubeSource);
+        this.audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new GetyarnAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+        
+        // Set up the IP rotator.
+        String ipBlock; if(!(ipBlock = ElixirConstants.IPV6_BLOCK).isEmpty()) {
+            new YoutubeIpRotatorSetup(new NanoIpRoutePlanner(Collections.singletonList(
+                    new Ipv6Block(ipBlock)), true
+            )).forSource(this.youtubeSource).setup();
+            ElixirClient.logger.info("IPv6 rotator block set to " + ipBlock + ".");
+        } else ElixirClient.logger.warn("You are not using an IPv6 rotator. This may cause issues with YouTube and rate-limiting.");
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
