@@ -71,6 +71,7 @@ public final class ElixirClient {
         var usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
         commandHandler = new ComplexCommandHandler(usePrefix)
                 .setPrefix(ElixirConstants.COMMAND_PREFIX);
+        logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
         var builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
