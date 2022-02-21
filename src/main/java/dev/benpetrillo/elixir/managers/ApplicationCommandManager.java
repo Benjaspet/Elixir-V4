@@ -55,8 +55,7 @@ public final class ApplicationCommandManager {
                 new ShuffleCommand(),
                 new SkipCommand(),
                 new StopCommand(),
-                new VolumeCommand(),
-                new UserInfoCommand()
+                new VolumeCommand()
         );
     }
     
