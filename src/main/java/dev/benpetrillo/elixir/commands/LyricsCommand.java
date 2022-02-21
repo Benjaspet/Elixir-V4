@@ -47,9 +47,13 @@ public final class LyricsCommand extends Command implements Arguments {
         String song = interaction.getArgument("song", "", String.class);
         boolean isAutomatic = false;
         if(song.isEmpty()) {
-            song = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild())
-                    .audioPlayer.getPlayingTrack().getInfo().title;
-            isAutomatic = true;
+            var track = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild())
+                    .audioPlayer.getPlayingTrack();
+            if(track == null) {
+                interaction.reply(EmbedUtil.sendErrorEmbed("There is not a song playing."));
+                return;
+            }
+            song = track.getInfo().title; isAutomatic = true;
         }
         
         try {
