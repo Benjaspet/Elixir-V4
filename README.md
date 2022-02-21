@@ -20,6 +20,18 @@
 
 - Developers: Ben Petrillo (Eerie6560), KingRainbow44 (Magix)
 
+### Hosting
+
+Firstly, clone this repository.
+
+```shell
+git clone https://github.com/Eerie6560/Elixir-V4.git
+```
+
+- Make sure to install all Maven dependencies using your IDE.
+- Fill in ALL values in the configuration file. An example is provided in `.env.example`. If you don't fill all fields properly, the bot will not run.
+- To avoid ratelimiting, Elixir uses IPv6 rotation. Note that this requires an entire 64-block IPv6 address. Check with your hosting provider to see if you have one. If not, leave this field blank; however, you may run into ratelimiting issues.
+
 ### All Features
 
 - [x] Support for YouTube and Spotify URLs (playlists included).
@@ -33,11 +45,12 @@
     - [x] Manually add or remove tracks based on their queue position.
     - [x] Fetch all tracks in any custom playlist.
     - [x] Global system (play anyone else's track).
-    - [x] Ability to delete your custom playlists (you cannot delete or modity someone else's).
+    - [x] Ability to delete your custom playlists (you cannot delete or modify someone else's).
 - [x] Modify player volume.
 - [x] Shuffle the guild queue.
 - [x] View all tracks in the guild queue.
 - [x] Loop a particular track or queue.
+- [x] Fetch lyrics of any track.
 
 ### API Usage
 
