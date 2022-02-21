@@ -68,8 +68,9 @@ public final class ElixirClient {
     }
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
-        commandHandler = new ComplexCommandHandler(!ElixirConstants.COMMAND_PREFIX.isEmpty());
-        this.jda = JDABuilder.createDefault(token)
+        var usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
+        commandHandler = new ComplexCommandHandler(usePrefix);
+        var builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
                 .setAutoReconnect(true)
@@ -95,9 +96,11 @@ public final class ElixirClient {
                         GatewayIntent.GUILD_MESSAGE_TYPING,
                         GatewayIntent.GUILD_VOICE_STATES,
                         GatewayIntent.GUILD_WEBHOOKS
-                )
-                .build();
-        commandHandler.setJda(this.jda);
+                );
+        if(usePrefix) 
+            builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
+        this.jda = builder.build();
+        
         ApplicationCommandManager.initialize();
         AllowedMentions.setDefaultMentionRepliedUser(false);
         OAuthUpdateTask.schedule(); DatabaseManager.create();

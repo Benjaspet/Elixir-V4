@@ -31,6 +31,7 @@ import java.util.List;
 public final class ApplicationCommandManager {
 
     public static void initialize() {
+        ElixirClient.getCommandHandler().setJda(ElixirClient.getJda());
         new ApplicationCommandManager(ElixirClient.getCommandHandler());
         if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GLOBAL"))) {
             ElixirClient.getCommandHandler().deployAll(null);

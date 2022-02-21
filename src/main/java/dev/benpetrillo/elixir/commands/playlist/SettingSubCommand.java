@@ -101,7 +101,7 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
         return List.of(
                 Argument.create("id", "The playlist ID.", "id", OptionType.STRING, true, 0),
                 Argument.createWithChoices("setting", "The setting to change.", "setting", OptionType.STRING, true, 1, "shuffle", "repeat", "volume", "name", "description", "cover", "volume"),
-                Argument.create("value", "The new value.", "value", OptionType.STRING, true, 2)
+                Argument.createTrailingArgument("value", "The new value.", "value", OptionType.STRING, true, 2)
         );
     }
 }
