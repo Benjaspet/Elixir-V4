@@ -68,7 +68,7 @@ public final class ElixirClient {
     }
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
-        commandHandler = new ComplexCommandHandler(false);
+        commandHandler = new ComplexCommandHandler(!ElixirConstants.COMMAND_PREFIX.isEmpty());
         this.jda = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)

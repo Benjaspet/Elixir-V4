@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.managers;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.*;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;
 
@@ -41,6 +42,8 @@ public final class ApplicationCommandManager {
     }
     
     private ApplicationCommandManager(ComplexCommandHandler handler) {
+        var prefix = ElixirConstants.COMMAND_PREFIX;
+        if(!prefix.isEmpty()) handler.setPrefix(prefix);
         registerCommand(handler, 
                 new InfoCommand(),
                 new JoinCommand(),

@@ -37,6 +37,7 @@ public final class ElixirConstants {
     public static String API_ADDRESS = Config.get("API-ADDRESS");
     public static String API_PORT = Config.get("API-PORT");
     public static String IPV6_BLOCK = Config.get("IPV6-BLOCK");
+    public static String COMMAND_PREFIX = Config.get("COMMAND-PREFIX");
     public static String[] OWNERS = Config.get("OWNERS").split(",");
     public static String[] GUILDS = Config.get("GUILDS").split(",");
     public static Color DEFAULT_EMBED_COLOR = Color.decode(Config.get("DEFAULT-EMBED-COLOR"));
