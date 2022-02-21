@@ -49,31 +49,35 @@ public final class LoopCommand extends Command implements Arguments {
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final TrackScheduler scheduler = musicManager.scheduler;
-        switch(mode) {
-            case "Track Loop":
-                scheduler.repeating = TrackScheduler.LoopMode.TRACK; mode = "track";
-                break;
-            case "Queue Loop":
-                scheduler.repeating = TrackScheduler.LoopMode.QUEUE; mode = "queue";
-                break;
-            case "Disable Loop":
+        switch (mode) {
+            case "Track Loop" -> {
+                scheduler.repeating = TrackScheduler.LoopMode.TRACK;
+                mode = "track";
+            }
+            case "Queue Loop" -> {
+                scheduler.repeating = TrackScheduler.LoopMode.QUEUE;
+                mode = "queue";
+            }
+            case "Disable Loop" -> {
                 scheduler.repeating = TrackScheduler.LoopMode.NONE;
                 interaction.reply(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode."));
                 return;
-            default:
+            }
+            default -> {
+                interaction.reply(EmbedUtil.sendErrorEmbed("Invalid mode."));
                 return;
+            }
         }
         interaction.reply(EmbedUtil.sendDefaultEmbed("Set the loop mode to **%s**.".formatted(mode)));
     }
 
     @Override
     public Collection<Argument> getArguments() {
-        return List.of(
-                Argument.createWithChoices(
-                        "mode", "Loop mode", "mode", 
-                        OptionType.STRING, true, 0,
-                        "Track Loop", "Queue Loop", "Disable Loop"
-                )
-        );
+        var argument = Argument.createWithChoices(
+                "mode", "Loop mode", "mode",
+                OptionType.STRING, true, 0,
+                "Track Loop", "Queue Loop", "Disable Loop"
+        ); argument.trailing = true;
+        return List.of(argument);
     }
 }

@@ -25,6 +25,7 @@ import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public final class ApplicationCommandManager {
 
@@ -60,7 +61,7 @@ public final class ApplicationCommandManager {
     }
     
     private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {
-        ArrayList<String> commandNames = new ArrayList<>();
+        List<String> commandNames = new ArrayList<>();
         for (BaseCommand command : commands) {
             handler.registerCommand(command);
             commandNames.add(command.getLabel());

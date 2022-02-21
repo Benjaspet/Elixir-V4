@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.LyricManager;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -36,7 +37,6 @@ import java.util.Date;
 import java.util.List;
 
 public final class LyricsCommand extends Command implements Arguments {
-
     public LyricsCommand() {
         super("lyrics", "Fetch lyrics for a song.");
     }
@@ -44,8 +44,15 @@ public final class LyricsCommand extends Command implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
+        String song = interaction.getArgument("song", "", String.class);
+        boolean isAutomatic = false;
+        if(song.isEmpty()) {
+            song = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild())
+                    .audioPlayer.getPlayingTrack().getInfo().title;
+            isAutomatic = true;
+        }
+        
         try {
-            String song = (String) interaction.getArguments().getOrDefault("song", "all star");
             SongSearch result = LyricManager.getTrackData(song);
             SongSearch.Hit shortened = result.getHits().get(0);
             MessageEmbed embed = new EmbedBuilder()
@@ -58,14 +65,18 @@ public final class LyricsCommand extends Command implements Arguments {
                     .build();
             interaction.reply(embed);
         } catch (IOException exception) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track."));
+            if(isAutomatic) {
+                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track. Maybe try searching manually?"));
+            } else {
+                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track."));
+            }
         }
     }
 
     @Override
     public Collection<Argument> getArguments() {
         return List.of(
-                Argument.create("song", "The song to fetch the lyrics of.", "song", OptionType.STRING, true, 0)
+                Argument.createTrailingArgument("song", "The song to fetch the lyrics of.", "song", OptionType.STRING, false, 0)
         );
     }
 }

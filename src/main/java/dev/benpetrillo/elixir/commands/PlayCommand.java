@@ -88,7 +88,7 @@ public final class PlayCommand extends Command implements Arguments {
     @Override
     public Collection<Argument> getArguments() {
         return List.of(
-                Argument.create("query", "The track to play, by URL or query.", "query", OptionType.STRING, true, 0)
+                Argument.createTrailingArgument("query", "The track to play, by URL or query.", "query", OptionType.STRING, true, 0)
         );
     }
 }
