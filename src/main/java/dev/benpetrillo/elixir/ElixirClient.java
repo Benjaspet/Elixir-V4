@@ -102,6 +102,7 @@ public final class ElixirClient {
         if(usePrefix) 
             builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
         this.jda = builder.build();
+        commandHandler.setJda(this.jda);
         
         ApplicationCommandManager.initialize();
         AllowedMentions.setDefaultMentionRepliedUser(false);
