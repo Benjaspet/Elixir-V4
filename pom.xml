@@ -18,6 +18,10 @@
             <id>sonatype</id>
             <url>https://s01.oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -80,6 +84,11 @@
             <groupId>tech.xigam</groupId>
             <artifactId>Express.Java</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.LowLevelSubmarine</groupId>
+            <artifactId>GeniusLyricsAPI</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
 </project>
