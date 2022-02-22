@@ -55,15 +55,16 @@ public final class SkipCommand extends Command implements Arguments {
             musicManager.scheduler.queue.clear();
             musicManager.audioPlayer.destroy();
             MessageEmbed embed = EmbedUtil.sendDefaultEmbed("There were no tracks left in the queue, so I left.");
-            interaction.reply(embed);
+            interaction.reply(embed, false);
             return;
         }
         if (audioPlayer.getPlayingTrack() == null) {
             MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
-            interaction.reply(embed);
+            interaction.reply(embed, false);
         }
         int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
+            return;
         }
         final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1L);
         assert musicManager.scheduler.queue.peek() != null;
@@ -92,7 +93,7 @@ public final class SkipCommand extends Command implements Arguments {
                 .setFooter("Elixir Music", ElixirClient.getJda().getSelfUser().getAvatarUrl())
                 .setTimestamp(new Date().toInstant())
                 .build();
-        interaction.reply(embed);
+        interaction.reply(embed, false);
     }
 
     @Override

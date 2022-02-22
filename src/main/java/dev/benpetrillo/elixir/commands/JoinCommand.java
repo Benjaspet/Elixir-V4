@@ -39,11 +39,12 @@ public final class JoinCommand extends Command {
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();
         if (!memberVoiceState.inAudioChannel()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."), false);
             return;
         }
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people are required to continue.")); return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people are required to continue."), false);
+            return;
         }
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
         final AudioChannel memberChannel = memberVoiceState.getChannel();
@@ -54,9 +55,9 @@ public final class JoinCommand extends Command {
             assert memberChannel != null;
             String name = memberChannel.getName();
             MessageEmbed embed = EmbedUtil.sendDefaultEmbed(String.format("I've connected to **%s** successfully.", name));
-            interaction.reply(embed);
+            interaction.reply(embed, false);
         } else {
-            interaction.reply(EmbedUtil.sendErrorEmbed("I'm already connected to a voice channel."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("I'm already connected to a voice channel."), false);
         }
     }
 }

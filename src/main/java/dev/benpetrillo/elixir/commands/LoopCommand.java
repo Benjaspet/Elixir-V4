@@ -44,8 +44,9 @@ public final class LoopCommand extends Command implements Arguments {
         var mode = (String) interaction.getArguments().getOrDefault("mode", "Disable Loop");
         if (!AudioUtil.audioCheck(interaction)) return;
         if (!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
-        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
+        int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
+            return;
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final TrackScheduler scheduler = musicManager.scheduler;
@@ -60,15 +61,15 @@ public final class LoopCommand extends Command implements Arguments {
             }
             case "Disable Loop" -> {
                 scheduler.repeating = TrackScheduler.LoopMode.NONE;
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode."));
+                interaction.reply(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode."), false);
                 return;
             }
             default -> {
-                interaction.reply(EmbedUtil.sendErrorEmbed("Invalid mode."));
+                interaction.reply(EmbedUtil.sendErrorEmbed("Invalid mode."), false);
                 return;
             }
         }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Set the loop mode to **%s**.".formatted(mode)));
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Set the loop mode to **%s**.".formatted(mode)), false);
     }
 
     @Override

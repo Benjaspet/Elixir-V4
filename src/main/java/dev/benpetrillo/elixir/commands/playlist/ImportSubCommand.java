@@ -44,27 +44,27 @@ public final class ImportSubCommand extends SubCommand implements Arguments {
         var playlistId = interaction.getArgument("id", String.class);
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."), false);
             return;
         }
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
         var sourcePlaylist = interaction.getArgument("playlist", String.class);
         if (!Utilities.isValidURL(sourcePlaylist)) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid playlist!"));
+            interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid playlist!"), false);
             return;
         }
         var playlistInfo = TrackUtil.getPlaylistInfoFromUrl(sourcePlaylist);
         if (playlistInfo == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to get playlist info from that URL."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to get playlist info from that URL."), false);
             return;
         }
         for (var track : playlistInfo) {
             PlaylistUtil.addTrackToList(track, playlist, -1);
         }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully imported `" + playlistInfo.size() + "` tracks from playlist."));
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully imported `" + playlistInfo.size() + "` tracks from playlist."), false);
     }
 
     @Override

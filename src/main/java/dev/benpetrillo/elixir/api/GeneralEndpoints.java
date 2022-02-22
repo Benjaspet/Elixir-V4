@@ -25,6 +25,7 @@ import tech.xigam.express.Request;
  * - /
  * - /...
  */
+
 public final class GeneralEndpoints {
 
     /**
@@ -44,5 +45,4 @@ public final class GeneralEndpoints {
     public static void notFoundEndpoint(Request request) {
         request.code(404).respond("The requested resource was not found on our servers.");
     }
-
 }

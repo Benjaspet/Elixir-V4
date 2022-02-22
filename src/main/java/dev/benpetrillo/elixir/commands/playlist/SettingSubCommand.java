@@ -45,20 +45,20 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
         String toChange = (String) interaction.getArguments().getOrDefault("setting", "name");
         String value = (String) interaction.getArguments().getOrDefault("value", "Default Name");
         switch (toChange) {
-            default -> interaction.reply(EmbedUtil.sendErrorEmbed("Invalid setting `" + toChange + "`."));
+            default -> interaction.reply(EmbedUtil.sendErrorEmbed("Invalid setting: `" + toChange + "`."), false);
             case "cover" -> {
                 if (!Utilities.isValidURL(value)) {
-                    interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid URL!"));
+                    interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid URL!"), false);
                     return;
                 }
                 PlaylistUtil.setPlaylistCover(playlist, value);
@@ -69,29 +69,29 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
             }
             case "name" -> {
                 PlaylistUtil.setPlaylistName(playlist, value);
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the playlist name to `" + value + "`."));
+                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the playlist name to `" + value + "`."), false);
             }
             case "description" -> {
                 PlaylistUtil.setPlaylistDescription(playlist, value);
                 interaction.reply(new EmbedBuilder()
                         .setDescription("Successfully swapped the playlist description!")
                         .addField("New Description", value, false)
-                        .setColor(ElixirConstants.DEFAULT_EMBED_COLOR).build());
+                        .setColor(ElixirConstants.DEFAULT_EMBED_COLOR).build(), false);
             }
             case "shuffle" -> {
                 PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.SHUFFLE, playlist, Utilities.parseBoolean(value));
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the shuffle setting to `" + value + "`."));
+                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the shuffle setting to `" + value + "`."), false);
             }
             case "repeat" -> {
                 PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.REPEAT, playlist, Utilities.parseBoolean(value));
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the repeat setting to `" + value + "`."));
+                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the repeat setting to `" + value + "`."), false);
             }
             case "volume" -> {
                 int volume = Integer.parseInt(value);
                 if (volume < 0 || volume > 150)
                     volume = 100;
                 PlaylistUtil.setPlaylistVolume(playlist, volume);
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the volume to `" + volume + "`%."));
+                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the volume to `" + volume + "`%."), false);
             }
         }
     }

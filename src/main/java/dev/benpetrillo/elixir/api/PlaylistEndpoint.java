@@ -38,14 +38,16 @@ import java.util.Collections;
 
 /**
  * Includes:
- * - /playlist/
+ * - /playlist
  */
+
 @SuppressWarnings({"JavadocReference"})
+
 public final class PlaylistEndpoint {
 
     /**
      * The base URL for the playlist endpoint.
-     * Ex: https://app.ponjo.club/v1/elixir/playlist/
+     * Ex: https://app.ponjo.club/v1/elixir/playlist?id=magix
      * @param playlistId The playlist ID.
      * @param action What to do with the playlist.
      *               
@@ -58,21 +60,16 @@ public final class PlaylistEndpoint {
     public static void indexEndpoint(Request request) {
         var playlistId = request.requestArguments.getOrDefault("playlistId", "");
         var action = request.requestArguments.getOrDefault("action", "");
-        if(playlistId.isEmpty() || action.isEmpty()) {
+        if (playlistId.isEmpty() || action.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
-        
         var playlist = PlaylistUtil.findPlaylist(playlistId);
-        if(playlist == null) {
+        if (playlist == null) {
             request.code(404).respond("Playlist not found."); return;
         }
-        
         switch(action) {
             default -> request.code(400).respond("Invalid action.");
-            
-            case "fetch" -> request.respond(Utilities.base64Encode(
-                    Utilities.serialize(playlist)
-            ));
+            case "fetch" -> request.respond(Utilities.base64Encode(Utilities.serialize(playlist)));
             case "addtrack" -> {
                 try {
                     addTrack(request, playlist);
@@ -109,31 +106,28 @@ public final class PlaylistEndpoint {
     private static void queue(Request request, CustomPlaylist playlist) {
         var guildId = request.requestArguments.getOrDefault("guildId", "");
         var channelId = request.requestArguments.getOrDefault("channelId", "");
-        if(guildId.isEmpty() || channelId.isEmpty()) {
+        if (guildId.isEmpty() || channelId.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
         final Guild guild = ElixirClient.getJda().getGuildById(guildId);
-        if(guild == null) {
+        if (guild == null) {
             request.code(400).respond("Unable to find guild."); return;
         }
         final AudioChannel voiceChannel = guild.getVoiceChannelById(channelId);
-        if(voiceChannel == null) {
+        if (voiceChannel == null) {
             request.code(400).respond("Unable to find voice channel."); return;
         }
         final GuildVoiceState voiceState = guild.getSelfMember().getVoiceState();
         assert voiceState != null;
-        if(!voiceState.inAudioChannel()) {
-            guild.getAudioManager()
-                    .openAudioConnection(voiceChannel);
-            guild.getAudioManager()
-                    .setSelfDeafened(true);
+        if (!voiceState.inAudioChannel()) {
+            guild.getAudioManager().openAudioConnection(voiceChannel);
+            guild.getAudioManager().setSelfDeafened(true);
         }
         GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
         var tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser("838118537276031006", tracks);
         if (playlist.options.shuffle) Collections.shuffle(tracks);
         if (musicManager.scheduler.queue.isEmpty() && musicManager.audioPlayer.getPlayingTrack() == null) {
-            musicManager.scheduler.repeating = playlist.options.repeat
-                    ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
+            musicManager.scheduler.repeating = playlist.options.repeat ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
             musicManager.audioPlayer.setVolume(playlist.info.volume);
         }
         musicManager.scheduler.getQueue().addAll(tracks);

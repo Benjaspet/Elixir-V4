@@ -31,7 +31,5 @@ public final class MessageListener extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageDelete(@NotNull MessageDeleteEvent event) {
-        
-    }
+    public void onMessageDelete(@NotNull MessageDeleteEvent event) {}
 }

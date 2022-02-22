@@ -49,7 +49,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
         var tracks = PlaylistUtil.getTracks(playlist);
@@ -82,7 +82,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
                 .setFooter("Elixir Music", ElixirClient.getJda().getSelfUser().getAvatarUrl())
                 .setTimestamp(new Date().toInstant())
                 .build();
-        interaction.reply(embed);
+        interaction.reply(embed, false);
     }
 
     @Override

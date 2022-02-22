@@ -60,6 +60,6 @@ public final class InfoCommand extends Command {
                         """.formatted(servers, users, uptime), false)
                 .setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl())
                 .setTimestamp(OffsetDateTime.now());
-        interaction.reply(embed.build());
+        interaction.reply(embed.build(), false);
     }
 }

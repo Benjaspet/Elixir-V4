@@ -51,7 +51,7 @@ public final class NowPlayingCommand extends Command {
             final AudioPlayer audioPlayer = musicManager.audioPlayer;
             final AudioTrack track = audioPlayer.getPlayingTrack();
             if (track == null) {
-                interaction.reply(EmbedUtil.sendErrorEmbed("There is no track playing at the moment."));
+                interaction.reply(EmbedUtil.sendErrorEmbed("There is no track playing at the moment."), false);
             } else {
                 final AudioTrackInfo info = track.getInfo();
                 final String thumbnail = TrackUtil.getCoverArt(track.getInfo());
@@ -76,14 +76,14 @@ public final class NowPlayingCommand extends Command {
                         .setTimestamp(new Date().toInstant())
                         .setThumbnail(thumbnail)
                         .build();
-                interaction.reply(embed);
+                interaction.reply(embed, false);
             }
         } catch (PermissionException ignored) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("I do not have permission to do this."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("I do not have permission to do this."), false);
         } catch (Exception exception) {
             ElixirClient.logger.error("An error occurred while getting the currently playing track.", exception);
             Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception).additionalInformation("Not a permission exception."));
-            interaction.reply(EmbedUtil.sendErrorEmbed("An unknown error occurred."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("An unknown error occurred."), false);
         }
     }
 }

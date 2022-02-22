@@ -48,7 +48,7 @@ public final class QueueCommand extends Command {
     public void execute(Interaction interaction) {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         if (musicManager.scheduler.queue.isEmpty()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("There are no songs in the queue."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("There are no songs in the queue."), false);
             return;
         }
         interaction.deferReply();
@@ -87,9 +87,9 @@ public final class QueueCommand extends Command {
                     .setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getAvatarUrl())
                     .setTimestamp(new Date().toInstant())
                     .build();
-            interaction.reply(embed);
+            interaction.reply(embed, false);
         } catch (PermissionException ignored) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while running this command."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while running this command."), false);
         }
     }
 }

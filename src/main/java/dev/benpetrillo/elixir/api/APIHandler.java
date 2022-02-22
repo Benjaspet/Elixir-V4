@@ -37,7 +37,6 @@ public final class APIHandler {
                 .get("/player/join", PlayerEndpoint::joinEndpoint)
                 .get("/playlist", PlaylistEndpoint::indexEndpoint)
                 .get("/queue", QueueEndpoint::indexEndpoint);
-        
         try {
             express.router(router).listen();
         } catch (IOException exception) {

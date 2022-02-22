@@ -40,6 +40,6 @@ public final class PlaylistCommand extends Command implements Baseless {
     
     @Override
     public void execute(Interaction interaction) {
-        interaction.reply(EmbedUtil.sendErrorEmbed("Cannot execute this command."));
+        interaction.reply(EmbedUtil.sendErrorEmbed("Cannot execute this command."), false);
     }
 }
