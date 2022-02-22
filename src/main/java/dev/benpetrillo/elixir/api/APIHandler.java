@@ -27,15 +27,16 @@ import tech.xigam.express.Router;
 import java.io.IOException;
 
 public final class APIHandler {
+
     public static void initialize() {
         var express = Express.create(Integer.parseInt(ElixirConstants.API_PORT), ElixirConstants.API_ADDRESS)
                 .notFound(GeneralEndpoints::notFoundEndpoint);
         var router = new Router()
                 .get("/", GeneralEndpoints::indexEndpoint)
-                .get("/player/", PlayerEndpoint::indexEndpoint)
-                .get("/player/join/", PlayerEndpoint::joinEndpoint)
-                .get("/playlist/", PlaylistEndpoint::indexEndpoint)
-                .get("/queue/", QueueEndpoint::indexEndpoint);
+                .get("/player", PlayerEndpoint::indexEndpoint)
+                .get("/player/join", PlayerEndpoint::joinEndpoint)
+                .get("/playlist", PlaylistEndpoint::indexEndpoint)
+                .get("/queue", QueueEndpoint::indexEndpoint);
         
         try {
             express.router(router).listen();
