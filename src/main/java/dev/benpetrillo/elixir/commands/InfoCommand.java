@@ -18,16 +18,18 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import com.sun.management.OperatingSystemMXBean;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.time.OffsetDateTime;
 
 public final class InfoCommand extends Command {
@@ -46,7 +48,28 @@ public final class InfoCommand extends Command {
         for (Guild server : ElixirClient.getInstance().jda.getGuilds()) {
             users += server.getMemberCount();
         }
-        var uptime = Utilities.formatDuration(1000 * (OffsetDateTime.now().toEpochSecond() - ElixirClient.startTime.toEpochSecond()));
+        // get java process memory usage
+        OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+        long memory = os.getTotalMemorySize() / 1024 / 1024;
+        long memoryUsed = os.getCommittedVirtualMemorySize() / 1024 / 1024;
+        long memoryFree = memory - memoryUsed;
+        long memoryUsedPercent = (memoryUsed * 100) / memory;
+        long memoryFreePercent = (memoryFree * 100) / memory;
+        // get java process cpu usage and round it to 4 decimal places
+        double cpuUsage = Math.round(os.getProcessCpuLoad() * 100 * 10000.0) / 10000.0;
+        // get cpu cores
+        int cores = Runtime.getRuntime().availableProcessors();
+        // get java process threads
+        int threads = Thread.activeCount();
+        //get java process uptime
+        long uptime = runtime.getUptime();
+        // get uptime in days, hours, minutes, and seconds
+        long days = uptime / 86400000;
+        long hours = (uptime % 86400000) / 3600000;
+        long minutes = (uptime % 3600000) / 60000;
+        long seconds = (uptime % 60000) / 1000;
+        String uptimeString = "%dd %dh %dm %ds".formatted(days, hours, minutes, seconds);
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setAuthor("Total Playing Streams: " + streams)
@@ -57,7 +80,14 @@ public final class InfoCommand extends Command {
                         • Server count: %s
                         • User count: %s
                         • Uptime: %s
-                        """.formatted(servers, users, uptime), false)
+                        """.formatted(servers, users, uptimeString), false)
+                .addField("Host Information", """
+                        • CPU Usage: %s%%
+                        • CPU Cores: %s
+                        • Threads: %s
+                        • Memory Usage: %s/%s MB (%s%%)
+                        • Memory Free: %s/%s MB (%s%%)
+                        """.formatted(cpuUsage, cores, threads, memoryUsed, memory, memoryUsedPercent, memoryFree, memory, memoryFreePercent), false)
                 .setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl())
                 .setTimestamp(OffsetDateTime.now());
         interaction.reply(embed.build(), false);

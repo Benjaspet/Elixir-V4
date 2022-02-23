@@ -40,7 +40,6 @@ import tech.xigam.cch.ComplexCommandHandler;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 
 public final class ElixirClient {
     
@@ -48,14 +47,9 @@ public final class ElixirClient {
 
     public static ComplexCommandHandler commandHandler;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
-    public static final OffsetDateTime startTime;
     
     public JDA jda;
     public ElixirVoiceDispatchInterceptor dispatchInterceptor;
-    
-    static {
-        startTime = OffsetDateTime.now();
-    }
 
     public static void main(String[] args) {
         try {
