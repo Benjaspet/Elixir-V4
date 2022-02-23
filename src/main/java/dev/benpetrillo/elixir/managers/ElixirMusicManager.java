@@ -124,7 +124,7 @@ public final class ElixirMusicManager {
                         .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                         .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, track.getInfo().uri))
                         .build();
-                interaction.reply(embed);
+                interaction.reply(embed, false);
             }
 
             @Override
@@ -142,7 +142,7 @@ public final class ElixirMusicManager {
                             .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                             .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, tracks.get(0).getInfo().uri))
                             .build();
-                    interaction.reply(embed);
+                    interaction.reply(embed, false);
                     musicManager.scheduler.queue(tracks.get(0));
                 } else {
                     final String success = String.format("Queued **%s** tracks from [%s](%s).", tracks.size(), playlist.getName(), url);
