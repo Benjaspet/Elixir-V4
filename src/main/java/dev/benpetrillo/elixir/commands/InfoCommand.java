@@ -52,10 +52,7 @@ public final class InfoCommand extends Command {
         OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
         long memory = os.getTotalMemorySize() / 1024 / 1024;
-        long memoryUsed = os.getCommittedVirtualMemorySize() / 1024 / 1024;
-        long memoryFree = memory - memoryUsed;
-        long memoryUsedPercent = (memoryUsed * 100) / memory;
-        long memoryFreePercent = (memoryFree * 100) / memory;
+        long freeMemory = os.getFreeMemorySize() / 1024 / 1024;
         // get java process cpu usage and round it to 4 decimal places
         double cpuUsage = Math.round(os.getProcessCpuLoad() * 100 * 10000.0) / 10000.0;
         // get cpu cores
@@ -85,9 +82,8 @@ public final class InfoCommand extends Command {
                         • CPU Usage: %s%%
                         • CPU Cores: %s
                         • Threads: %s
-                        • Memory Usage: %s/%s MB (%s%%)
-                        • Memory Free: %s/%s MB (%s%%)
-                        """.formatted(cpuUsage, cores, threads, memoryUsed, memory, memoryFreePercent, memoryFree, memory, memoryUsedPercent), false)
+                        • Total Memory: %s MB
+                        """.formatted(cpuUsage, cores, threads, memory), false)
                 .setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl())
                 .setTimestamp(OffsetDateTime.now());
         interaction.reply(embed.build(), false);
