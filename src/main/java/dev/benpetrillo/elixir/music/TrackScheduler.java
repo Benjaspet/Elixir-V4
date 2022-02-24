@@ -20,6 +20,7 @@ package dev.benpetrillo.elixir.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
@@ -76,7 +77,6 @@ public final class TrackScheduler extends AudioEventAdapter {
                 audioManager.closeAudioConnection();
             }
         }
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
         if (endReason.mayStartNext) {
             if (this.repeating == LoopMode.TRACK) {
                 this.player.startTrack(track.makeClone(), false);
@@ -85,6 +85,14 @@ public final class TrackScheduler extends AudioEventAdapter {
                 this.queue.add(track.makeClone());
             }
             nextTrack();
+        }
+    }
+
+    @Override
+    public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
+        var error = exception.getCause();
+        if(error instanceof RuntimeException && error.getMessage().contains("403")) {
+            this.player.startTrack(track.makeClone(), false);
         }
     }
 

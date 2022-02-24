@@ -67,7 +67,7 @@ public final class LyricsCommand extends Command implements Arguments {
                     .setTimestamp(new Date().toInstant())
                     .build();
             interaction.reply(embed);
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             if(isAutomatic) {
                 interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track. Maybe try searching manually?"));
             } else {
