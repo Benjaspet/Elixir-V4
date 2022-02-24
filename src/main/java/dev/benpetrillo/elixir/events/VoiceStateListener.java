@@ -20,21 +20,26 @@ package dev.benpetrillo.elixir.events;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.util.Objects;
+
 public final class VoiceStateListener extends ListenerAdapter {
 
+    @SneakyThrows
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
         Member selfMember = event.getGuild().getSelfMember();
-        if (selfMember.getVoiceState().inAudioChannel()) {
+        if (Objects.requireNonNull(selfMember.getVoiceState()).inAudioChannel()) {
             if (event.getChannelLeft().getMembers().size() == 1) {
                 if (event.getChannelLeft().getMembers().get(0).equals(selfMember)) {
                     event.getChannelLeft().getGuild().getAudioManager().closeAudioConnection();
                     final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(event.getGuild());
                     final AudioManager audioManager = event.getGuild().getAudioManager();
+                    Thread.sleep(5000);
                     audioManager.closeAudioConnection();
                     musicManager.scheduler.queue.clear();
                     musicManager.audioPlayer.destroy();

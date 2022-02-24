@@ -40,7 +40,8 @@ public final class StopCommand extends Command {
         assert selfVoiceState != null;
         if (!AudioUtil.audioCheck(interaction)) return;
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
+            return;
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final AudioManager audioManager = interaction.getGuild().getAudioManager();

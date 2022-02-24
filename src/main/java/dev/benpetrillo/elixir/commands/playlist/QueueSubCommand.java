@@ -50,19 +50,18 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
     public void execute(Interaction interaction) {
         interaction.deferReply();
         var member = interaction.getMember(); var guild = interaction.getGuild();
-        int continueExec; if((continueExec = DJUtil.continueExecution(guild, member)) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
+        int continueExec; if ((continueExec = DJUtil.continueExecution(guild, member)) != -1) {
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false); return;
         }
-        
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of ID `" + playlistId + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of ID `" + playlistId + "`."), false);
             return;
         }
         final GuildVoiceState memberVoiceState = member.getVoiceState(); assert memberVoiceState != null;
         if (!memberVoiceState.inAudioChannel()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to queue tracks."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to queue tracks."), false);
             return;
         }
         final GuildVoiceState voiceState = guild.getSelfMember().getVoiceState(); assert voiceState != null;
@@ -81,7 +80,7 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
         }
         musicManager.scheduler.getQueue().addAll(tracks);
         if (musicManager.audioPlayer.getPlayingTrack() == null) musicManager.scheduler.nextTrack();
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Queued **%s** tracks from %s.".formatted(playlist.tracks.size(), playlist.info.name)));
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Queued **%s** tracks from %s.".formatted(playlist.tracks.size(), playlist.info.name)), false);
     }
 
     @Override

@@ -77,7 +77,10 @@ public final class ElixirMusicManager {
         this.audioPlayerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
         
-        // Set up the IP rotator.
+        // IPv6 rotation setup.
+        // If the bot receives a 429 from YouTube, it will rotate the IP address to another, provided that
+        // an entire 64-bit block is provided in the config.
+
         String ipBlock; if(!(ipBlock = ElixirConstants.IPV6_BLOCK).isEmpty()) {
             new YoutubeIpRotatorSetup(new NanoIpRoutePlanner(Collections.singletonList(
                     new Ipv6Block(ipBlock)), true
@@ -121,7 +124,7 @@ public final class ElixirMusicManager {
                         .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                         .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, track.getInfo().uri))
                         .build();
-                interaction.reply(embed);
+                interaction.reply(embed, false);
             }
 
             @Override
@@ -139,7 +142,7 @@ public final class ElixirMusicManager {
                             .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                             .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, tracks.get(0).getInfo().uri))
                             .build();
-                    interaction.reply(embed);
+                    interaction.reply(embed, false);
                     musicManager.scheduler.queue(tracks.get(0));
                 } else {
                     final String success = String.format("Queued **%s** tracks from [%s](%s).", tracks.size(), playlist.getName(), url);

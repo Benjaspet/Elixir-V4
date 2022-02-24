@@ -40,7 +40,6 @@ import tech.xigam.cch.ComplexCommandHandler;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 
 public final class ElixirClient {
     
@@ -48,14 +47,9 @@ public final class ElixirClient {
 
     public static ComplexCommandHandler commandHandler;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
-    public static final OffsetDateTime startTime;
     
     public JDA jda;
     public ElixirVoiceDispatchInterceptor dispatchInterceptor;
-    
-    static {
-        startTime = OffsetDateTime.now();
-    }
 
     public static void main(String[] args) {
         try {
@@ -69,8 +63,7 @@ public final class ElixirClient {
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         var usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
-        commandHandler = new ComplexCommandHandler(usePrefix)
-                .setPrefix(ElixirConstants.COMMAND_PREFIX);
+        commandHandler = new ComplexCommandHandler(usePrefix).setPrefix(ElixirConstants.COMMAND_PREFIX);
         logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
         var builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))

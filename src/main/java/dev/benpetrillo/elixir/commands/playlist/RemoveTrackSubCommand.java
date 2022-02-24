@@ -42,19 +42,19 @@ public final class RemoveTrackSubCommand extends SubCommand implements Arguments
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
         var index = (long) interaction.getArguments().getOrDefault("index", 0);
         try {
             PlaylistUtil.removeTrackFromList((int) index, playlist);
-            interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully removed track from playlist."));
+            interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully removed track from playlist."), false);
         } catch (IndexOutOfBoundsException ignored) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("That track doesn't exist."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("That track doesn't exist."), false);
         }
     }
 

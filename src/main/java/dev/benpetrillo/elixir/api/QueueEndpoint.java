@@ -30,14 +30,16 @@ import java.util.List;
 
 /**
  * Includes:
- * - /queue/
+ * - /queue
  */
+
 @SuppressWarnings({"JavadocReference"})
+
 public final class QueueEndpoint {
 
     /**
      * The base URL for the queue endpoint.
-     * Ex: https://app.ponjo.club/v1/elixir/queue/
+     * Ex: https://app.ponjo.club/v1/elixir/queue?guild=836268305211719690
      * @param guildId The guild ID of the queue you want to use.
      * @param action The action you want to perform.
      */
@@ -54,13 +56,11 @@ public final class QueueEndpoint {
         }
         switch (action) {
             default -> request.code(400).respond("Invalid action.");
-            
             case "queue" -> {
                 List<AudioTrack> tracks = musicManager.scheduler.queue.stream().toList();
                 List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
                 request.respond(Utilities.base64Encode(Utilities.serialize(trackInfo)));
             }
-            
             case "shuffle" -> {
                 List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
                 Collections.shuffle(tracks); musicManager.scheduler.queue.clear();
@@ -70,5 +70,4 @@ public final class QueueEndpoint {
             }
         }
     }
-
 }

@@ -72,10 +72,6 @@ public final class TrackScheduler extends AudioEventAdapter {
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (this.queue.size() == 0 && this.repeating == LoopMode.NONE) {
             this.player.destroy();
-            final AudioManager audioManager = guild.getAudioManager();
-            if (Objects.requireNonNull(guild.getSelfMember().getVoiceState()).inAudioChannel()) {
-                audioManager.closeAudioConnection();
-            }
         }
         if (endReason.mayStartNext) {
             if (this.repeating == LoopMode.TRACK) {

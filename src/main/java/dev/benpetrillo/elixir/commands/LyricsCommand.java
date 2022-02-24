@@ -50,7 +50,7 @@ public final class LyricsCommand extends Command implements Arguments {
             var track = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild())
                     .audioPlayer.getPlayingTrack();
             if (track == null) {
-                interaction.reply(EmbedUtil.sendErrorEmbed("There is not a song playing."));
+                interaction.reply(EmbedUtil.sendErrorEmbed("There is not a song playing."), false);
                 return;
             }
             song = track.getInfo().title; isAutomatic = true;
@@ -67,11 +67,11 @@ public final class LyricsCommand extends Command implements Arguments {
                     .setTimestamp(new Date().toInstant())
                     .build();
             interaction.reply(embed);
-        } catch (Exception exception) {
-            if(isAutomatic) {
-                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track. Maybe try searching manually?"));
+        } catch (IOException | IndexOutOfBoundsException exception) {
+            if (isAutomatic) {
+                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track. Maybe try searching manually?"), false);
             } else {
-                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track."));
+                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track."), false);
             }
         }
     }

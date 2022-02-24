@@ -41,11 +41,11 @@ public final class AddTrackSubCommand extends SubCommand implements Arguments {
         var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."), false);
             return;
         }
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
         var track = (String) interaction.getArguments().getOrDefault("track", "https://youtube.com/watch?v=dQw4w9WgXcQ");
@@ -57,11 +57,11 @@ public final class AddTrackSubCommand extends SubCommand implements Arguments {
         }
         var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
         if (trackInfo == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a track with the URL `" + track + "`."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a track with the URL `" + track + "`."), false);
             return;
         }
         PlaylistUtil.addTrackToList(trackInfo, playlist, (int) index);
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully added [%s](%s) to playlist.".formatted(trackInfo.title, trackInfo.uri)));
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully added [%s](%s) to playlist.".formatted(trackInfo.title, trackInfo.uri)), false);
     }
 
     @Override

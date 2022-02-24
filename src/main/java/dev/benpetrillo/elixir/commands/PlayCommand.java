@@ -54,7 +54,7 @@ public final class PlayCommand extends Command implements Arguments {
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();
         if (!memberVoiceState.inAudioChannel()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."));
+            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."), false);
             return;
         }
         String query = (String) interaction.getArguments().getOrDefault("query", "https://youtube.com/watch?v=dQw4w9WgXcQ");
@@ -67,7 +67,7 @@ public final class PlayCommand extends Command implements Arguments {
         }
         if (!Utilities.isValidURL(query)) {
             try {
-                ElixirMusicManager.getInstance().loadAndPlay(HttpUtil.getYouTubeURL(query), interaction, "https://www.youtube.com/");
+                ElixirMusicManager.getInstance().loadAndPlay(HttpUtil.getYouTubeURL(query), interaction, "https://www.youtube.com");
                 return;
             } catch (UnsupportedEncodingException exception) {
                 interaction.reply(EmbedUtil.sendErrorEmbed("No search results found."));
@@ -75,7 +75,7 @@ public final class PlayCommand extends Command implements Arguments {
                 return;
             }
         }
-        if (Utilities.isValidURL(query) && query.contains("spotify")) {
+        if (Utilities.isValidURL(query) && query.contains("spotify") && query.contains("track")) {
             try {
                 SpotifySourceManager.authorize();
             } catch (IOException | ParseException | SpotifyWebApiException exception) {

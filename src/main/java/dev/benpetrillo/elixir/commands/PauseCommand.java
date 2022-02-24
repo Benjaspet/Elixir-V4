@@ -36,17 +36,18 @@ public final class PauseCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         if (!AudioUtil.audioCheck(interaction)) return;
-        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
+        int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
+            return;
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         if (!musicManager.scheduler.player.isPaused()) {
             musicManager.scheduler.player.setPaused(true);
             MessageEmbed embed = EmbedUtil.sendDefaultEmbed("Successfully paused the queue.");
-            interaction.reply(embed);
+            interaction.reply(embed, false);
         } else {
             MessageEmbed embed = EmbedUtil.sendErrorEmbed("The queue is already paused.");
-            interaction.reply(embed);
+            interaction.reply(embed, false);
         }
     }
 }

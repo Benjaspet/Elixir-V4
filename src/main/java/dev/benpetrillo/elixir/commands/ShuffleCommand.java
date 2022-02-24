@@ -40,14 +40,15 @@ public final class ShuffleCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         if (!AudioUtil.audioCheck(interaction)) return;
-        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people are required to continue.")); return;
+        int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people are required to continue."), false);
+            return;
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
         Collections.shuffle(tracks);
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.queue.addAll(tracks);
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Shuffled the queue."));
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Shuffled the queue."), false);
     }
 }

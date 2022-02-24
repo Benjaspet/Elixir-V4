@@ -32,9 +32,11 @@ import java.util.List;
 
 /**
  * Includes:
- * - /player/
+ * - /player
  */
+
 @SuppressWarnings({"JavadocReference"})
+
 public final class PlayerEndpoint {
 
     /**
@@ -49,28 +51,25 @@ public final class PlayerEndpoint {
     public static void indexEndpoint(Request request) {
         var guildId = request.requestArguments.getOrDefault("guildId", "");
         var action = request.requestArguments.getOrDefault("action", "");
-        if(guildId.isEmpty() || action.isEmpty()) {
+        if (guildId.isEmpty() || action.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
-        
         final Guild guild = ElixirClient.getJda().getGuildById(guildId);
-        if(guild == null) {
+        if (guild == null) {
             request.code(404).respond("Guild not found."); return;
         }
-        if(!guild.getAudioManager().isConnected()) {
+        if (!guild.getAudioManager().isConnected()) {
             request.code(410).respond("The bot isn't connected to a voice channel, maybe try /player/join first?"); return;
         }
-        
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
-        switch(action) {
+        switch (action) {
             default -> {
-                request.code(400).respond("Invalid action."); return;
+                request.code(400).respond("Invalid action.");
+                return;
             }
-            
             case "pause" -> musicManager.audioPlayer.setPaused(true);
             case "resume" -> musicManager.audioPlayer.setPaused(false);
             case "skip" -> musicManager.scheduler.nextTrack();
-            
             case "stop" -> {
                 stop(request, guild, musicManager); return;
             }
@@ -94,20 +93,18 @@ public final class PlayerEndpoint {
     public static void joinEndpoint(Request request) {
         var guildId = request.requestArguments.getOrDefault("guildId", "");
         var channelId = request.requestArguments.getOrDefault("channelId", "");
-        if(guildId.isEmpty() || channelId.isEmpty()) {
+        if (guildId.isEmpty() || channelId.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
-        
         final Guild guild = ElixirClient.getJda().getGuildById(guildId);
-        if(guild == null) {
+        if (guild == null) {
             request.code(404).respond("Guild not found."); return;
         }
-        if(guild.getAudioManager().isConnected()) {
+        if (guild.getAudioManager().isConnected()) {
             request.code(409).respond("The bot is already connected to a voice channel."); return;
         }
-        
         final AudioChannel channel = guild.getVoiceChannelById(channelId);
-        if(channel == null) {
+        if (channel == null) {
             request.code(404).respond("Voice channel not found."); return;
         }
         guild.getAudioManager().openAudioConnection(channel);
@@ -121,48 +118,40 @@ public final class PlayerEndpoint {
     private static void stop(Request request, Guild guild, GuildMusicManager musicManager) {
         musicManager.scheduler.queue.clear(); // Clear the queue.
         musicManager.audioPlayer.destroy(); // Destroy the player.
-        if(guild.getAudioManager().isConnected()) {
+        if (guild.getAudioManager().isConnected()) {
             guild.getAudioManager().closeAudioConnection(); // Disconnect from the voice channel.
         }
-        
         request.respond("Success.");
     }
     
     private static void nowPlaying(Request request, GuildMusicManager musicManager) {
         var audioTrack = musicManager.audioPlayer.getPlayingTrack();
-        if(audioTrack == null) {
+        if (audioTrack == null) {
             request.code(410).respond("The bot isn't playing anything."); return;
         }
-        
-        request.respond(Utilities.base64Encode(
-                Utilities.serialize(NowPlayingObject.create(audioTrack))
-        ));
+        request.respond(Utilities.base64Encode(Utilities.serialize(NowPlayingObject.create(audioTrack))));
     }
     
     @SuppressWarnings("unchecked")
     private static void play(Request request, Guild guild) {
         var query = request.requestArguments.getOrDefault("query", "");
-        if(query.isEmpty()) {
+        if (query.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
-        
         var decodedQuery = Utilities.base64Decode(query);
-        if(!Utilities.isValidURL(decodedQuery)) {
+        if (!Utilities.isValidURL(decodedQuery)) {
             decodedQuery = "ytsearch:" + decodedQuery;
         }
-        
         ElixirMusicManager.getInstance().loadAndPlay(guild, decodedQuery, object -> {
-            if(object == null) {
+            if (object == null) {
                 request.code(404).respond("No results found.");
-            } else if(object instanceof AudioTrack) {
+            } else if (object instanceof AudioTrack) {
                 request.respond(Utilities.base64Encode(
                         Utilities.serialize(((AudioTrack) object).getInfo())
                 ));
-            } else if(object instanceof List<?>) {
+            } else if (object instanceof List<?>) {
                 List<AudioTrack> tracks = (List<AudioTrack>) object;
-                request.respond(Utilities.base64Encode(
-                        Utilities.serialize(tracks.stream().map(AudioTrack::getInfo).toArray())
-                ));
+                request.respond(Utilities.base64Encode(Utilities.serialize(tracks.stream().map(AudioTrack::getInfo).toArray())));
             } else if(object instanceof Throwable) {
                 request.code(400).respond("The bot encountered an error while trying to play the track.");
             }
