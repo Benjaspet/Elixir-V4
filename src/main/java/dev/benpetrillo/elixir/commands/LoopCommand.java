@@ -41,7 +41,7 @@ public final class LoopCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        if(!interaction.isFromGuild()) {
+        if (!interaction.isFromGuild()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }

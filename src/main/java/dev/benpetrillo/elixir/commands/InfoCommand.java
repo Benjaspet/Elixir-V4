@@ -87,7 +87,7 @@ public final class InfoCommand extends Command {
                         • Threads: %s
                         • Memory Usage: %s/%s MB (%s%%)
                         • Memory Free: %s/%s MB (%s%%)
-                        """.formatted(cpuUsage, cores, threads, memoryUsed, memory, memoryUsedPercent, memoryFree, memory, memoryFreePercent), false)
+                        """.formatted(cpuUsage, cores, threads, memoryUsed, memory, memoryFreePercent, memoryFree, memory, memoryUsedPercent), false)
                 .setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl())
                 .setTimestamp(OffsetDateTime.now());
         interaction.reply(embed.build(), false);
