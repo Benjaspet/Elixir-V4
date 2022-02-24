@@ -35,6 +35,10 @@ public final class JoinCommand extends Command {
     
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         final GuildVoiceState voiceState = interaction.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();

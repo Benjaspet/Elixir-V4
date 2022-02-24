@@ -36,6 +36,10 @@ public final class StopCommand extends Command {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
         assert selfVoiceState != null;
         if (!AudioUtil.audioCheck(interaction)) return;
@@ -48,8 +52,7 @@ public final class StopCommand extends Command {
         if (selfVoiceState.inAudioChannel()) {
             audioManager.closeAudioConnection();
         }
-        musicManager.scheduler.queue.clear();
-        musicManager.audioPlayer.destroy();
+        musicManager.stop();
         interaction.reply(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped."));
     }
 }

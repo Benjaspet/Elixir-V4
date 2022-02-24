@@ -46,6 +46,10 @@ public final class SkipCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         if (!AudioUtil.audioCheck(interaction)) return;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final AudioManager audioManager = interaction.getGuild().getAudioManager();

@@ -38,11 +38,8 @@ public final class VoiceStateListener extends ListenerAdapter {
                 if (event.getChannelLeft().getMembers().get(0).equals(selfMember)) {
                     event.getChannelLeft().getGuild().getAudioManager().closeAudioConnection();
                     final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(event.getGuild());
-                    final AudioManager audioManager = event.getGuild().getAudioManager();
                     Thread.sleep(5000);
-                    audioManager.closeAudioConnection();
-                    musicManager.scheduler.queue.clear();
-                    musicManager.audioPlayer.destroy();
+                    musicManager.audioPlayer.setPaused(true);
                 }
             }
         }

@@ -41,6 +41,10 @@ public final class LoopCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         var mode = (String) interaction.getArguments().getOrDefault("mode", "Disable Loop");
         if (!AudioUtil.audioCheck(interaction)) return;
         if (!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;

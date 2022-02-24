@@ -40,6 +40,10 @@ public final class VolumeCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         if (!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         if (!AudioUtil.audioCheck(interaction)) return;
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {

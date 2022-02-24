@@ -46,6 +46,10 @@ public final class QueueCommand extends Command {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         if (musicManager.scheduler.queue.isEmpty()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("There are no songs in the queue."), false);

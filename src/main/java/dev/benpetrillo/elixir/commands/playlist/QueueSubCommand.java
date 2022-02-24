@@ -48,6 +48,10 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         interaction.deferReply();
         var member = interaction.getMember(); var guild = interaction.getGuild();
         int continueExec; if ((continueExec = DJUtil.continueExecution(guild, member)) != -1) {

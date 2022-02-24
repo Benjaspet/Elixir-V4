@@ -39,6 +39,10 @@ public final class ShuffleCommand extends Command {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         if (!AudioUtil.audioCheck(interaction)) return;
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people are required to continue."), false);

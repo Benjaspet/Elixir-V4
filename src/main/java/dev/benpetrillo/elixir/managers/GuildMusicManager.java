@@ -38,4 +38,11 @@ public final class GuildMusicManager {
     public AudioPlayerSendHandler getSendHandler() {
         return new AudioPlayerSendHandler(this.audioPlayer);
     }
+    
+    public void stop() {
+        this.audioPlayer.setVolume(100); // Reset the volume to default.
+        this.audioPlayer.destroy(); // Destroy the audio player.
+        this.scheduler.queue.clear(); // Clear the queue.
+        this.scheduler.repeating = TrackScheduler.LoopMode.NONE; // Disable loop mode.
+    }
 }

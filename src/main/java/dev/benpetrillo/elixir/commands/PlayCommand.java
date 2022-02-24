@@ -49,6 +49,10 @@ public final class PlayCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
+        if(!interaction.isFromGuild()) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            return;
+        }
         final MessageChannel channel = interaction.getChannel();
         final GuildVoiceState voiceState = interaction.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
