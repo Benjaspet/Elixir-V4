@@ -92,8 +92,7 @@ public final class ElixirClient {
                         GatewayIntent.GUILD_VOICE_STATES,
                         GatewayIntent.GUILD_WEBHOOKS
                 );
-        if(usePrefix) 
-            builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
+        if (usePrefix) builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
         this.jda = builder.build();
         commandHandler.setJda(this.jda);
         
