@@ -7,7 +7,6 @@
     "author": "(discord snowflake)",
     "volume": 100
   },
-  
   "tracks": [
     {
       "title": "(track title)",
@@ -25,7 +24,6 @@
       "isrc": "(track isrc)"
     }
   ],
-  
   "options": {
     "shuffle": true,
     "repeat": true

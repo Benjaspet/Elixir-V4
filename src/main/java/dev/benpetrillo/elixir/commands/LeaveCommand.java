@@ -18,39 +18,32 @@
 
 package dev.benpetrillo.elixir.commands;
 
-import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.DJUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.managers.AudioManager;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
-public final class ResumeCommand extends Command {
+public final class LeaveCommand extends Command {
 
-    public ResumeCommand() {
-        super("resume", "Resume the queue playback.");
+    public LeaveCommand() {
+        super("leave", "Leave the current voice channel.");
     }
-    
+
     @Override
     public void execute(Interaction interaction) {
-        if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
-            return;
-        }
+        final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
+        assert selfVoiceState != null;
         if (!AudioUtil.audioCheck(interaction)) return;
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
-            return;
+            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        MessageEmbed embed; if (musicManager.scheduler.player.isPaused()) {
-            musicManager.scheduler.player.setPaused(false);
-            embed = EmbedUtil.sendDefaultEmbed("Successfully resumed the queue.");
-        } else {
-            embed = EmbedUtil.sendErrorEmbed("The queue is already playing.");
+        final AudioManager audioManager = interaction.getGuild().getAudioManager();
+        if (selfVoiceState.inAudioChannel()) {
+            audioManager.closeAudioConnection();
         }
-        interaction.reply(embed, false);
+        interaction.reply(EmbedUtil.sendDefaultEmbed("I've left the voice channel."));
     }
 }
