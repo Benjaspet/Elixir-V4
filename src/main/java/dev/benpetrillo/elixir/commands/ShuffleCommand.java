@@ -19,11 +19,14 @@
 package dev.benpetrillo.elixir.commands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.DJUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import net.dv8tion.jda.api.EmbedBuilder;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
@@ -48,11 +51,33 @@ public final class ShuffleCommand extends Command {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people are required to continue."), false);
             return;
         }
+        interaction.deferReply();
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
         Collections.shuffle(tracks);
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.queue.addAll(tracks);
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Shuffled the queue."), false);
+
+        StringBuilder description = new StringBuilder();
+        int maxAmount = Math.min(tracks.size(), 12);
+        for (int i = 0; i < maxAmount; i++) {
+            final AudioTrack track = tracks.get(i);
+            final AudioTrackInfo info = track.getInfo();
+            String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
+            String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
+            description
+                    .append(formattedString)
+                    .append("\n");
+        }
+        if (tracks.size() > maxAmount) {
+            description
+                    .append("\n")
+                    .append(String.format("...and %s more tracks.", tracks.size() - maxAmount));
+        }
+        
+        interaction.reply(new EmbedBuilder().setTitle("New Queue:")
+                .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
+                .setAuthor("Shuffled the queue.")
+                .setDescription(description).build(), false);
     }
 }
