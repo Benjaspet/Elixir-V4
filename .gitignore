@@ -4,3 +4,5 @@ target/
 
 # IntelliJ
 .idea/
+.env
+out/artifacts/Elixir_V4_jar/Elixir-V4.jar
