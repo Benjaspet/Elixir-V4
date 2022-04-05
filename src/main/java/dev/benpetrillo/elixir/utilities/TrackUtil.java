@@ -227,12 +227,14 @@ public final class TrackUtil {
     public static TrackType determineTrackType(String url) {
         if (url.contains("youtu")) return TrackType.YOUTUBE;
         if (url.contains("spotify")) return TrackType.SPOTIFY;
+        if (url.contains("file")) return TrackType.CUSTOM;
         return TrackType.UNKNOWN;
     }
     
     public enum TrackType {
         YOUTUBE,
         SPOTIFY,
+        CUSTOM,
         UNKNOWN
     }
 }

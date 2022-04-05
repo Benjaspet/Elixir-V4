@@ -74,7 +74,6 @@ public final class ElixirClient {
                 .setBulkDeleteSplittingEnabled(true)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
-                        commandHandler,
                         new GuildListener(),
                         new ReadyListener(),
                         new MessageListener(),
