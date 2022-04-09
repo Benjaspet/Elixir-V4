@@ -77,8 +77,7 @@ public final class ElixirClient {
                         new GuildListener(),
                         new ReadyListener(),
                         new MessageListener(),
-                        new ShutdownListener(),
-                        new VoiceStateListener()
+                        new ShutdownListener()
                 )
                 .enableIntents(
                         GatewayIntent.DIRECT_MESSAGES,
