@@ -46,6 +46,7 @@ public final class ApplicationCommandManager {
                 new JoinCommand(),
                 new LoopCommand(),
                 new LyricsCommand(),
+                new MoveQueueCommand(),
                 new NowPlayingCommand(),
                 new PauseCommand(),
                 new PlayCommand(),
