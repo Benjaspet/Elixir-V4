@@ -71,7 +71,7 @@ public final class TrackUtil {
             }
         } else if (trackUri.contains("www.youtube.com") || trackUri.contains("youtu.be")) {
             final YTVideoData data = HttpUtil.getVideoData(Utilities.extractVideoId(track.uri));
-            return data != null ? data.items.get(0).snippet.thumbnails.get("default").get("url") : null;
+            return data != null ? data.items.get(0).snippet.thumbnails.get("maxres").get("url") : null;
         }
         return null;
     }
