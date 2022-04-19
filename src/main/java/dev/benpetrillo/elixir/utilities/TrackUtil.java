@@ -18,19 +18,20 @@
 
 package dev.benpetrillo.elixir.utilities;
 
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.*;
+import com.sedmelluq.discord.lavaplayer.tools.JsonBrowser;
+import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ExtendedAudioTrackInfo;
 import dev.benpetrillo.elixir.types.YTVideoData;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.IPlaylistItem;
 import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
@@ -42,7 +43,16 @@ import java.util.Collection;
 import java.util.List;
 
 public final class TrackUtil {
-
+    private static final SoundCloudDataLoader soundCloudDataLoader;
+    private static final SoundCloudDataReader soundCloudDataReader;
+    private static final SoundCloudFormatHandler formatHandler;
+    
+    static {
+        soundCloudDataLoader = new DefaultSoundCloudDataLoader();
+        soundCloudDataReader = new DefaultSoundCloudDataReader();
+        formatHandler = new DefaultSoundCloudFormatHandler();
+    }
+    
     /**
      * Returns a URL of a track/video's cover art/thumbnail.
      * @param track The AudioTrack to fetch.
@@ -157,6 +167,21 @@ public final class TrackUtil {
                         "https://youtu.be/" + searchData.items.get(0).id
                 );
             }
+            case SOUNDCLOUD -> {
+                try (HttpInterface httpInterface = ElixirMusicManager.getInstance().soundCloudSource.getHttpInterface()) {
+                    JsonBrowser rootData = soundCloudDataLoader.load(httpInterface, url);
+                    JsonBrowser trackData = soundCloudDataReader.findTrackData(rootData);
+
+                    if (trackData == null) {
+                        return null;
+                    }
+
+                    SoundCloudTrackFormat format = formatHandler.chooseBestFormat(soundCloudDataReader.readTrackFormats(trackData));
+                    return soundCloudDataReader.readTrackInfo(trackData, formatHandler.buildFormatIdentifier(format));
+                } catch (IOException e) {
+                    return null;
+                }
+            }
             default -> {
                 return null;
             }
@@ -227,6 +252,7 @@ public final class TrackUtil {
     public static TrackType determineTrackType(String url) {
         if (url.contains("youtu")) return TrackType.YOUTUBE;
         if (url.contains("spotify")) return TrackType.SPOTIFY;
+        if (url.contains("soundcloud")) return TrackType.SOUNDCLOUD;
         if (url.contains("file")) return TrackType.CUSTOM;
         return TrackType.UNKNOWN;
     }
@@ -234,6 +260,7 @@ public final class TrackUtil {
     public enum TrackType {
         YOUTUBE,
         SPOTIFY,
+        SOUNDCLOUD,
         CUSTOM,
         UNKNOWN
     }

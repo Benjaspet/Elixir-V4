@@ -109,6 +109,7 @@ public final class PlaylistUtil {
             AudioSourceManager source = switch (trackType) {
                 case YOUTUBE -> ElixirMusicManager.getInstance().youtubeSource;
                 case SPOTIFY -> ElixirMusicManager.getInstance().spotifySource;
+                case SOUNDCLOUD -> ElixirMusicManager.getInstance().soundCloudSource;
                 default -> throw new IllegalArgumentException("Unsupported track URL: " + track.url);
             };
             tracks.add(new PlaylistTrack(track.title, track, source));

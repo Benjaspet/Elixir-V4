@@ -64,11 +64,12 @@ public final class ElixirMusicManager {
     
     public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(true);
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
+    public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
 
     public ElixirMusicManager() {
         this.audioPlayerManager.registerSourceManager(this.spotifySource);
         this.audioPlayerManager.registerSourceManager(this.youtubeSource);
-        this.audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        this.audioPlayerManager.registerSourceManager(this.soundCloudSource);
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
