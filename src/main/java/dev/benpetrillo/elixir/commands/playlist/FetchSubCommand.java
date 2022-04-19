@@ -46,7 +46,8 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
+        var playlistId = interaction.getArgument("id", "test", String.class);
+        var page = interaction.getArgument("page", 1, Integer.class);
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
@@ -57,7 +58,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
         int maxAmount = Math.min(tracks.size(), 8);
         final String thumbnail = playlist.info.playlistCoverUrl;
         if (tracks.size() == 0) description.append("This playlist is empty.");
-        for (int i = 0; i < maxAmount; i++) {
+        for (int i = (maxAmount * page); i < (maxAmount * page) + page; i++) {
             final AudioTrack playlistTrack = tracks.get(i);
             final AudioTrackInfo info = playlistTrack.getInfo();
             String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
@@ -88,7 +89,8 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
     @Override
     public Collection<Argument> getArguments() {
         return List.of(
-                Argument.create("id", "The playlist ID.", "id", OptionType.STRING, true, 0)
+                Argument.create("id", "The playlist ID.", "id", OptionType.STRING, true, 0),
+                Argument.create("page", "The page number to fetch.", "page", OptionType.INTEGER, false, 1)
         );
     }
 }
