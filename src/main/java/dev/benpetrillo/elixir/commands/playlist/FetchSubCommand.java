@@ -47,7 +47,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
     public void execute(Interaction interaction) {
         interaction.deferReply();
         var playlistId = interaction.getArgument("id", "test", String.class);
-        var page = interaction.getArgument("page", 1, Integer.class);
+        var page = interaction.getArgument("page", 1L, Long.class).intValue(); if(page == 0) page = 1;
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
@@ -58,9 +58,9 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
         int maxAmount = Math.min(tracks.size(), 8);
         final String thumbnail = playlist.info.playlistCoverUrl;
         if (tracks.size() == 0) description.append("This playlist is empty.");
-        for (int i = (maxAmount * page); i < (maxAmount * page) + page; i++) {
-            final AudioTrack playlistTrack = tracks.get(i);
-            final AudioTrackInfo info = playlistTrack.getInfo();
+        for (int i = (page - 1) * 8; i < page * 8 && i < tracks.size(); i++) {
+            var track = tracks.get(i);
+            var info = track.getInfo();
             String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
             String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
             description.append(formattedString).append("\n");
@@ -90,7 +90,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
     public Collection<Argument> getArguments() {
         return List.of(
                 Argument.create("id", "The playlist ID.", "id", OptionType.STRING, true, 0),
-                Argument.create("page", "The page number to fetch.", "page", OptionType.INTEGER, false, 1)
+                Argument.create("page", "The page number to fetch.", "page", OptionType.INTEGER, false, 1).range(1, 100)
         );
     }
 }

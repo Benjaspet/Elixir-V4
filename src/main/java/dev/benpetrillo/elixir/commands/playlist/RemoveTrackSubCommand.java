@@ -39,7 +39,7 @@ public final class RemoveTrackSubCommand extends SubCommand implements Arguments
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
+        var playlistId = interaction.getArgument("id", "test", String.class);
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
@@ -49,9 +49,9 @@ public final class RemoveTrackSubCommand extends SubCommand implements Arguments
             interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
-        var index = (long) interaction.getArguments().getOrDefault("index", 0);
+        var index = interaction.getArgument("index", 0L, Long.class).intValue();
         try {
-            PlaylistUtil.removeTrackFromList((int) index, playlist);
+            PlaylistUtil.removeTrackFromList(index, playlist);
             interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully removed track from playlist."), false);
         } catch (IndexOutOfBoundsException ignored) {
             interaction.reply(EmbedUtil.sendErrorEmbed("That track doesn't exist."), false);
@@ -62,7 +62,7 @@ public final class RemoveTrackSubCommand extends SubCommand implements Arguments
     public Collection<Argument> getArguments() {
         return List.of(
                 Argument.create("id", "The playlist ID.", "id", OptionType.STRING, true, 0),
-                Argument.create("index", "The index of the track.", "index", OptionType.INTEGER, true, 1)
+                Argument.create("track", "The track number in the playlist.", "track", OptionType.INTEGER, true, 1).range(0, 800)
         );
     }
 }
