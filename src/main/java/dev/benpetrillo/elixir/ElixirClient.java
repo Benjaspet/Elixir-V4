@@ -50,7 +50,7 @@ public final class ElixirClient {
     
     public JDA jda;
     public ElixirVoiceDispatchInterceptor dispatchInterceptor;
-
+    
     public static void main(String[] args) {
         try {
             ConfigStartupManager.checkAll(); APIHandler.initialize();

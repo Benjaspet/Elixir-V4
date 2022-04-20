@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.managers;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.*;
+import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;
 
@@ -59,6 +60,8 @@ public final class ApplicationCommandManager {
                 new StopCommand(),
                 new VolumeCommand()
         );
+        
+        handler.onArgumentError = interaction -> interaction.setEphemeral().reply(EmbedUtil.sendErrorEmbed("Invalid argument(s) provided."));
     }
     
     private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {

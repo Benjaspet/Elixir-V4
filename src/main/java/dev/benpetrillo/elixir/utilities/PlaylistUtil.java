@@ -150,7 +150,7 @@ public final class PlaylistUtil {
      */
     
     public static void removeTrackFromList(int index, CustomPlaylist playlist) throws IndexOutOfBoundsException {
-        playlist.tracks.remove(index);
+        playlist.tracks.remove(index - 1);
         updatePlaylist(playlist);
     }
 
