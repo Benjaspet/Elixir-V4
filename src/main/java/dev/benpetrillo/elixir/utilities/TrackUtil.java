@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class TrackUtil {
+
     private static final SoundCloudDataLoader soundCloudDataLoader;
     private static final SoundCloudDataReader soundCloudDataReader;
     private static final SoundCloudFormatHandler formatHandler;
@@ -81,7 +82,8 @@ public final class TrackUtil {
             }
         } else if (trackUri.contains("www.youtube.com") || trackUri.contains("youtu.be")) {
             final YTVideoData data = HttpUtil.getVideoData(Utilities.extractVideoId(track.uri));
-            return data != null ? data.items.get(0).snippet.thumbnails.get("maxres").get("url") : null;
+            System.out.print(data);
+            return data != null ? data.items.get(0).snippet.thumbnails.get("default").get("url") : null;
         }
         return null;
     }
