@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public final class TrackUtil {
     private static final SoundCloudDataLoader soundCloudDataLoader;
@@ -61,29 +62,49 @@ public final class TrackUtil {
     
     public static String getCoverArt(AudioTrackInfo track) {
         var trackUri = track.uri;
-        if (trackUri.contains("spotify") && trackUri.contains("/track/")) {
-            try {
-                String[] firstSplit = trackUri.split("/");
-                String[] secondSplit; String id;
-                if (firstSplit.length > 5) {
-                    secondSplit = firstSplit[6].split("\\?");
-                } else {
-                    secondSplit = firstSplit[4].split("\\?");
-                }
-                id = secondSplit[0];
-                GetTrackRequest trackRequest = SpotifySourceManager.getSpotify().getTrack(id).build();
-                Track spotifyTrack = trackRequest.execute();
-                Image thumbnail = spotifyTrack.getAlbum().getImages()[0];
-                return thumbnail.getUrl();
-            } catch (SpotifyWebApiException | IOException | ParseException | NullPointerException exception) {
-                exception.printStackTrace();
+        switch(TrackUtil.determineTrackType(trackUri)) {
+            default -> {
                 return null;
             }
-        } else if (trackUri.contains("www.youtube.com") || trackUri.contains("youtu.be")) {
-            final YTVideoData data = HttpUtil.getVideoData(Utilities.extractVideoId(track.uri));
-            return data != null ? data.items.get(0).snippet.thumbnails.get("maxres").get("url") : null;
+            
+            case SPOTIFY -> {
+                String artUrl = null;
+                try {
+                    String[] firstSplit = trackUri.split("/");
+                    String[] secondSplit; String id;
+                    if (firstSplit.length > 5) {
+                        secondSplit = firstSplit[6].split("\\?");
+                    } else {
+                        secondSplit = firstSplit[4].split("\\?");
+                    }
+                    id = secondSplit[0];
+                    GetTrackRequest trackRequest = SpotifySourceManager.getSpotify().getTrack(id).build();
+                    Track spotifyTrack = trackRequest.execute();
+                    Image thumbnail = spotifyTrack.getAlbum().getImages()[0];
+                    artUrl = thumbnail.getUrl();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                } return artUrl;
+            }
+            case YOUTUBE -> {
+                final YTVideoData data = HttpUtil.getVideoData(Utilities.extractVideoId(track.uri));
+                return data != null ? data.items.get(0).snippet.thumbnails.get("default").get("url") : null;
+            }
+            case SOUNDCLOUD -> {
+                try (HttpInterface httpInterface = ElixirMusicManager.getInstance().soundCloudSource.getHttpInterface()) {
+                    JsonBrowser rootData = soundCloudDataLoader.load(httpInterface, trackUri);
+                    JsonBrowser trackData = soundCloudDataReader.findTrackData(rootData);
+
+                    if (trackData == null) {
+                        return null;
+                    }
+
+                    return trackData.get("artwork_url").text();
+                } catch (IOException e) {
+                    return null;
+                }
+            }
         }
-        return null;
     }
 
     /**
