@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.music.spotify;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
+import dev.benpetrillo.elixir.ElixirClient;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 public final class SpotifyTrack extends DelegatedAudioTrack {
@@ -86,6 +87,7 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
             processDelegate((InternalAudioTrack) track, executor);
             return;
         }
+        ElixirClient.getLogger().error(track.getClass().getName());
         throw new SpotifyTrackNotFoundException();
     }
 

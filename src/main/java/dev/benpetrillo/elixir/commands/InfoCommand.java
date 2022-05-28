@@ -72,7 +72,7 @@ public final class InfoCommand extends Command {
                 .setAuthor("Total Playing Streams: " + streams)
                 .setDescription("[Invite Elixir to your server!](" + ElixirConstants.INVITE + ")")
                 .addField("Bot Information", """
-                        • Powered by: JDA 5.0.0-alpha.6
+                        • Powered by: JDA 5.0.0-alpha.12
                         • Developed by: Ponjo Studios
                         • Server count: %s
                         • User count: %s
