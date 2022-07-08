@@ -36,6 +36,7 @@ public final class PlaylistCommand extends Command implements Baseless {
         registerSubCommand(new FetchSubCommand());
         registerSubCommand(new SettingSubCommand());
         registerSubCommand(new ImportSubCommand());
+        registerSubCommand(new ListSubCommand());
     }
     
     @Override

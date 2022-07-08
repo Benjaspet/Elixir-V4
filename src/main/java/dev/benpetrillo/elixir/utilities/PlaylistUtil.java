@@ -86,6 +86,22 @@ public final class PlaylistUtil {
     }
 
     /**
+     * Gets all Elixir playlists in the database.
+     * @return A list of all Elixir playlists.
+     */
+
+    public static List<CustomPlaylist> getAllPlaylists() {
+        MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
+        List<CustomPlaylist> playlists = new ArrayList<>();
+        for (Document document : dbCollection.find()) {
+            String serializedPlaylistData = document.getString("playlistData");
+            playlists.add(Utilities.deserialize(Utilities.base64Decode(serializedPlaylistData), CustomPlaylist.class));
+        }
+
+        return playlists;
+    }
+
+    /**
      * Determines if the member is an author of the playlist.
      * @param playlist The playlist to check.
      * @param member The member to check.
