@@ -19,7 +19,9 @@
 package dev.benpetrillo.elixir.utilities;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.types.PonjoYTSearchData;
 import dev.benpetrillo.elixir.types.YTPlaylistData;
 import dev.benpetrillo.elixir.types.YTSearchData;
 import dev.benpetrillo.elixir.types.YTVideoData;
@@ -35,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class HttpUtil {
+    private static final OkHttpClient client = new OkHttpClient();
+    private static final TypeToken<List<PonjoYTSearchData>> SEARCH_TYPE = new TypeToken<>() {};
 
     /**
      * Get a YouTube video URL from a search query.
@@ -43,8 +47,8 @@ public final class HttpUtil {
      * @throws UnsupportedEncodingException If the input isn't encodable.
      */
 
+    @Deprecated
     public static String getYouTubeURL(String query) throws UnsupportedEncodingException {
-        OkHttpClient client = new OkHttpClient();
         String encodedQuery = Utilities.encodeURIComponent(query);
         String url = "https://www.googleapis.com/youtube/v3/search?key=" +
                 Config.get("YOUTUBE-API-KEY") +
@@ -64,6 +68,29 @@ public final class HttpUtil {
     }
 
     /**
+     * Searches for a video on YouTube.
+     * @param query The search query.
+     * @return The video's URL.
+     */
+
+    @SuppressWarnings("unchecked") @Nullable
+    public static String searchForVideo(String query) {
+        String encodedQuery = Utilities.encodeURIComponent(query);
+        String url = "http://localhost:6420?query=" + encodedQuery;
+        Request request = new Request.Builder()
+                .url(url).build();
+        try (Response response = client.newCall(request).execute()) {
+            assert response.body() != null;
+            var requestData = (List<PonjoYTSearchData>) new Gson().fromJson(response.body().string(), SEARCH_TYPE.getType());
+            return requestData.size() == 0 ? null
+                    : "https://www.youtube.com/watch?v=" + requestData.get(0).id.get("videoId");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        }
+    }
+
+    /**
      * Get data on a particular YouTube video by ID.
      * @param videoId The video ID.
      * @return YTVideoData
@@ -71,7 +98,6 @@ public final class HttpUtil {
     
     @Nullable
     public static YTVideoData getVideoData(String videoId) {
-        OkHttpClient client = new OkHttpClient();
         String url = "https://www.googleapis.com/youtube/v3/videos?key=" +
                 Config.get("YOUTUBE-API-KEY") +
                 "&part=snippet%2CcontentDetails&id=" +
@@ -97,7 +123,6 @@ public final class HttpUtil {
         boolean lastPage = false; String nextPageToken = null;
         List<YTPlaylistData> totalData = new ArrayList<>();
         while (!lastPage) {
-            OkHttpClient client = new OkHttpClient();
             String url = "https://www.googleapis.com/youtube/v3/playlistItems?key=" + ElixirConstants.YOUTUBE_API_KEY +
                     "&part=snippet%2CcontentDetails&maxResults=50&playlistId=" + playlistId;
             if (nextPageToken != null) url += "&pageToken=" + nextPageToken;

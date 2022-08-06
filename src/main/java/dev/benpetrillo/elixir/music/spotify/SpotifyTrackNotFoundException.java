@@ -19,8 +19,7 @@
 package dev.benpetrillo.elixir.music.spotify;
 
 public final class SpotifyTrackNotFoundException extends RuntimeException {
-
-    public SpotifyTrackNotFoundException() {
-        super("No matching Spotify track found.");
+    public SpotifyTrackNotFoundException(String searchQuery) {
+        super("No matching Spotify track found. Using query: " + searchQuery);
     }
 }

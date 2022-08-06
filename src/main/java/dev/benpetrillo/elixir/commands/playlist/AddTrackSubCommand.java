@@ -38,7 +38,7 @@ public final class AddTrackSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
+        var playlistId = (String) interaction.getArgument("id", "test", String.class);
         CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."), false);
@@ -48,20 +48,29 @@ public final class AddTrackSubCommand extends SubCommand implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
-        var track = (String) interaction.getArguments().getOrDefault("track", "https://youtube.com/watch?v=dQw4w9WgXcQ");
-        var index = (long) interaction.getArguments().getOrDefault("index", -1L);
+        var track = (String) interaction.getArgument("track", "https://youtube.com/watch?v=dQw4w9WgXcQ", String.class);
+        var index = (long) interaction.getArgument("index", -1L, Long.class);
         if (!Utilities.isValidURL(track)) {
             try {
-                track = HttpUtil.getYouTubeURL(track);
+                track = HttpUtil.searchForVideo(track);
             } catch (Exception ignored) { return; }
+
+            if(track == null) {
+                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a track with the query `" + track + "`."), false);
+                return;
+            }
         }
-        var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
-        if (trackInfo == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a track with the URL `" + track + "`."), false);
-            return;
+        try {
+            var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
+            if (trackInfo == null) {
+                interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a track with the URL `" + track + "`."), false);
+                return;
+            }
+            PlaylistUtil.addTrackToList(trackInfo, playlist, (int) index);
+            interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully added [%s](%s) to playlist.".formatted(trackInfo.title, trackInfo.uri)), false);
+        } catch (Exception ignored) {
+            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to add track to playlist."), false);
         }
-        PlaylistUtil.addTrackToList(trackInfo, playlist, (int) index);
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully added [%s](%s) to playlist.".formatted(trackInfo.title, trackInfo.uri)), false);
     }
 
     @Override

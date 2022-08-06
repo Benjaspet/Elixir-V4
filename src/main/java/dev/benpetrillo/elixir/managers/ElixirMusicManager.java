@@ -62,7 +62,7 @@ public final class ElixirMusicManager {
     private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
     
-    public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(true);
+    public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
 

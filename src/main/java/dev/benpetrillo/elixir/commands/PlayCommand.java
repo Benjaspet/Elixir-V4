@@ -53,7 +53,6 @@ public final class PlayCommand extends Command implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
-        final MessageChannel channel = interaction.getChannel();
         final GuildVoiceState voiceState = interaction.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();
@@ -61,7 +60,7 @@ public final class PlayCommand extends Command implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."), false);
             return;
         }
-        String query = (String) interaction.getArguments().getOrDefault("query", "https://youtube.com/watch?v=dQw4w9WgXcQ");
+        String query = interaction.getArgument("query", "https://youtube.com/watch?v=dQw4w9WgXcQ", String.class);
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
         final AudioChannel memberChannel = memberVoiceState.getChannel();
         assert voiceState != null;
@@ -70,14 +69,13 @@ public final class PlayCommand extends Command implements Arguments {
             audioManager.setSelfDeafened(true);
         }
         if (!Utilities.isValidURL(query)) {
-            try {
-                ElixirMusicManager.getInstance().loadAndPlay(HttpUtil.getYouTubeURL(query), interaction, "https://www.youtube.com");
-                return;
-            } catch (UnsupportedEncodingException exception) {
-                interaction.reply(EmbedUtil.sendErrorEmbed("No search results found."));
-                Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception).additionalInformation("Encoding was not supported."));
-                return;
+            query = HttpUtil.searchForVideo(query);
+            if(query == null) {
+                interaction.reply(EmbedUtil.sendErrorEmbed("No results found for that query."));return;
             }
+
+            ElixirMusicManager.getInstance().loadAndPlay(query, interaction, "https://www.youtube.com");
+            return;
         }
         if (Utilities.isValidURL(query) && query.contains("spotify") && query.contains("track")) {
             try {

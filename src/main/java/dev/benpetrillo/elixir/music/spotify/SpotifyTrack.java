@@ -18,10 +18,13 @@
 
 package dev.benpetrillo.elixir.music.spotify;
 
+import com.google.gson.Gson;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.utilities.HttpUtil;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 public final class SpotifyTrack extends DelegatedAudioTrack {
@@ -64,21 +67,27 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
     }
 
     private String getQuery() {
-        var query = "ytsearch:" + trackInfo.title;
+        var query = trackInfo.title;
         if (!trackInfo.author.equals("unknown")) {
             query += " " + trackInfo.author;
-        } 
-        return query;
+        } return query + " - topic";
     }
 
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         AudioItem track = null;
         if (this.isrc != null) {
-            track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference("ytsearch:\"" + this.isrc + "\"", null));
+            track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference("ytsearch:" + this.isrc, null));
         }
         if (track == null) {
-            track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference(getQuery(), null));
+            track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference("ytsearch:" + this.getQuery(), null));
+        }
+        if(track instanceof AudioReference) {
+            var query = HttpUtil.searchForVideo(this.isrc);
+            if(query == null) {
+                query = HttpUtil.searchForVideo(this.getQuery());
+            }
+            track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference(query, null));
         }
         if (track instanceof AudioPlaylist) {
             track = ((AudioPlaylist) track).getTracks().get(0);
@@ -88,7 +97,7 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
             return;
         }
         ElixirClient.getLogger().error(track.getClass().getName());
-        throw new SpotifyTrackNotFoundException();
+        throw new SpotifyTrackNotFoundException(this.getQuery());
     }
 
     @Override

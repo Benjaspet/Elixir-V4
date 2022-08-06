@@ -93,7 +93,10 @@ public final class PlaylistEndpoint {
         }
         track = Utilities.base64Decode(track);
         if (!Utilities.isValidURL(track)) {
-            track = HttpUtil.getYouTubeURL(track);
+            track = HttpUtil.searchForVideo(track);
+            if(track == null) {
+                request.code(404).respond("Track not found."); return;
+            }
         }
         var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
         if (trackInfo == null) {

@@ -142,9 +142,11 @@ public final class PlaylistUtil {
     public static void addTrackToList(AudioTrackInfo track, CustomPlaylist playlist, int index) {
         if(track.uri == null) {
             try {
+                var url = HttpUtil.searchForVideo(track.title);
+                if(url == null) return;
+
                 track = new ExtendedAudioTrackInfo(
-                        track.title, track.author, track.length, track.identifier, track.isStream,
-                        HttpUtil.getYouTubeURL(track.title)
+                        track.title, track.author, track.length, track.identifier, track.isStream, url
                 );
             } catch (Exception ignored) { return; }
         }
