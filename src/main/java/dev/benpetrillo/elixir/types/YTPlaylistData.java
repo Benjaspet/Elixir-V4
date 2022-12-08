@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class YTPlaylistData {
+
     public String kind, etag, nextPageToken = null, prevPageToken = null;
     public List<YTPlaylistData.Item> items;
 

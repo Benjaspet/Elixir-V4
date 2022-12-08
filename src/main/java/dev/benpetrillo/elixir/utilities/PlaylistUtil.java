@@ -207,8 +207,8 @@ public final class PlaylistUtil {
 
     /**
      * Sets the volume to set the player to on startup. (for a custom playlist)
-     * @param playlist
-     * @param volume
+     * @param playlist The playlist to set the starting volume of.
+     * @param volume The volume, as an integer, to set this playlist to.
      */
     
     public static void setPlaylistVolume(CustomPlaylist playlist, int volume) {

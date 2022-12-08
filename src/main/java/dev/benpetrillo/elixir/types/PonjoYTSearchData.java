@@ -23,6 +23,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Map;
 
 public final class PonjoYTSearchData {
+
     public Map<String, String> id = Map.of();
     public String url = "";
     public String title = "";
@@ -52,6 +53,7 @@ public final class PonjoYTSearchData {
          * Returns the better thumbnail.
          * @return The thumbnail's URL.
          */
+
         public String getBetterThumbnail() {
             if(this.high.url.isEmpty()) {
                 return this.default_.url;

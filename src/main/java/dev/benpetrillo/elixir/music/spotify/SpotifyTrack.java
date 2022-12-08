@@ -18,12 +18,10 @@
 
 package dev.benpetrillo.elixir.music.spotify;
 
-import com.google.gson.Gson;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
@@ -67,24 +65,21 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
     }
 
     private String getQuery() {
-        var query = trackInfo.title;
-        if (!trackInfo.author.equals("unknown")) {
-            query += " " + trackInfo.author;
-        } return query + " - topic";
+        return isrc;
     }
 
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         AudioItem track = null;
         if (this.isrc != null) {
-            track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference("ytsearch:" + this.isrc, null));
+            track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference("ytsearch:" + this.getQuery(), null));
         }
         if (track == null) {
             track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference("ytsearch:" + this.getQuery(), null));
         }
         if(track instanceof AudioReference) {
-            var query = HttpUtil.searchForVideo(this.isrc);
-            if(query == null) {
+            String query = HttpUtil.searchForVideo(this.isrc);
+            if (query == null) {
                 query = HttpUtil.searchForVideo(this.getQuery());
             }
             track = this.spotifySourceManager.getSearchSourceManager().loadItem(null, new AudioReference(query, null));

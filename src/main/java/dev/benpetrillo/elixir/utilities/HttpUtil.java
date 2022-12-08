@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class HttpUtil {
+
     private static final OkHttpClient client = new OkHttpClient();
     private static final TypeToken<List<PonjoYTSearchData>> SEARCH_TYPE = new TypeToken<>() {};
 
@@ -77,13 +78,11 @@ public final class HttpUtil {
     public static String searchForVideo(String query) {
         String encodedQuery = Utilities.encodeURIComponent(query);
         String url = "http://localhost:6420?query=" + encodedQuery;
-        Request request = new Request.Builder()
-                .url(url).build();
+        Request request = new Request.Builder().url(url).build();
         try (Response response = client.newCall(request).execute()) {
             assert response.body() != null;
-            var requestData = (List<PonjoYTSearchData>) new Gson().fromJson(response.body().string(), SEARCH_TYPE.getType());
-            return requestData.size() == 0 ? null
-                    : "https://www.youtube.com/watch?v=" + requestData.get(0).id.get("videoId");
+            var requestData = (List<YTSearchDataV2>) new Gson().fromJson(response.body().string(), SEARCH_TYPE.getType());
+            return requestData.size() == 0 ? null : "https://www.youtube.com/watch?v=" + requestData.get(0).videoId;
         } catch (IOException ex) {
             ex.printStackTrace();
             return "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
@@ -126,8 +125,7 @@ public final class HttpUtil {
             String url = "https://www.googleapis.com/youtube/v3/playlistItems?key=" + ElixirConstants.YOUTUBE_API_KEY +
                     "&part=snippet%2CcontentDetails&maxResults=50&playlistId=" + playlistId;
             if (nextPageToken != null) url += "&pageToken=" + nextPageToken;
-            Request request = new Request.Builder()
-                    .url(url).build();
+            Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 assert response.body() != null;
                 var playlistData = new Gson().fromJson(response.body().string(), YTPlaylistData.class);
