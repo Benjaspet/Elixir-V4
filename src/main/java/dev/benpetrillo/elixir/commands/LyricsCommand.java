@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.LyricManager;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
@@ -47,7 +48,8 @@ public final class LyricsCommand extends Command implements Arguments {
         String song = interaction.getArgument("song", "", String.class);
         boolean isAutomatic = false;
         if (song.isEmpty()) {
-            var track = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild())
+            assert interaction.getGuild() != null;
+            AudioTrack track = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild())
                     .audioPlayer.getPlayingTrack();
             if (track == null) {
                 interaction.reply(EmbedUtil.sendErrorEmbed("There is not a song playing."), false);

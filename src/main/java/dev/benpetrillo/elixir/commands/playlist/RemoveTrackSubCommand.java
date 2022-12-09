@@ -39,17 +39,18 @@ public final class RemoveTrackSubCommand extends SubCommand implements Arguments
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = interaction.getArgument("id", "test", String.class);
-        CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
+        final String playlistId = interaction.getArgument("id", String.class);
+        final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
+        assert interaction.getMember() != null;
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
-        var index = interaction.getArgument("index", 0L, Long.class).intValue();
+        int index = interaction.getArgument("index", 0L, Long.class).intValue();
         try {
             PlaylistUtil.removeTrackFromList(index, playlist);
             interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully removed track from playlist."), false);

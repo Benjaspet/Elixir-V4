@@ -27,7 +27,7 @@ public final class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        String message = event.getMessage().getContentRaw();
+        final String message = event.getMessage().getContentRaw();
     }
 
     @Override

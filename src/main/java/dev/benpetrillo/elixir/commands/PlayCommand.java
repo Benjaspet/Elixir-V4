@@ -24,9 +24,8 @@ import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.apache.hc.core5.http.ParseException;
@@ -37,9 +36,9 @@ import tech.xigam.cch.utils.Argument;
 import tech.xigam.cch.utils.Interaction;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public final class PlayCommand extends Command implements Arguments {
 
@@ -53,16 +52,18 @@ public final class PlayCommand extends Command implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
+        assert interaction.getGuild() != null;
         final GuildVoiceState voiceState = interaction.getGuild().getSelfMember().getVoiceState();
+        assert interaction.getMember() != null;
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();
         if (!memberVoiceState.inAudioChannel()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."), false);
             return;
         }
-        String query = interaction.getArgument("query", "https://youtube.com/watch?v=dQw4w9WgXcQ", String.class);
+        String query = interaction.getArgument("query", "https://www.youtube.com/watch?v=7-qGKqveZaM", String.class);
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
-        final AudioChannel memberChannel = memberVoiceState.getChannel();
+        final VoiceChannel memberChannel = Objects.requireNonNull(memberVoiceState.getChannel()).asVoiceChannel();
         assert voiceState != null;
         if (!voiceState.inAudioChannel()) {
             audioManager.openAudioConnection(memberChannel);
@@ -70,10 +71,9 @@ public final class PlayCommand extends Command implements Arguments {
         }
         if (!Utilities.isValidURL(query)) {
             query = HttpUtil.searchForVideo(query);
-            if(query == null) {
+            if (query == null) {
                 interaction.reply(EmbedUtil.sendErrorEmbed("No results found for that query."));return;
             }
-
             ElixirMusicManager.getInstance().loadAndPlay(query, interaction, "https://www.youtube.com");
             return;
         }

@@ -19,9 +19,9 @@
 package dev.benpetrillo.elixir.events;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.ShutdownEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -31,10 +31,9 @@ public final class ShutdownListener extends ListenerAdapter {
 
     @Override
     public void onShutdown(ShutdownEvent event) {
-        JDA jda = event.getJDA();
+        final JDA jda = event.getJDA();
         for (Guild guild : jda.getGuildCache()) {
-            final AudioChannel channel = Objects.requireNonNull(guild.getSelfMember().getVoiceState()).getChannel();
-            assert channel != null;
+            final VoiceChannel channel = Objects.requireNonNull(Objects.requireNonNull(guild.getSelfMember().getVoiceState()).getChannel()).asVoiceChannel();
             final AudioManager audioManager = channel.getGuild().getAudioManager();
             audioManager.closeAudioConnection();
         }

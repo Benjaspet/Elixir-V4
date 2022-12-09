@@ -65,12 +65,12 @@ public final class ApplicationCommandManager {
     }
     
     private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {
-        List<String> commandNames = new ArrayList<>();
+        final List<String> commandNames = new ArrayList<>();
         for (BaseCommand command : commands) {
             handler.registerCommand(command);
             commandNames.add(command.getLabel());
         }
-        String commandNamesString = String.join(", ", commandNames);
+        final String commandNamesString = String.join(", ", commandNames);
         ElixirClient.logger.info("Registered commands: " + commandNamesString);
     }
 }

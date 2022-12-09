@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 public final class GuildListener extends ListenerAdapter {
 
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
-        Guild guild = event.getGuild();
+        final Guild guild = event.getGuild();
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(event.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
         if (!audioPlayer.isPaused() || !musicManager.scheduler.getQueue().isEmpty()) {

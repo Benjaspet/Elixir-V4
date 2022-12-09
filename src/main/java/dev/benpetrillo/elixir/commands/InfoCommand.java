@@ -40,34 +40,33 @@ public final class InfoCommand extends Command {
     
     @Override
     public void execute(Interaction interaction) {
-        var streams = 0; var users = 0;
-        var servers = ElixirClient.getInstance().jda.getGuilds().size();
+        int streams = 0; var users = 0;
+        int servers = ElixirClient.getInstance().jda.getGuilds().size();
         for (GuildMusicManager musicManager : ElixirMusicManager.getInstance().getMusicManagers()) {
             streams += musicManager.audioPlayer.getPlayingTrack() != null ? 1 : 0;
         }
         for (Guild server : ElixirClient.getInstance().jda.getGuilds()) {
             users += server.getMemberCount();
         }
-        // get java process memory usage
-        OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-        long memory = os.getTotalMemorySize() / 1024 / 1024;
-        long freeMemory = os.getFreeMemorySize() / 1024 / 1024;
-        // get java process cpu usage and round it to 4 decimal places
-        double cpuUsage = Math.round(os.getProcessCpuLoad() * 100 * 10000.0) / 10000.0;
-        // get cpu cores
-        int cores = Runtime.getRuntime().availableProcessors();
-        // get java process threads
-        int threads = Thread.activeCount();
-        //get java process uptime
-        long uptime = runtime.getUptime();
-        // get uptime in days, hours, minutes, and seconds
-        long days = uptime / 86400000;
-        long hours = (uptime % 86400000) / 3600000;
-        long minutes = (uptime % 3600000) / 60000;
-        long seconds = (uptime % 60000) / 1000;
-        String uptimeString = "%dd %dh %dm %ds".formatted(days, hours, minutes, seconds);
-        EmbedBuilder embed = new EmbedBuilder()
+        // Get Java process memory usage.
+        final OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        final RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+        final long memory = os.getTotalMemorySize() / 1024 / 1024;
+        // Get Java process CPU usage, and round it to 4 decimal places.
+        final double cpuUsage = Math.round(os.getProcessCpuLoad() * 100 * 10000.0) / 10000.0;
+        // Get the total amount of available CPU cores.
+        final int cores = Runtime.getRuntime().availableProcessors();
+        // Get the total amount of active threads.
+        final int threads = Thread.activeCount();
+        // Get the total process uptime in milliseconds.
+        final long uptime = runtime.getUptime();
+        // Get the uptime in days, hours, minutes, and seconds.
+        final long days = uptime / 86400000;
+        final long hours = (uptime % 86400000) / 3600000;
+        final long minutes = (uptime % 3600000) / 60000;
+        final long seconds = (uptime % 60000) / 1000;
+        final String uptimeString = "%dd %dh %dm %ds".formatted(days, hours, minutes, seconds);
+        final EmbedBuilder embed = new EmbedBuilder()
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setAuthor("Total Playing Streams: " + streams)
                 .setDescription("[Invite Elixir to your server!](" + ElixirConstants.INVITE + ")")

@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.commands.playlist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
@@ -46,21 +47,21 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = interaction.getArgument("id", "test", String.class);
-        var page = interaction.getArgument("page", 1L, Long.class).intValue(); if(page == 0) page = 1;
-        CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
+        final String playlistId = interaction.getArgument("id", String.class);
+        int page = interaction.getArgument("page", 1L, Long.class).intValue(); if(page == 0) page = 1;
+        final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
-        var tracks = PlaylistUtil.getTracks(playlist);
-        StringBuilder description = new StringBuilder();
-        int maxAmount = Math.min(tracks.size(), 8);
+        final List<PlaylistTrack> tracks = PlaylistUtil.getTracks(playlist);
+        final StringBuilder description = new StringBuilder();
+        final int maxAmount = Math.min(tracks.size(), 8);
         final String thumbnail = playlist.info.playlistCoverUrl;
         if (tracks.size() == 0) description.append("This playlist is empty.");
         for (int i = (page - 1) * 8; i < page * 8 && i < tracks.size(); i++) {
-            var track = tracks.get(i);
-            var info = track.getInfo();
+            PlaylistTrack track = tracks.get(i);
+            AudioTrackInfo info = track.getInfo();
             String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
             String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
             description.append(formattedString).append("\n");

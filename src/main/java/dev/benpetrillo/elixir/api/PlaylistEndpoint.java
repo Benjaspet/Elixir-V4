@@ -18,23 +18,26 @@
 
 package dev.benpetrillo.elixir.api;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
+import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import tech.xigam.express.Request;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Includes:
@@ -58,12 +61,12 @@ public final class PlaylistEndpoint {
      */
     
     public static void indexEndpoint(Request request) {
-        var playlistId = request.requestArguments.getOrDefault("playlistId", "");
-        var action = request.requestArguments.getOrDefault("action", "");
+        String playlistId = request.requestArguments.getOrDefault("playlistId", "");
+        String action = request.requestArguments.getOrDefault("action", "");
         if (playlistId.isEmpty() || action.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
-        var playlist = PlaylistUtil.findPlaylist(playlistId);
+        CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             request.code(404).respond("Playlist not found."); return;
         }
@@ -86,8 +89,8 @@ public final class PlaylistEndpoint {
      */
     
     private static void addTrack(Request request, CustomPlaylist playlist) throws UnsupportedEncodingException {
-        var track = request.requestArguments.getOrDefault("track", "");
-        var position = Integer.parseInt(request.requestArguments.getOrDefault("position", "-1"));
+        String track = request.requestArguments.getOrDefault("track", "");
+        int position = Integer.parseInt(request.requestArguments.getOrDefault("position", "-1"));
         if (track.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
@@ -98,7 +101,7 @@ public final class PlaylistEndpoint {
                 request.code(404).respond("Track not found."); return;
             }
         }
-        var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
+        AudioTrackInfo trackInfo = TrackUtil.getTrackInfoFromUrl(track);
         if (trackInfo == null) {
             request.code(400).respond("Unable to get track info."); return;
         }
@@ -107,8 +110,8 @@ public final class PlaylistEndpoint {
     }
     
     private static void queue(Request request, CustomPlaylist playlist) {
-        var guildId = request.requestArguments.getOrDefault("guildId", "");
-        var channelId = request.requestArguments.getOrDefault("channelId", "");
+        final String guildId = request.requestArguments.getOrDefault("guildId", "");
+        final String channelId = request.requestArguments.getOrDefault("channelId", "");
         if (guildId.isEmpty() || channelId.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
@@ -116,7 +119,7 @@ public final class PlaylistEndpoint {
         if (guild == null) {
             request.code(400).respond("Unable to find guild."); return;
         }
-        final AudioChannel voiceChannel = guild.getVoiceChannelById(channelId);
+        final VoiceChannel voiceChannel = guild.getVoiceChannelById(channelId);
         if (voiceChannel == null) {
             request.code(400).respond("Unable to find voice channel."); return;
         }
@@ -126,8 +129,8 @@ public final class PlaylistEndpoint {
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setSelfDeafened(true);
         }
-        GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
-        var tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser("838118537276031006", tracks);
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
+        final List<PlaylistTrack> tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser("838118537276031006", tracks);
         if (playlist.options.shuffle) Collections.shuffle(tracks);
         if (musicManager.scheduler.queue.isEmpty() && musicManager.audioPlayer.getPlayingTrack() == null) {
             musicManager.scheduler.repeating = playlist.options.repeat ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;

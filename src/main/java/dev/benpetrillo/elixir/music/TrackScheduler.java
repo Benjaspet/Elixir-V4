@@ -23,12 +23,9 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.managers.AudioManager;
 
-import java.util.Objects;
+import net.dv8tion.jda.api.entities.Guild;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -86,8 +83,8 @@ public final class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        var error = exception.getCause();
-        if(error instanceof RuntimeException && error.getMessage().contains("403")) {
+        final Throwable error = exception.getCause();
+        if (error instanceof RuntimeException && error.getMessage().contains("403")) {
             this.player.startTrack(track.makeClone(), false);
         }
     }

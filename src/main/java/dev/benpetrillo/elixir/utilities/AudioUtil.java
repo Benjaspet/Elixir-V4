@@ -25,7 +25,6 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import tech.xigam.cch.utils.Interaction;
 
-import javax.annotation.Nullable;
 import java.util.Objects;
 
 public final class AudioUtil {
@@ -37,7 +36,7 @@ public final class AudioUtil {
      * - The user is in the same voice channel as the bot
      */
 
-    public static FailureReason simpleAudioCheck(Guild guild, @Nullable Member member) {
+    public static FailureReason simpleAudioCheck(Guild guild, Member member) {
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState(); assert selfVoiceState != null;
         if (member == null) {
             return selfVoiceState.inAudioChannel() ? FailureReason.PASSED : FailureReason.BOT_NOT_IN_VOICE_CHANNEL;
@@ -60,21 +59,22 @@ public final class AudioUtil {
      */
 
     public static boolean audioCheck(Interaction interaction) {
+        assert interaction.getGuild() != null;
         AudioUtil.FailureReason reason = AudioUtil.simpleAudioCheck(interaction.getGuild(), interaction.getMember());
         switch (reason) {
             case BOT_NOT_IN_VOICE_CHANNEL -> {
                 interaction.reply(EmbedUtil.sendErrorEmbed("I must be in a voice channel."));
-                return false;
+                return true;
             }
             case MEMBER_NOT_IN_VOICE_CHANNEL -> {
                 interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel."));
-                return false;
+                return true;
             }
             case BOT_NOT_IN_SAME_VOICE_CHANNEL -> {
                 interaction.reply(EmbedUtil.sendErrorEmbed("You need to be in my voice channel."));
-                return false;
+                return true;
             }
-        } return true;
+        } return false;
     }
     
     public static FailureReason simplePlayerCheck(Guild guild) {
@@ -82,14 +82,14 @@ public final class AudioUtil {
         return musicManager.audioPlayer.getPlayingTrack() == null ? FailureReason.BOT_IS_NOT_PLAYING : FailureReason.PASSED;
     }
     
-    public static boolean playerCheck(Interaction interaction, @Nullable ReturnMessage message) {
+    public static boolean playerCheck(Interaction interaction, ReturnMessage message) {
         if (message == null) {
             message = ReturnMessage.NO_QUEUE;
         }
         AudioUtil.FailureReason reason = AudioUtil.simplePlayerCheck(interaction.getGuild());
         if (reason == FailureReason.BOT_IS_NOT_PLAYING) {
             interaction.reply(EmbedUtil.sendErrorEmbed(message.getContents()));
-        } return reason == FailureReason.PASSED;
+        } return reason != FailureReason.PASSED;
     }
     
     public enum FailureReason {

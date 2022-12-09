@@ -112,11 +112,13 @@ public final class ElixirMusicManager {
     }
 
     public void loadAndPlay(String track, Interaction interaction, String url) {
+        assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = this.getMusicManager(interaction.getGuild());
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 
             @Override
             public void trackLoaded(AudioTrack track) {
+                assert interaction.getMember() != null;
                 track.setUserData(interaction.getMember().getId());
                 musicManager.scheduler.queue(track);
                 final String title = track.getInfo().title;
@@ -136,6 +138,7 @@ public final class ElixirMusicManager {
                     return;
                 }
                 if (playlist.isSearchResult()) {
+                    assert interaction.getMember() != null;
                     tracks.get(0).setUserData(interaction.getMember().getId());
                     final String title = tracks.get(0).getInfo().title;
                     final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
@@ -153,6 +156,7 @@ public final class ElixirMusicManager {
                             .build();
                     interaction.reply(embed);
                     for (final AudioTrack track : tracks) {
+                        assert interaction.getMember() != null;
                         track.setUserData(interaction.getMember().getId());
                         musicManager.scheduler.queue(track);
                     }

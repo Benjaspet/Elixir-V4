@@ -32,7 +32,6 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.AllowedMentions;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,10 +61,10 @@ public final class ElixirClient {
     }
 
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
-        var usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
+        final boolean usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
         commandHandler = new ComplexCommandHandler(usePrefix).setPrefix(ElixirConstants.COMMAND_PREFIX);
         logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
-        var builder = JDABuilder.createDefault(token)
+        final JDABuilder builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
                 .setAutoReconnect(true)
@@ -83,7 +82,6 @@ public final class ElixirClient {
                         GatewayIntent.DIRECT_MESSAGES,
                         GatewayIntent.DIRECT_MESSAGE_REACTIONS,
                         GatewayIntent.DIRECT_MESSAGE_TYPING,
-                        GatewayIntent.GUILD_EMOJIS,
                         GatewayIntent.GUILD_INVITES,
                         GatewayIntent.GUILD_MESSAGE_REACTIONS,
                         GatewayIntent.GUILD_MESSAGE_TYPING,
@@ -95,7 +93,6 @@ public final class ElixirClient {
         commandHandler.setJda(this.jda);
         
         ApplicationCommandManager.initialize();
-        AllowedMentions.setDefaultMentionRepliedUser(false);
         OAuthUpdateTask.schedule(); DatabaseManager.create();
         this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();
     }

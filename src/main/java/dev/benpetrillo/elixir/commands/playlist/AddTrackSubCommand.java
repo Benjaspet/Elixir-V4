@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands.playlist;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.*;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -38,30 +39,30 @@ public final class AddTrackSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = (String) interaction.getArgument("id", "test", String.class);
-        CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
+        final String playlistId = interaction.getArgument("id", "test", String.class);
+        final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."), false);
             return;
         }
+        assert interaction.getMember() != null;
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
-        var track = (String) interaction.getArgument("track", "https://youtube.com/watch?v=dQw4w9WgXcQ", String.class);
-        var index = (long) interaction.getArgument("index", -1L, Long.class);
+        String track = interaction.getArgument("track", "https://youtube.com/watch?v=dQw4w9WgXcQ", String.class);
+        final long index = interaction.getArgument("index", -1L, Long.class);
         if (!Utilities.isValidURL(track)) {
             try {
                 track = HttpUtil.searchForVideo(track);
             } catch (Exception ignored) { return; }
-
-            if(track == null) {
+            if (track == null) {
                 interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a track with the query `" + track + "`."), false);
                 return;
             }
         }
         try {
-            var trackInfo = TrackUtil.getTrackInfoFromUrl(track);
+            final AudioTrackInfo trackInfo = TrackUtil.getTrackInfoFromUrl(track);
             if (trackInfo == null) {
                 interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a track with the URL `" + track + "`."), false);
                 return;

@@ -56,7 +56,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         DelegatedAudioTrack track = null;
-        switch(TrackUtil.determineTrackType(this.getInfo().uri)) {
+        switch (TrackUtil.determineTrackType(this.getInfo().uri)) {
             case YOUTUBE -> {
                 track = new YoutubeAudioTrack(
                         this.trackInfo, (YoutubeAudioSourceManager) this.sourceManager
@@ -73,8 +73,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
                 ); this.length = track.getDuration();
             }
         }
-
-        if(track != null) track.process(executor);
+        if (track != null) track.process(executor);
     }
 
     @Override

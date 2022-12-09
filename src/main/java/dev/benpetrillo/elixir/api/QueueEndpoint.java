@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.api;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import tech.xigam.express.Request;
 
@@ -45,27 +46,27 @@ public final class QueueEndpoint {
      */
     
     public static void indexEndpoint(Request request) {
-        var guildId = request.requestArguments.getOrDefault("guildId", "");
-        var action = request.requestArguments.getOrDefault("action", "");
+        final String guildId = request.requestArguments.getOrDefault("guildId", "");
+        final String action = request.requestArguments.getOrDefault("action", "");
         if (guildId.isEmpty() || action.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
-        var musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guildId);
         if (musicManager == null) {
             request.code(400).respond("Unable to find guild music manager."); return;
         }
         switch (action) {
             default -> request.code(400).respond("Invalid action.");
             case "queue" -> {
-                List<AudioTrack> tracks = musicManager.scheduler.queue.stream().toList();
-                List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
+                final List<AudioTrack> tracks = musicManager.scheduler.queue.stream().toList();
+                final List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
                 request.respond(Utilities.base64Encode(Utilities.serialize(trackInfo)));
             }
             case "shuffle" -> {
-                List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
+                final List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
                 Collections.shuffle(tracks); musicManager.scheduler.queue.clear();
                 musicManager.scheduler.queue.addAll(tracks);
-                List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
+                final List<AudioTrackInfo> trackInfo = tracks.stream().map(AudioTrack::getInfo).toList();
                 request.respond(Utilities.base64Encode(Utilities.serialize(trackInfo)));
             }
         }

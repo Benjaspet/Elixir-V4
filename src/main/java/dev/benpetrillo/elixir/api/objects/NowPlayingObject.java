@@ -19,6 +19,7 @@
 package dev.benpetrillo.elixir.api.objects;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 public final class NowPlayingObject {
 
@@ -41,8 +42,8 @@ public final class NowPlayingObject {
     }
 
     public static NowPlayingObject create(AudioTrack track) {
-        var position = track.getPosition();
-        var trackInfo = track.getInfo();
+        final long position = track.getPosition();
+        final AudioTrackInfo trackInfo = track.getInfo();
         return new NowPlayingObject(
                 trackInfo.title, trackInfo.author, trackInfo.length,
                 trackInfo.identifier, trackInfo.isStream, trackInfo.uri, position

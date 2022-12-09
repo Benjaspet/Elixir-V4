@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands.playlist;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
@@ -41,22 +42,23 @@ public final class ImportSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = interaction.getArgument("id", String.class);
-        CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
+        final String playlistId = interaction.getArgument("id", String.class);
+        final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."), false);
             return;
         }
+        assert interaction.getMember() != null;
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
             return;
         }
-        var sourcePlaylist = interaction.getArgument("playlist", String.class);
+        final String sourcePlaylist = interaction.getArgument("playlist", String.class);
         if (!Utilities.isValidURL(sourcePlaylist)) {
             interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid playlist!"), false);
             return;
         }
-        var playlistInfo = TrackUtil.getPlaylistInfoFromUrl(sourcePlaylist);
+        final Collection<AudioTrackInfo> playlistInfo = TrackUtil.getPlaylistInfoFromUrl(sourcePlaylist);
         if (playlistInfo == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to get playlist info from that URL."), false);
             return;

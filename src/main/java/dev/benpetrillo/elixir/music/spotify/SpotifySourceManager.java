@@ -29,16 +29,14 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.ModelObjectType;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
-import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.sedmelluq.discord.lavaplayer.tools.DataFormatTools.readNullableText;
@@ -72,9 +70,9 @@ public final class SpotifySourceManager implements AudioSourceManager {
                 .setClientId(Config.get("SPOTIFY-CLIENT-ID"))
                 .setClientSecret(Config.get("SPOTIFY-CLIENT-SECRET"))
                 .build();
-        ClientCredentialsRequest.Builder credRequest =
+        final ClientCredentialsRequest.Builder credRequest =
                 new ClientCredentialsRequest.Builder(spotify.getClientId(), spotify.getClientSecret());
-        ClientCredentials credentials = credRequest.grant_type("client_credentials").build().execute();
+        final ClientCredentials credentials = credRequest.grant_type("client_credentials").build().execute();
         spotify.setAccessToken(credentials.getAccessToken());
         ElixirClient.logger.info("Successfully updated Spotify OAuth access token.");
     }
@@ -94,9 +92,9 @@ public final class SpotifySourceManager implements AudioSourceManager {
             if (reference.identifier.startsWith(SEARCH_PREFIX)) {
                 return this.getSearch(reference.identifier.substring(SEARCH_PREFIX.length()).trim());
             }
-            var matcher = SPOTIFY_URL_PATTERN.matcher(reference.identifier);
+            final Matcher matcher = SPOTIFY_URL_PATTERN.matcher(reference.identifier);
             if (!matcher.find()) return null;
-            var id = matcher.group("identifier");
+            final String id = matcher.group("identifier");
             switch (matcher.group("type")) {
                 case "album":
                     return this.getAlbum(id);
@@ -120,7 +118,7 @@ public final class SpotifySourceManager implements AudioSourceManager {
 
     @Override
     public void encodeTrack(AudioTrack track, DataOutput output) {
-        var spotifyTrack = (SpotifyTrack) track;
+        final SpotifyTrack spotifyTrack = (SpotifyTrack) track;
         try {
             writeNullableText(output, spotifyTrack.getISRC());
             writeNullableText(output, spotifyTrack.getArtworkURL());
@@ -144,7 +142,7 @@ public final class SpotifySourceManager implements AudioSourceManager {
     public void shutdown() {}
 
     public AudioItem getSearch(String query) throws IOException, ParseException, SpotifyWebApiException {
-        var searchResult = spotify.searchTracks(query).build().execute();
+        final Paging<Track> searchResult = spotify.searchTracks(query).build().execute();
         if (searchResult.getItems().length == 0) {
             return AudioReference.NO_TRACK;
         }
@@ -156,12 +154,12 @@ public final class SpotifySourceManager implements AudioSourceManager {
     }
 
     public AudioItem getTrack(String id) throws IOException, ParseException, SpotifyWebApiException {
-        var track = spotify.getTrack(id).build().execute();
+        final Track track = spotify.getTrack(id).build().execute();
         return SpotifyTrack.of(track, this);
     }
 
     public AudioItem getAlbum(String id) throws IOException, ParseException, SpotifyWebApiException {
-        var album = spotify.getAlbum(id).build().execute();
+        final Album album = spotify.getAlbum(id).build().execute();
         var tracks = new ArrayList<AudioTrack>();
         Paging<TrackSimplified> paging = null;
         do {
@@ -178,7 +176,7 @@ public final class SpotifySourceManager implements AudioSourceManager {
     }
 
     public AudioItem getPlaylist(String id) throws IOException, SpotifyWebApiException, ParseException, NullPointerException {
-        var playlist = spotify.getPlaylist(id).build().execute();
+        final Playlist playlist = spotify.getPlaylist(id).build().execute();
         var tracks = new ArrayList<AudioTrack>();
         Paging<PlaylistTrack> paging = null;
         do {
@@ -195,8 +193,8 @@ public final class SpotifySourceManager implements AudioSourceManager {
     }
 
     public AudioItem getArtist(String id) throws IOException, ParseException, SpotifyWebApiException {
-        var artist = spotify.getArtist(id).build().execute();
-        var artistTracks = spotify.getArtistsTopTracks(id, CountryCode.US).build().execute();
+        final Artist artist = spotify.getArtist(id).build().execute();
+        final Track[] artistTracks = spotify.getArtistsTopTracks(id, CountryCode.US).build().execute();
         var tracks = new ArrayList<AudioTrack>();
         for (var item : artistTracks) {
             if (item.getType() != ModelObjectType.TRACK) continue;

@@ -50,7 +50,8 @@ public final class SkipCommand extends Command implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
-        if (!AudioUtil.audioCheck(interaction)) return;
+        if (AudioUtil.audioCheck(interaction)) return;
+        assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
@@ -58,21 +59,21 @@ public final class SkipCommand extends Command implements Arguments {
             audioManager.closeAudioConnection();
             musicManager.scheduler.queue.clear();
             musicManager.audioPlayer.destroy();
-            MessageEmbed embed = EmbedUtil.sendDefaultEmbed("There were no tracks left in the queue, so I left.");
+            final MessageEmbed embed = EmbedUtil.sendDefaultEmbed("There were no tracks left in the queue, so I left.");
             interaction.reply(embed, false);
             return;
         }
         if (audioPlayer.getPlayingTrack() == null) {
-            MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
+            final MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
             interaction.reply(embed, false);
         }
-        int continueExec; if((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
+        int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
             return;
         }
         final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1L);
         assert musicManager.scheduler.queue.peek() != null;
-        AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
+        final AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
         for (int i = 0; i < skipTo; i++) {
             musicManager.scheduler.nextTrack();
         }
@@ -88,7 +89,7 @@ public final class SkipCommand extends Command implements Arguments {
                             • Duration: %s
                             • Livestream: %s
                             """.formatted(artist, requestedBy, duration, isLive);
-        MessageEmbed embed = new EmbedBuilder()
+        final MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Up Next")
                 .setDescription("[%s](%s)".formatted(title, url))
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)

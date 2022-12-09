@@ -46,33 +46,29 @@ public final class ShuffleCommand extends Command {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
-        if (!AudioUtil.audioCheck(interaction)) return;
+        if (AudioUtil.audioCheck(interaction)) return;
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people are required to continue."), false);
             return;
         }
         interaction.deferReply();
+        assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
+        final List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
         Collections.shuffle(tracks);
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.queue.addAll(tracks);
-
-        StringBuilder description = new StringBuilder();
-        int maxAmount = Math.min(tracks.size(), 12);
+        final StringBuilder description = new StringBuilder();
+        final int maxAmount = Math.min(tracks.size(), 12);
         for (int i = 0; i < maxAmount; i++) {
             final AudioTrack track = tracks.get(i);
             final AudioTrackInfo info = track.getInfo();
             String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
             String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
-            description
-                    .append(formattedString)
-                    .append("\n");
+            description.append(formattedString).append("\n");
         }
         if (tracks.size() > maxAmount) {
-            description
-                    .append("\n")
-                    .append(String.format("...and %s more tracks.", tracks.size() - maxAmount));
+            description.append("\n").append(String.format("...and %s more tracks.", tracks.size() - maxAmount));
         }
         
         interaction.reply(new EmbedBuilder().setTitle("New Queue:")

@@ -36,12 +36,10 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public final class TrackUtil {
     private static final SoundCloudDataLoader soundCloudDataLoader;
@@ -161,8 +159,7 @@ public final class TrackUtil {
      * @param url The URL to fetch information from.
      * @return An AudioTrackInfo object.
      */
-    
-    @Nullable
+
     public static AudioTrackInfo getTrackInfoFromUrl(String url) {
         TrackType type = TrackUtil.determineTrackType(url);
         switch (type) {

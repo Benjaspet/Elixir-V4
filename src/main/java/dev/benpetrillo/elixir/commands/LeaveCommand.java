@@ -34,12 +34,14 @@ public final class LeaveCommand extends Command {
 
     @Override
     public void execute(Interaction interaction) {
+        assert interaction.getMember() != null;
         final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
         assert selfVoiceState != null;
-        if (!AudioUtil.audioCheck(interaction)) return;
+        if (AudioUtil.audioCheck(interaction)) return;
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
         }
+        assert interaction.getGuild() != null;
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
         if (selfVoiceState.inAudioChannel()) {
             audioManager.closeAudioConnection();

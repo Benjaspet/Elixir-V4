@@ -21,8 +21,6 @@ package dev.benpetrillo.elixir.types;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
-import javax.annotation.Nullable;
-
 public class ElixirException extends Exception {
 
     public Guild guild;
@@ -55,13 +53,11 @@ public class ElixirException extends Exception {
     public ElixirException additionalInformation(String additionalInformation) {
         this.additionalInformation = additionalInformation; return this;
     }
-    
-    @Nullable
+
     public StackTraceElement stackTrace() {
         return this.exception == null ? null : this.exception.getStackTrace()[0];
     }
-    
-    @Nullable 
+
     public StackTraceElement[] fullStackTrace() {
         return this.exception.getStackTrace();
     }

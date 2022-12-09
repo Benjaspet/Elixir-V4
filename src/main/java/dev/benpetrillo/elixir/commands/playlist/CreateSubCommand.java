@@ -38,7 +38,7 @@ public final class CreateSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-        var playlistId = (String) interaction.getArguments().getOrDefault("id", "");
+        final String playlistId = interaction.getArgument("id", String.class);
         if (!PlaylistUtil.createPlaylist(playlistId, interaction.getMember())) {
             interaction.reply(EmbedUtil.sendErrorEmbed("A playlist with ID `" + playlistId + "` already exists."), false);
             return;

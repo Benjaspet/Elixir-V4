@@ -18,10 +18,15 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.managers.AudioManager;
 import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Argument;
@@ -29,6 +34,7 @@ import tech.xigam.cch.utils.Interaction;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 public final class MoveQueueCommand extends Command implements Arguments {
     public MoveQueueCommand() {
@@ -37,34 +43,35 @@ public final class MoveQueueCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        var guildId = interaction.getArgument("guild", String.class);
-        var guild = ElixirClient.getJda().getGuildById(guildId);
-        if(guild == null) {
+        final String guildId = interaction.getArgument("guild", String.class);
+        final Guild guild = ElixirClient.getJda().getGuildById(guildId);
+        if (guild == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("The guild with the specified ID doesn't exist."));
             return;
         }
-        var targetAudioManager = guild.getAudioManager();
-        if(!targetAudioManager.isConnected()) {
+        final AudioManager targetAudioManager = guild.getAudioManager();
+        if (!targetAudioManager.isConnected()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Connect the bot to a voice channel before moving queues."));
             return;
         }
-        var targetMusicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
-        var targetQueue = targetMusicManager.scheduler.queue;
-        var targetPlayer = targetMusicManager.audioPlayer;
-        if(!targetQueue.isEmpty() || targetPlayer.getPlayingTrack() != null) {
+        GuildMusicManager targetMusicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
+        final BlockingQueue<AudioTrack> targetQueue = targetMusicManager.scheduler.queue;
+        final AudioPlayer targetPlayer = targetMusicManager.audioPlayer;
+        if (!targetQueue.isEmpty() || targetPlayer.getPlayingTrack() != null) {
             interaction.reply(EmbedUtil.sendErrorEmbed(guild.getName() + "'s Elixir is in use!"));
             return;
         }
-        var sourceMusicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        var sourceQueue = sourceMusicManager.scheduler.queue;
-        var sourcePlayer = sourceMusicManager.audioPlayer;
+        assert interaction.getGuild() != null;
+        final GuildMusicManager sourceMusicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
+        final BlockingQueue<AudioTrack> sourceQueue = sourceMusicManager.scheduler.queue;
+        final AudioPlayer sourcePlayer = sourceMusicManager.audioPlayer;
         targetQueue.addAll(sourceQueue); 
         targetPlayer.setVolume(sourcePlayer.getVolume());
-        var newTrack = sourcePlayer.getPlayingTrack().makeClone();
+        final AudioTrack newTrack = sourcePlayer.getPlayingTrack().makeClone();
         newTrack.setPosition(sourcePlayer.getPlayingTrack().getPosition());
         targetPlayer.playTrack(newTrack);
-        var sourceAudioManager = interaction.getGuild().getAudioManager();
-        if(sourceAudioManager.isConnected()) {
+        final AudioManager sourceAudioManager = interaction.getGuild().getAudioManager();
+        if (sourceAudioManager.isConnected()) {
             sourceMusicManager.stop();
             sourceAudioManager.closeAudioConnection();
         }

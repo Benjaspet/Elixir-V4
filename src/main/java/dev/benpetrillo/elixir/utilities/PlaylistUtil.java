@@ -33,7 +33,6 @@ import net.dv8tion.jda.api.entities.Member;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,15 +57,14 @@ public final class PlaylistUtil {
     
     /**
      * Deletes a custom playlist.
+     *
      * @param playlistId The playlist ID.
-     * @return If the playlist was deleted.
      */
     
-    public static boolean deletePlaylist(String playlistId) {
-        if (findPlaylist(playlistId) == null) return false;
+    public static void deletePlaylist(String playlistId) {
+        if (findPlaylist(playlistId) == null) return;
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         dbCollection.deleteOne(new Document("playlistId", playlistId));
-        return true;
     }
 
     /**
@@ -75,7 +73,6 @@ public final class PlaylistUtil {
      * @return The playlist object or null if one cannot be found.
      */
 
-    @Nullable
     public static CustomPlaylist findPlaylist(String playlistId) {
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         BasicDBObject object = new BasicDBObject("playlistId", playlistId);

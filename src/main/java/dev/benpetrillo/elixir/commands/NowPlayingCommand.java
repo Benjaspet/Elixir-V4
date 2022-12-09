@@ -51,6 +51,7 @@ public final class NowPlayingCommand extends Command {
         }
         interaction.deferReply();
         try {
+            assert interaction.getGuild() != null;
             final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
             final AudioPlayer audioPlayer = musicManager.audioPlayer;
             final AudioTrack track = audioPlayer.getPlayingTrack();

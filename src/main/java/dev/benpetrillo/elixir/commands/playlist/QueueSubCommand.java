@@ -21,13 +21,16 @@ package dev.benpetrillo.elixir.commands.playlist;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
+import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.DJUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
-import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.managers.AudioManager;
 import tech.xigam.cch.command.Arguments;
@@ -48,35 +51,37 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        if(!interaction.isFromGuild()) {
+        if (!interaction.isFromGuild()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
         interaction.deferReply();
-        var member = interaction.getMember(); var guild = interaction.getGuild();
+        final Member member = interaction.getMember(); Guild guild = interaction.getGuild();
         int continueExec; if ((continueExec = DJUtil.continueExecution(guild, member)) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false); return;
         }
-        var playlistId = (String) interaction.getArguments().getOrDefault("id", "test");
-        CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
+        final String playlistId = interaction.getArgument("id", String.class);
+        final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
             interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of ID `" + playlistId + "`."), false);
             return;
         }
+        assert member != null;
         final GuildVoiceState memberVoiceState = member.getVoiceState(); assert memberVoiceState != null;
         if (!memberVoiceState.inAudioChannel()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to queue tracks."), false);
             return;
         }
+        assert guild != null;
         final GuildVoiceState voiceState = guild.getSelfMember().getVoiceState(); assert voiceState != null;
         final AudioManager audioManager = guild.getAudioManager();
-        final AudioChannel audioChannel = Objects.requireNonNull(member.getVoiceState()).getChannel();
+        final VoiceChannel audioChannel = Objects.requireNonNull(memberVoiceState.getChannel()).asVoiceChannel();
         if (!voiceState.inAudioChannel()) {
             audioManager.openAudioConnection(audioChannel);
             audioManager.setSelfDeafened(true);
         }
-        GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
-        var tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser(member.getId(), tracks);
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
+        final List<PlaylistTrack> tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser(member.getId(), tracks);
         if (playlist.options.shuffle) Collections.shuffle(tracks);
         if (musicManager.scheduler.queue.isEmpty() && musicManager.audioPlayer.getPlayingTrack() == null) {
             musicManager.scheduler.repeating = playlist.options.repeat ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;

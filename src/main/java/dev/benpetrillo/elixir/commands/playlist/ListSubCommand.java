@@ -19,6 +19,7 @@
 package dev.benpetrillo.elixir.commands.playlist;
 
 import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.types.CustomPlaylist;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -41,47 +42,30 @@ public final class ListSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         interaction.deferReply();
-
-        // Get the page to fetch.
         int page = interaction.getArgument("page", 1L, Long.class).intValue();
         if (page == 0) page = 1; // Fallback the page to 1 if it's 0.
-
-        // Fetch all playlists from the database.
-        var playlists = PlaylistUtil.getAllPlaylists();
-        // Get the maximum amount of playlists to display.
-        var maxAmount = Math.min(playlists.size(), 12);
-        // Get the total pages.
-        var totalPages = (int) Math.ceil(playlists.size() / maxAmount);
-
-        // Check if the page is valid.
+        final List<CustomPlaylist> playlists = PlaylistUtil.getAllPlaylists();
+        int maxAmount = Math.min(playlists.size(), 12);
+        int totalPages = playlists.size() / maxAmount;
         if (page > totalPages) {
             interaction.reply(EmbedUtil.sendErrorEmbed("There is not a page `" + page + "`!"), false);
             return;
         }
-
-        // Create an embed for the playlist.
-        var embed = new EmbedBuilder()
+        final EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("Elixir Playlists")
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setFooter("Elixir Music", ElixirClient.getJda().getSelfUser().getAvatarUrl())
                 .setTimestamp(OffsetDateTime.now());
-
-        // Add the playlists to the embed.
-        var description = new StringBuilder();
-        for(int i = (page - 1) * maxAmount; i < page * maxAmount && i < playlists.size(); i++) {
-            var playlist = playlists.get(i);
-            var formatted = "**%s**: `%s`".formatted(playlist.info.name, playlist.info.id);
+        final StringBuilder description = new StringBuilder();
+        for (int i = (page - 1) * maxAmount; i < page * maxAmount && i < playlists.size(); i++) {
+            CustomPlaylist playlist = playlists.get(i);
+            String formatted = "**%s**: `%s`".formatted(playlist.info.name, playlist.info.id);
             description.append(formatted).append("\n");
         }
-
-        // Check if there are more pages.
-        if(playlists.size() > maxAmount) {
+        if (playlists.size() > maxAmount) {
             description.append("\n").append("Page %d of %d".formatted(page, totalPages));
         }
-
-        // Set the description of the embed.
         embed.setDescription(description.toString());
-        // Reply with the embed.
         interaction.reply(embed.build());
     }
 

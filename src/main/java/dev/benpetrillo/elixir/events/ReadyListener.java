@@ -23,7 +23,7 @@ import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,10 +31,10 @@ public final class ReadyListener extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        JDA jda = event.getJDA();
+        final JDA jda = event.getJDA();
         ElixirClient.getLogger().info("{} has logged in.", event.getJDA().getSelfUser().getAsTag());
         for (String id : ElixirConstants.GUILDS) {
-            Guild guild = jda.getGuildById(id);
+            final Guild guild = jda.getGuildById(id);
             if (guild != null) {
                 if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
                     ElixirClient.getCommandHandler().deployAll(guild);

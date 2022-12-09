@@ -27,16 +27,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class HttpUtil {
 
     private static final OkHttpClient client = new OkHttpClient();
-    private static final TypeToken<List<PonjoYTSearchData>> SEARCH_TYPE = new TypeToken<>() {};
+    private static final TypeToken<List<YTSearchDataV2>> SEARCH_TYPE = new TypeToken<>() {};
 
     /**
      * Get a YouTube video URL from a search query.
@@ -71,7 +71,7 @@ public final class HttpUtil {
      * @return The video's URL.
      */
 
-    @SuppressWarnings("unchecked") @Nullable
+    @SuppressWarnings("unchecked")
     public static String searchForVideo(String query) {
         String encodedQuery = Utilities.encodeURIComponent(query);
         String url = "http://localhost:6420?query=" + encodedQuery;
@@ -82,7 +82,7 @@ public final class HttpUtil {
             return requestData.size() == 0 ? null : "https://www.youtube.com/watch?v=" + requestData.get(0).videoId;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+            return "https://www.youtube.com/watch?v=7-qGKqveZaM";
         }
     }
 
@@ -91,8 +91,7 @@ public final class HttpUtil {
      * @param videoId The video ID.
      * @return YTVideoData
      */
-    
-    @Nullable
+
     public static YTVideoData getVideoData(String videoId) {
         String url = "https://www.googleapis.com/youtube/v3/videos?key=" +
                 Config.get("YOUTUBE-API-KEY") +
@@ -125,7 +124,7 @@ public final class HttpUtil {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 assert response.body() != null;
-                var playlistData = new Gson().fromJson(response.body().string(), YTPlaylistData.class);
+                var playlistData = new Gson().fromJson(Objects.requireNonNull(response.body()).string(), YTPlaylistData.class);
                 totalData.add(playlistData);
                 if(playlistData.nextPageToken != null) {
                     nextPageToken = playlistData.nextPageToken;

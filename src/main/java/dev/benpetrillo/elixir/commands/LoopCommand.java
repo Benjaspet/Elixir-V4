@@ -46,12 +46,13 @@ public final class LoopCommand extends Command implements Arguments {
             return;
         }
         var mode = (String) interaction.getArguments().getOrDefault("mode", "Disable Loop");
-        if (!AudioUtil.audioCheck(interaction)) return;
-        if (!AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
+        if (AudioUtil.audioCheck(interaction)) return;
+        if (AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
             interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
             return;
         }
+        assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final TrackScheduler scheduler = musicManager.scheduler;
         switch (mode) {
@@ -78,7 +79,7 @@ public final class LoopCommand extends Command implements Arguments {
 
     @Override
     public Collection<Argument> getArguments() {
-        var argument = Argument.createWithChoices(
+        Argument argument = Argument.createWithChoices(
                 "mode", "Loop mode", "mode",
                 OptionType.STRING, true, 0,
                 "Track Loop", "Queue Loop", "Disable Loop"

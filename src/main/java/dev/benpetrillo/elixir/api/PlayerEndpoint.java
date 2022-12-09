@@ -24,8 +24,8 @@ import dev.benpetrillo.elixir.api.objects.NowPlayingObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.Utilities;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import tech.xigam.express.Request;
 
 import java.util.List;
@@ -49,8 +49,8 @@ public final class PlayerEndpoint {
      */
     
     public static void indexEndpoint(Request request) {
-        var guildId = request.requestArguments.getOrDefault("guildId", "");
-        var action = request.requestArguments.getOrDefault("action", "");
+        final String guildId = request.requestArguments.getOrDefault("guildId", "");
+        final String action = request.requestArguments.getOrDefault("action", "");
         if (guildId.isEmpty() || action.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
@@ -91,8 +91,8 @@ public final class PlayerEndpoint {
      */
     
     public static void joinEndpoint(Request request) {
-        var guildId = request.requestArguments.getOrDefault("guildId", "");
-        var channelId = request.requestArguments.getOrDefault("channelId", "");
+        final String guildId = request.requestArguments.getOrDefault("guildId", "");
+        final String channelId = request.requestArguments.getOrDefault("channelId", "");
         if (guildId.isEmpty() || channelId.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
@@ -103,7 +103,7 @@ public final class PlayerEndpoint {
         if (guild.getAudioManager().isConnected()) {
             request.code(409).respond("The bot is already connected to a voice channel."); return;
         }
-        final AudioChannel channel = guild.getVoiceChannelById(channelId);
+        final VoiceChannel channel = guild.getVoiceChannelById(channelId);
         if (channel == null) {
             request.code(404).respond("Voice channel not found."); return;
         }
@@ -125,7 +125,7 @@ public final class PlayerEndpoint {
     }
     
     private static void nowPlaying(Request request, GuildMusicManager musicManager) {
-        var audioTrack = musicManager.audioPlayer.getPlayingTrack();
+        final AudioTrack audioTrack = musicManager.audioPlayer.getPlayingTrack();
         if (audioTrack == null) {
             request.code(410).respond("The bot isn't playing anything."); return;
         }
@@ -134,11 +134,11 @@ public final class PlayerEndpoint {
     
     @SuppressWarnings("unchecked")
     private static void play(Request request, Guild guild) {
-        var query = request.requestArguments.getOrDefault("query", "");
+        final String query = request.requestArguments.getOrDefault("query", "");
         if (query.isEmpty()) {
             request.code(400).respond("Missing required arguments."); return;
         }
-        var decodedQuery = Utilities.base64Decode(query);
+        String decodedQuery = Utilities.base64Decode(query);
         if (!Utilities.isValidURL(decodedQuery)) {
             decodedQuery = "ytsearch:" + decodedQuery;
         }
@@ -150,7 +150,7 @@ public final class PlayerEndpoint {
                         Utilities.serialize(((AudioTrack) object).getInfo())
                 ));
             } else if (object instanceof List<?>) {
-                List<AudioTrack> tracks = (List<AudioTrack>) object;
+                final List<AudioTrack> tracks = (List<AudioTrack>) object;
                 request.respond(Utilities.base64Encode(Utilities.serialize(tracks.stream().map(AudioTrack::getInfo).toArray())));
             } else if(object instanceof Throwable) {
                 request.code(400).respond("The bot encountered an error while trying to play the track.");

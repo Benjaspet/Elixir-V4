@@ -50,6 +50,7 @@ public final class QueueCommand extends Command {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
+        assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         if (musicManager.scheduler.queue.isEmpty()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("There are no songs in the queue."), false);
@@ -66,16 +67,12 @@ public final class QueueCommand extends Command {
             for (int i = 0; i < maxAmount; i++) {
                 final AudioTrack track = arrayQueue.get(i);
                 final AudioTrackInfo info = track.getInfo();
-                String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
-                String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
-                description
-                        .append(formattedString)
-                        .append("\n");
+                final String title = info.title.length() > 55 ? info.title.substring(0, 52) + "..." : info.title;
+                final String formattedString = String.format("**#%s** - [%s](%s)", i + 1, title, info.uri);
+                description.append(formattedString).append("\n");
             }
             if (arrayQueue.size() > maxAmount) {
-                description
-                        .append("\n")
-                        .append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
+                description.append("\n").append(String.format("...and %s more tracks.", arrayQueue.size() - maxAmount));
             }
             final String nowPlayingTitle = nowPlaying.getInfo().title;
             final String nowPlayingTrimmed = nowPlayingTitle.length() > 55 ? nowPlayingTitle.substring(0, 52) + "..." : nowPlayingTitle;
