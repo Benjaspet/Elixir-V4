@@ -65,7 +65,7 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
     }
 
     private String getQuery() {
-        return isrc;
+        return this.trackInfo.title + " " + this.trackInfo.author;
     }
 
     @Override

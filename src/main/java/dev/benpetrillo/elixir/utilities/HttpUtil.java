@@ -131,7 +131,6 @@ public final class HttpUtil {
                 } else lastPage = true;
             } catch (IOException ignored) { lastPage = true; }
         }
-
         var videoData = new YTVideoData();
         videoData.items = new ArrayList<>();
         for(var playlistData : totalData) {
