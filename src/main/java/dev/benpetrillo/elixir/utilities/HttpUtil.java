@@ -71,15 +71,14 @@ public final class HttpUtil {
      * @return The video's URL.
      */
 
-    @SuppressWarnings("unchecked")
     public static String searchForVideo(String query) {
         String encodedQuery = Utilities.encodeURIComponent(query);
-        String url = "http://localhost:6420?query=" + encodedQuery;
+        String url = "https://app.seikimo.moe/search/" + encodedQuery;
         Request request = new Request.Builder().url(url).build();
         try (Response response = client.newCall(request).execute()) {
             assert response.body() != null;
-            var requestData = (List<YTSearchDataV2>) new Gson().fromJson(response.body().string(), SEARCH_TYPE.getType());
-            return requestData.size() == 0 ? null : "https://www.youtube.com/watch?v=" + requestData.get(0).videoId;
+            var requestData = new Gson().fromJson(response.body().string(), LaudiolinSearchData.class);
+            return "https://www.youtube.com/watch?v=" + requestData.top.id;
         } catch (IOException ex) {
             ex.printStackTrace();
             return "https://www.youtube.com/watch?v=7-qGKqveZaM";
@@ -113,7 +112,7 @@ public final class HttpUtil {
      * @param playlistId The playlist ID.
      * @return YTVideoData
      */
-    
+
     public static YTVideoData getPlaylistData(String playlistId) {
         boolean lastPage = false; String nextPageToken = null;
         List<YTPlaylistData> totalData = new ArrayList<>();
