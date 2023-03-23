@@ -1,21 +1,19 @@
 /*
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
- *  * Copyright © 2022 Ben Petrillo. All rights reserved.
- *  *
- *  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
- *  *
- *  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- *  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- *  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- *  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- *  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- *  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- *  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
- *  * OR OTHER DEALINGS IN THE SOFTWARE.
- *  *
- *  * All portions of this software are available for public use, provided that
- *  * credit is given to the original author(s).
- *  
+ * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+ * OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * All portions of this software are available for public use, provided that
+ * credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir.utilities;
@@ -27,6 +25,8 @@ import com.google.gson.Gson;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import net.dv8tion.jda.api.JDAInfo;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -241,5 +241,24 @@ public final class Utilities {
     
     public static String base64Decode(String toDecode) {
         return new String(Base64.getUrlDecoder().decode(toDecode));
+    }
+
+    /**
+     * Shorten a string to enable it to fit inside an embed.
+     * @param toShorten The string to shorten.
+     * @return String
+     */
+
+    public static String shorten(String toShorten) {
+        return StringUtils.abbreviate(toShorten, 3900);
+    }
+
+    /**
+     * Get the JDA version.
+     * @return String
+     */
+
+    public static String getJDAVersion() {
+        return JDAInfo.VERSION;
     }
 }

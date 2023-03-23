@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -82,12 +82,15 @@ public final class ElixirMusicManager {
         // If the bot receives a 429 from YouTube, it will rotate the IP address to another, provided that
         // an entire 64-bit block is provided in the config.
 
-        String ipBlock; if(!(ipBlock = ElixirConstants.IPV6_BLOCK).isEmpty()) {
-            new YoutubeIpRotatorSetup(new NanoIpRoutePlanner(Collections.singletonList(
-                    new Ipv6Block(ipBlock)), true
-            )).forSource(this.youtubeSource).setup();
-            ElixirClient.logger.info("IPv6 rotator block set to " + ipBlock + ".");
-        } else ElixirClient.logger.warn("You are not using an IPv6 rotator. This may cause issues with YouTube and rate-limiting.");
+        if (!ElixirConstants.IPV6_BLOCK.isEmpty()) {
+            new YoutubeIpRotatorSetup(
+                    new NanoIpRoutePlanner(Collections.singletonList(new Ipv6Block(ElixirConstants.IPV6_BLOCK)), true))
+                    .forSource(this.youtubeSource)
+                    .setup();
+            ElixirClient.logger.info("IPv6 rotator block set to " + ElixirConstants.IPV6_BLOCK + ".");
+        } else {
+            ElixirClient.logger.warn("You are not using an IPv6 rotator. This may cause issues with YouTube and rate-limiting.");
+        }
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -101,7 +104,7 @@ public final class ElixirMusicManager {
     public void removeGuildMusicManager(Guild guild) {
         this.musicManagers.remove(guild.getId());
     }
-    
+
     @Nullable
     public GuildMusicManager getMusicManager(String guildId) {
         return this.musicManagers.get(guildId);

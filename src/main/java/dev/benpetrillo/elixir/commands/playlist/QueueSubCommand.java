@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -23,7 +23,6 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utilities.DJUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.PlaylistUtil;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
@@ -57,9 +56,6 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
         }
         interaction.deferReply();
         final Member member = interaction.getMember(); Guild guild = interaction.getGuild();
-        int continueExec; if ((continueExec = DJUtil.continueExecution(guild, member)) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false); return;
-        }
         final String playlistId = interaction.getArgument("id", String.class);
         final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -19,7 +19,6 @@
 package dev.benpetrillo.elixir.commands;
 
 import dev.benpetrillo.elixir.utilities.AudioUtil;
-import dev.benpetrillo.elixir.utilities.DJUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -38,9 +37,6 @@ public final class LeaveCommand extends Command {
         final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
         assert selfVoiceState != null;
         if (AudioUtil.audioCheck(interaction)) return;
-        int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue.")); return;
-        }
         assert interaction.getGuild() != null;
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
         if (selfVoiceState.inAudioChannel()) {

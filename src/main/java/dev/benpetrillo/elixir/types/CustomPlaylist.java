@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -29,7 +29,7 @@ import java.util.List;
 public final class CustomPlaylist {
 
     public static CustomPlaylist create(String playlistId, Member creator) {
-        var playlist = new CustomPlaylist();
+        CustomPlaylist playlist = new CustomPlaylist();
         playlist.info = new Info();
         playlist.tracks = new ArrayList<>();
         playlist.options = new Options();
@@ -57,7 +57,7 @@ public final class CustomPlaylist {
         public String isrc = null;
         
         public static CustomPlaylistTrack from(AudioTrackInfo info) {
-            var track = new CustomPlaylistTrack();
+            CustomPlaylistTrack track = new CustomPlaylistTrack();
             track.title = info.title;
             track.url = info.uri.contains("spotify") ? "https://open.spotify.com/track/" + info.uri.split("/")[5] : info.uri;
             track.artist = info.author;

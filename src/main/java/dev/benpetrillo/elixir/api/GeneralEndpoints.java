@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -19,12 +19,6 @@
 package dev.benpetrillo.elixir.api;
 
 import tech.xigam.express.Request;
-
-/**
- * Includes:
- * - /
- * - /...
- */
 
 public final class GeneralEndpoints {
 

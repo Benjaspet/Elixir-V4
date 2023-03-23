@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.List;
 
 public final class TrackUtil {
+
     private static final SoundCloudDataLoader soundCloudDataLoader;
     private static final SoundCloudDataReader soundCloudDataReader;
     private static final SoundCloudFormatHandler formatHandler;
@@ -64,7 +65,6 @@ public final class TrackUtil {
             default -> {
                 return null;
             }
-            
             case SPOTIFY -> {
                 String artUrl = null;
                 try {
@@ -92,11 +92,9 @@ public final class TrackUtil {
                 try (HttpInterface httpInterface = ElixirMusicManager.getInstance().soundCloudSource.getHttpInterface()) {
                     JsonBrowser rootData = soundCloudDataLoader.load(httpInterface, trackUri);
                     JsonBrowser trackData = soundCloudDataReader.findTrackData(rootData);
-
                     if (trackData == null) {
                         return null;
                     }
-
                     return trackData.get("artwork_url").text();
                 } catch (IOException e) {
                     return null;

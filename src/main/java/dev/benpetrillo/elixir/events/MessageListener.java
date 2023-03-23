@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -26,9 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public final class MessageListener extends ListenerAdapter {
 
     @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        final String message = event.getMessage().getContentRaw();
-    }
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {}
 
     @Override
     public void onMessageDelete(@NotNull MessageDeleteEvent event) {}

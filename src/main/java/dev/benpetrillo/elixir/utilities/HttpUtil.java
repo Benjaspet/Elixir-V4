@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -28,7 +28,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -42,11 +41,10 @@ public final class HttpUtil {
      * Get a YouTube video URL from a search query.
      * @param query The search query.
      * @return String
-     * @throws UnsupportedEncodingException If the input isn't encodable.
      */
 
     @Deprecated
-    public static String getYouTubeURL(String query) throws UnsupportedEncodingException {
+    public static String getYouTubeURL(String query) {
         String encodedQuery = Utilities.encodeURIComponent(query);
         String url = "https://www.googleapis.com/youtube/v3/search?key=" +
                 Config.get("YOUTUBE-API-KEY") +

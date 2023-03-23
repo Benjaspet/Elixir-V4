@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -66,10 +66,6 @@ public final class SkipCommand extends Command implements Arguments {
         if (audioPlayer.getPlayingTrack() == null) {
             final MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
             interaction.reply(embed, false);
-        }
-        int continueExec; if ((continueExec = DJUtil.continueExecution(interaction.getGuild(), interaction.getMember())) != -1) {
-            interaction.reply(EmbedUtil.sendDefaultEmbed(continueExec + " more people is required to continue."), false);
-            return;
         }
         final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1L);
         assert musicManager.scheduler.queue.peek() != null;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -55,6 +55,7 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
         }
         final String toChange = interaction.getArgument("setting", "name", String.class);
         final String value = interaction.getArgument("value", "Default Name", String.class);
+        final String defAulr = interaction.getArgument("default", "false", String.class);
         switch (toChange) {
             default -> interaction.reply(EmbedUtil.sendErrorEmbed("Invalid setting: `" + toChange + "`."), false);
             case "cover" -> {

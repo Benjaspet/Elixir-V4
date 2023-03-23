@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -30,25 +30,15 @@ public final class DatabaseManager {
     private static MongoClient mongoClient;
     private static MongoDatabase database;
     private static MongoCollection<Document> playlists;
-    private static MongoCollection<Document> djRoles;
     
     public static void create() {
         mongoClient = new MongoClient(new MongoClientURI(Config.get("MONGO-URI")));
         database = mongoClient.getDatabase("Elixir");
         playlists = database.getCollection("playlists");
-        djRoles = database.getCollection("dj-role");
         ElixirClient.logger.info("Database loaded successfully.");
-    }
-
-    public static MongoDatabase getDatabase() {
-        return database;
     }
 
     public static MongoCollection<Document> getPlaylistCollection() {
         return playlists;
-    }
-    
-    public static MongoCollection<Document> getDjRoleCollection() {
-        return djRoles;
     }
 }
