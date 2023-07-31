@@ -20,11 +20,13 @@ package dev.benpetrillo.elixir.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
+import lombok.Getter;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+@Getter
 public final class AudioPlayerSendHandler implements AudioSendHandler {
 
     private final AudioPlayer player;
@@ -52,13 +54,5 @@ public final class AudioPlayerSendHandler implements AudioSendHandler {
     @Override
     public boolean isOpus() {
         return true;
-    }
-
-    public AudioPlayer getPlayer() {
-        return this.player;
-    }
-
-    public MutableAudioFrame getFrame() {
-        return this.frame;
     }
 }
