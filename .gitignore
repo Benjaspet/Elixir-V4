@@ -4,7 +4,7 @@ target/
 
 # IntelliJ
 .idea/
-.env
+.env*
 out/artifacts/Elixir_V4_jar/Elixir-V4.jar
 
 dist/
