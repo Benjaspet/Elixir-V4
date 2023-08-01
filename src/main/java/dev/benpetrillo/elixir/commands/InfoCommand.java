@@ -37,7 +37,7 @@ public final class InfoCommand extends Command {
     public InfoCommand() {
         super("info", "Get information about Elixir.");
     }
-    
+
     @Override
     public void execute(Interaction interaction) {
         int streams = 0; var users = 0;
@@ -71,7 +71,7 @@ public final class InfoCommand extends Command {
                 .setAuthor("Total Playing Streams: " + streams)
                 .setDescription("[Invite Elixir to your server!](" + ElixirConstants.INVITE + ")")
                 .addField("Bot Information", """
-                        • Powered by: JDA 5.0.0-alpha.12
+                        • Powered by: JDA 5.0.0-beta.12
                         • Developed by: Ponjo Studios
                         • Server count: %s
                         • User count: %s

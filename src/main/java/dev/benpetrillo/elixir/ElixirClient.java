@@ -28,6 +28,7 @@ import dev.benpetrillo.elixir.audio.ElixirVoiceDispatchInterceptor;
 import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -42,16 +43,23 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 
 public final class ElixirClient {
-    
+    @Getter private static String envFile;
     private static ElixirClient instance;
 
     public static ComplexCommandHandler commandHandler;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
-    
+
     public JDA jda;
     public ElixirVoiceDispatchInterceptor dispatchInterceptor;
-    
+
     public static void main(String[] args) {
+        if (args.length < 1) {
+            logger.error("No environment file specified.");
+            System.exit(0);
+        }
+
+        ElixirClient.envFile = args[0];
+
         try {
             ConfigStartupManager.checkAll(); APIHandler.initialize();
             instance = new ElixirClient(ElixirConstants.TOKEN);
@@ -93,20 +101,20 @@ public final class ElixirClient {
         if (usePrefix) builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
         this.jda = builder.build();
         commandHandler.setJda(this.jda);
-        
+
         ApplicationCommandManager.initialize();
         OAuthUpdateTask.schedule(); DatabaseManager.create();
         this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();
     }
-    
+
     public static Logger getLogger() {
         return logger;
     }
-    
+
     public static JDA getJda() {
         return instance.jda;
     }
-    
+
     public static ComplexCommandHandler getCommandHandler() {
         return commandHandler;
     }

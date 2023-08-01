@@ -25,8 +25,6 @@ import java.awt.*;
 public final class ElixirConstants {
 
     public static String TOKEN = Config.get("TOKEN");
-    public static String AVATAR_URL = Config.get("AVATAR-URL");
-    public static String VERSION = Config.get("VERSION");
     public static String ACTIVITY = Config.get("ACTIVITY");
     public static String BOT_ID = Config.get("BOT-ID");
     public static String INVITE = Config.get("INVITE");
@@ -38,16 +36,7 @@ public final class ElixirConstants {
     public static String API_PORT = Config.get("API-PORT");
     public static String IPV6_BLOCK = Config.get("IPV6-BLOCK");
     public static String COMMAND_PREFIX = Config.get("COMMAND-PREFIX");
-    public static String[] OWNERS = Config.get("OWNERS").split(",");
     public static String[] GUILDS = Config.get("GUILDS").split(",");
     public static Color DEFAULT_EMBED_COLOR = Color.decode(Config.get("DEFAULT-EMBED-COLOR"));
     public static Color ERROR_EMBED_COLOR = Color.decode(Config.get("ERROR-EMBED-COLOR"));
-
-    public static class Emojis {
-
-        public static String EMOJI_DEVELOPER = Config.get("EMOJI-DEVELOPER");
-        public static String EMOJI_USER = Config.get("EMOJI-USER");
-        public static String EMOJI_SERVER = Config.get("EMOJI-SERVER");
-
-    }
 }
