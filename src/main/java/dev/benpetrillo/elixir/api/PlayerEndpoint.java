@@ -44,10 +44,10 @@ public final class PlayerEndpoint {
      * Ex: https://app.ponjo.club/v1/elixir/player/
      * @param guildId The guild ID.
      * @param action The action to execute.
-     *               
+     *
      * @param query (optional) The query to play.
      */
-    
+
     public static void indexEndpoint(Request request) {
         final String guildId = request.requestArguments.getOrDefault("guildId", "");
         final String action = request.requestArguments.getOrDefault("action", "");
@@ -70,6 +70,9 @@ public final class PlayerEndpoint {
             case "pause" -> musicManager.audioPlayer.setPaused(true);
             case "resume" -> musicManager.audioPlayer.setPaused(false);
             case "skip" -> musicManager.scheduler.nextTrack();
+            case "volume" -> {
+                volume(request, musicManager); return;
+            }
             case "stop" -> {
                 stop(request, guild, musicManager); return;
             }
@@ -89,7 +92,7 @@ public final class PlayerEndpoint {
      * @param guildId The guild ID with the voice channel.
      * @param channelId The voice channel ID in the specified guild.
      */
-    
+
     public static void joinEndpoint(Request request) {
         final String guildId = request.requestArguments.getOrDefault("guildId", "");
         final String channelId = request.requestArguments.getOrDefault("channelId", "");
@@ -110,11 +113,11 @@ public final class PlayerEndpoint {
         guild.getAudioManager().openAudioConnection(channel);
         request.respond("Connected to voice channel.");
     }
-    
+
     /*
      * Below are endpoint methods, they are not endpoints.
      */
-    
+
     private static void stop(Request request, Guild guild, GuildMusicManager musicManager) {
         musicManager.scheduler.queue.clear(); // Clear the queue.
         musicManager.audioPlayer.destroy(); // Destroy the player.
@@ -123,7 +126,26 @@ public final class PlayerEndpoint {
         }
         request.respond("Success.");
     }
-    
+
+    private static void volume(Request request, GuildMusicManager musicManager) {
+        final String volumeStr = request.requestArguments.getOrDefault("volume", "");
+        if (volumeStr.isEmpty()) {
+            request.code(400).respond("No volume specified."); return;
+        }
+
+        try {
+            final int volume = Integer.parseInt(volumeStr);
+            if (volume < 0 || volume > 150) {
+                request.code(400).respond("Invalid volume specified."); return;
+            }
+
+            musicManager.audioPlayer.setVolume(volume);
+            request.respond("Success.");
+        } catch (NumberFormatException e) {
+            request.code(400).respond("Invalid volume specified."); return;
+        }
+    }
+
     private static void nowPlaying(Request request, GuildMusicManager musicManager) {
         final AudioTrack audioTrack = musicManager.audioPlayer.getPlayingTrack();
         if (audioTrack == null) {
@@ -131,7 +153,7 @@ public final class PlayerEndpoint {
         }
         request.respond(Utilities.base64Encode(Utilities.serialize(NowPlayingObject.create(audioTrack))));
     }
-    
+
     @SuppressWarnings("unchecked")
     private static void play(Request request, Guild guild) {
         final String query = request.requestArguments.getOrDefault("query", "");
