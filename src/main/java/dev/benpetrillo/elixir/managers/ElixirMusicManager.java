@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -128,7 +128,7 @@ public final class ElixirMusicManager {
                 final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
                 MessageEmbed embed = new EmbedBuilder()
                         .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
-                        .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, track.getInfo().uri))
+                        .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle.replaceAll("\\[|]]", ""), track.getInfo().uri))
                         .build();
                 interaction.reply(embed, false);
             }
@@ -147,7 +147,7 @@ public final class ElixirMusicManager {
                     final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
                     MessageEmbed embed = new EmbedBuilder()
                             .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
-                            .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle, tracks.get(0).getInfo().uri))
+                            .setDescription(String.format("**Queued:** [%s](%s)", shortenedTitle.replaceAll("\\[|]]", ""), tracks.get(0).getInfo().uri))
                             .build();
                     interaction.reply(embed, false);
                     musicManager.scheduler.queue(tracks.get(0));

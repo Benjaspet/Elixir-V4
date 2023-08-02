@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -16,12 +16,13 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands;
+package dev.benpetrillo.elixir.commands.info;
 
 import com.sun.management.OperatingSystemMXBean;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -71,12 +72,12 @@ public final class InfoCommand extends Command {
                 .setAuthor("Total Playing Streams: " + streams)
                 .setDescription("[Invite Elixir to your server!](" + ElixirConstants.INVITE + ")")
                 .addField("Bot Information", """
-                        • Powered by: JDA 5.0.0-beta.12
+                        • Powered by: JDA %s
                         • Developed by: Ponjo Studios
                         • Server count: %s
                         • User count: %s
                         • Uptime: %s
-                        """.formatted(servers, users, uptimeString), false)
+                        """.formatted(Utilities.getJDAVersion(), servers, users, uptimeString), false)
                 .addField("Host Information", """
                         • CPU Usage: %s%%
                         • CPU Cores: %s

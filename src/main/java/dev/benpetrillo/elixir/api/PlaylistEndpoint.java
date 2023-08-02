@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -97,9 +97,6 @@ public final class PlaylistEndpoint {
         track = Utilities.base64Decode(track);
         if (!Utilities.isValidURL(track)) {
             track = HttpUtil.searchForVideo(track);
-            if(track == null) {
-                request.code(404).respond("Track not found."); return;
-            }
         }
         AudioTrackInfo trackInfo = TrackUtil.getTrackInfoFromUrl(track);
         if (trackInfo == null) {

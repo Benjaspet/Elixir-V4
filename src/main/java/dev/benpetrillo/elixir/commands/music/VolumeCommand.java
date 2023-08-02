@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -16,11 +16,10 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands;
+package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -32,10 +31,10 @@ import tech.xigam.cch.utils.Interaction;
 import java.util.Collection;
 import java.util.List;
 
-public final class LoopCommand extends Command implements Arguments {
+public final class VolumeCommand extends Command implements Arguments {
 
-    public LoopCommand() {
-        super("loop", "Loop a song or queue.");
+    public VolumeCommand() {
+        super("volume", "Set the volume of the player.");
     }
 
     @Override
@@ -44,41 +43,20 @@ public final class LoopCommand extends Command implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
-        var mode = (String) interaction.getArguments().getOrDefault("mode", "Disable Loop");
-        if (AudioUtil.audioCheck(interaction)) return;
         if (AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
+        if (AudioUtil.audioCheck(interaction)) return;
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        final TrackScheduler scheduler = musicManager.scheduler;
-        switch (mode) {
-            case "Track Loop" -> {
-                scheduler.repeating = TrackScheduler.LoopMode.TRACK;
-                mode = "track";
-            }
-            case "Queue Loop" -> {
-                scheduler.repeating = TrackScheduler.LoopMode.QUEUE;
-                mode = "queue";
-            }
-            case "Disable Loop" -> {
-                scheduler.repeating = TrackScheduler.LoopMode.NONE;
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode."), false);
-                return;
-            }
-            default -> {
-                interaction.reply(EmbedUtil.sendErrorEmbed("Invalid mode."), false);
-                return;
-            }
-        }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Set the loop mode to **%s**.".formatted(mode)), false);
+        final int volume = interaction.getArgument("volume", Number.class).intValue();
+        musicManager.audioPlayer.setVolume(volume);
+        interaction.reply(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**."), false);
     }
 
     @Override
     public Collection<Argument> getArguments() {
-        Argument argument = Argument.createWithChoices(
-                "mode", "Loop mode", "mode",
-                OptionType.STRING, true, 0,
-                "Track Loop", "Queue Loop", "Disable Loop"
-        ); argument.trailing = true;
-        return List.of(argument);
+        return List.of(
+                Argument.create("volume", "Set the volume of the player.", "volume",
+                        OptionType.INTEGER, true, 0).range(0, 150)
+        );
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -21,11 +21,10 @@ package dev.benpetrillo.elixir.events;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
-
-import java.util.Objects;
 
 public final class ShutdownListener extends ListenerAdapter {
 
@@ -33,8 +32,9 @@ public final class ShutdownListener extends ListenerAdapter {
     public void onShutdown(ShutdownEvent event) {
         final JDA jda = event.getJDA();
         for (Guild guild : jda.getGuildCache()) {
-            final VoiceChannel channel = Objects.requireNonNull(Objects.requireNonNull(guild.getSelfMember().getVoiceState()).getChannel()).asVoiceChannel();
-            final AudioManager audioManager = channel.getGuild().getAudioManager();
+            final AudioChannelUnion channel = guild.getSelfMember().getVoiceState().getChannel();
+            final VoiceChannel voiceChannel = channel.asVoiceChannel();
+            final AudioManager audioManager = voiceChannel.getGuild().getAudioManager();
             audioManager.closeAudioConnection();
         }
     }

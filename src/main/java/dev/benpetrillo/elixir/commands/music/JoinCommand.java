@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -16,7 +16,7 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands;
+package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.GuildVoiceState;

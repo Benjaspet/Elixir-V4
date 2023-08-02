@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -24,11 +24,9 @@ import dev.benpetrillo.elixir.events.*;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.managers.ConfigStartupManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
-import dev.benpetrillo.elixir.audio.ElixirVoiceDispatchInterceptor;
 import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
-import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -43,28 +41,28 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 
 public final class ElixirClient {
-    @Getter private static String envFile;
+    
     private static ElixirClient instance;
 
     public static ComplexCommandHandler commandHandler;
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
-
+    
     public JDA jda;
-    public ElixirVoiceDispatchInterceptor dispatchInterceptor;
 
+    public static String envName;
+    
     public static void main(String[] args) {
-        if (args.length < 1) {
-            logger.error("No environment file specified.");
-            System.exit(0);
-        }
-
-        ElixirClient.envFile = args[0];
-
-        try {
-            ConfigStartupManager.checkAll(); APIHandler.initialize();
-            instance = new ElixirClient(ElixirConstants.TOKEN);
-        } catch (LoginException | IllegalArgumentException | IOException exception) {
-            logger.error("Unable to initiate Elixir Music.", exception);
+        if (args.length >= 1) {
+            envName = args[0];
+            try {
+                ConfigStartupManager.checkAll(); APIHandler.initialize();
+                instance = new ElixirClient(ElixirConstants.TOKEN);
+            } catch (LoginException | IllegalArgumentException | IOException exception) {
+                logger.error("Unable to initiate Elixir Music.", exception);
+                System.exit(0);
+            }
+        } else {
+            logger.error("No environment name provided.");
             System.exit(0);
         }
     }
@@ -72,7 +70,6 @@ public final class ElixirClient {
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         final boolean usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
         commandHandler = new ComplexCommandHandler(usePrefix).setPrefix(ElixirConstants.COMMAND_PREFIX);
-        logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
         logger.info("JDA Version: " + Utilities.getJDAVersion());
         final JDABuilder builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
@@ -98,23 +95,24 @@ public final class ElixirClient {
                         GatewayIntent.GUILD_VOICE_STATES,
                         GatewayIntent.GUILD_WEBHOOKS
                 );
-        if (usePrefix) builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
+        if (usePrefix) {
+            builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
+            logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
+        }
         this.jda = builder.build();
         commandHandler.setJda(this.jda);
-
         ApplicationCommandManager.initialize();
         OAuthUpdateTask.schedule(); DatabaseManager.create();
-        this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();
     }
-
+    
     public static Logger getLogger() {
         return logger;
     }
-
+    
     public static JDA getJda() {
         return instance.jda;
     }
-
+    
     public static ComplexCommandHandler getCommandHandler() {
         return commandHandler;
     }

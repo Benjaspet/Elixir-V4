@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -16,47 +16,37 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands;
+package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import tech.xigam.cch.command.Arguments;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import tech.xigam.cch.command.Command;
-import tech.xigam.cch.utils.Argument;
 import tech.xigam.cch.utils.Interaction;
 
-import java.util.Collection;
-import java.util.List;
+public final class ResumeCommand extends Command {
 
-public final class VolumeCommand extends Command implements Arguments {
-
-    public VolumeCommand() {
-        super("volume", "Set the volume of the player.");
+    public ResumeCommand() {
+        super("resume", "Resume the queue playback.");
     }
-
+    
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
-        if (AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         if (AudioUtil.audioCheck(interaction)) return;
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        final int volume = interaction.getArgument("volume", Number.class).intValue();
-        musicManager.audioPlayer.setVolume(volume);
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**."), false);
-    }
-
-    @Override
-    public Collection<Argument> getArguments() {
-        return List.of(
-                Argument.create("volume", "Set the volume of the player.", "volume",
-                        OptionType.INTEGER, true, 0).range(0, 150)
-        );
+        MessageEmbed embed; if (musicManager.scheduler.player.isPaused()) {
+            musicManager.scheduler.player.setPaused(false);
+            embed = EmbedUtil.sendDefaultEmbed("Successfully resumed the queue.");
+        } else {
+            embed = EmbedUtil.sendErrorEmbed("The queue is already playing.");
+        }
+        interaction.reply(embed, false);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -35,33 +35,6 @@ import java.util.Objects;
 public final class HttpUtil {
 
     private static final OkHttpClient client = new OkHttpClient();
-    private static final TypeToken<List<YTSearchDataV2>> SEARCH_TYPE = new TypeToken<>() {};
-
-    /**
-     * Get a YouTube video URL from a search query.
-     * @param query The search query.
-     * @return String
-     */
-
-    @Deprecated
-    public static String getYouTubeURL(String query) {
-        String encodedQuery = Utilities.encodeURIComponent(query);
-        String url = "https://www.googleapis.com/youtube/v3/search?key=" +
-                Config.get("YOUTUBE-API-KEY") +
-                "&type=video&part=snippet&max=5&q=" +
-                encodedQuery;
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            assert response.body() != null;
-            var requestData = new Gson().fromJson(response.body().string(), YTSearchData.class);
-            return "https://www.youtube.com/watch?v=" + requestData.items.get(0).id.get("videoId");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-        }
-    }
 
     /**
      * Searches for a video on YouTube.

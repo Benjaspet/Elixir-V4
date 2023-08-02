@@ -96,14 +96,18 @@ public final class SpotifySourceManager implements AudioSourceManager {
             if (!matcher.find()) return null;
             final String id = matcher.group("identifier");
             switch (matcher.group("type")) {
-                case "album":
+                case "album" -> {
                     return this.getAlbum(id);
-                case "track":
+                }
+                case "track" -> {
                     return this.getTrack(id);
-                case "playlist":
+                }
+                case "playlist" -> {
                     return this.getPlaylist(id);
-                case "artist":
+                }
+                case "artist" -> {
                     return this.getArtist(id);
+                }
             }
         } catch (IOException | ParseException | SpotifyWebApiException | NullPointerException e) {
             return null;

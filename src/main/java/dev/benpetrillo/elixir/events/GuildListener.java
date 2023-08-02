@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -29,8 +29,9 @@ import org.jetbrains.annotations.NotNull;
 public final class GuildListener extends ListenerAdapter {
 
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
+        final ElixirMusicManager elixirMusicManager = ElixirMusicManager.getInstance();
         final Guild guild = event.getGuild();
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(event.getGuild());
+        final GuildMusicManager musicManager = elixirMusicManager.getMusicManager(event.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
         if (!audioPlayer.isPaused() || !musicManager.scheduler.getQueue().isEmpty()) {
             musicManager.scheduler.queue.clear();

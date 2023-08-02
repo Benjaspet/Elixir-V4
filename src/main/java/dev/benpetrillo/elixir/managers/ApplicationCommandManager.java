@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -20,7 +20,8 @@ package dev.benpetrillo.elixir.managers;
 
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.commands.*;
+import dev.benpetrillo.elixir.commands.info.InfoCommand;
+import dev.benpetrillo.elixir.commands.music.*;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;

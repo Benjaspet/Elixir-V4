@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -16,7 +16,7 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands;
+package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
@@ -26,12 +26,12 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
-public final class ResumeCommand extends Command {
+public final class PauseCommand extends Command {
 
-    public ResumeCommand() {
-        super("resume", "Resume the queue playback.");
+    public PauseCommand() {
+        super("pause", "Pause the track currently playing.");
     }
-    
+
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
@@ -41,12 +41,13 @@ public final class ResumeCommand extends Command {
         if (AudioUtil.audioCheck(interaction)) return;
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        MessageEmbed embed; if (musicManager.scheduler.player.isPaused()) {
-            musicManager.scheduler.player.setPaused(false);
-            embed = EmbedUtil.sendDefaultEmbed("Successfully resumed the queue.");
+        if (!musicManager.scheduler.player.isPaused()) {
+            musicManager.scheduler.player.setPaused(true);
+            MessageEmbed embed = EmbedUtil.sendDefaultEmbed("Successfully paused the queue.");
+            interaction.reply(embed, false);
         } else {
-            embed = EmbedUtil.sendErrorEmbed("The queue is already playing.");
+            MessageEmbed embed = EmbedUtil.sendErrorEmbed("The queue is already paused.");
+            interaction.reply(embed, false);
         }
-        interaction.reply(embed, false);
     }
 }

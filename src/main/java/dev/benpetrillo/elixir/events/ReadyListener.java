@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -32,7 +32,23 @@ public final class ReadyListener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         final JDA jda = event.getJDA();
-        ElixirClient.getLogger().info("{} has logged in.", event.getJDA().getSelfUser().getAsTag());
+        final String username = jda.getSelfUser().getEffectiveName();
+        ElixirClient.getLogger().info("{} has logged in.", username);
+        if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
+            for (String id : ElixirConstants.GUILDS) {
+                final Guild guild = jda.getGuildById(id);
+                if (guild != null) {
+                    ElixirClient.getCommandHandler().deployAll(guild);
+                    ElixirClient.getLogger().info("All guild slash commands have been deployed.");
+                } else {
+                    ElixirClient.getLogger().error("An error occurred while deploying guild slash commands.");
+                }
+            }
+        }
+
+
+
+
         for (String id : ElixirConstants.GUILDS) {
             final Guild guild = jda.getGuildById(id);
             if (guild != null) {

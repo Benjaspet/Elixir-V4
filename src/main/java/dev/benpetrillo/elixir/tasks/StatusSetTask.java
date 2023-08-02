@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
+ * Copyright © 2022 Ben Petrillo, KingRanbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /*
  * Developer note: this task exists because of a bug that exists within Discord
  * bot application activities; they tend to disappear after extended periods of
- * time (i.e. two weeks).
+ * time (i.e. two weeks). This bug may or may not still exist™.
  */
 
 public final class StatusSetTask extends TimerTask {

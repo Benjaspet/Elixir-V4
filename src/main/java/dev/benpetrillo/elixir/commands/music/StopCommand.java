@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -16,20 +16,21 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands;
+package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.managers.AudioManager;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
-public final class PauseCommand extends Command {
+public final class StopCommand extends Command {
 
-    public PauseCommand() {
-        super("pause", "Pause the track currently playing.");
+    public StopCommand() {
+        super("stop", "Stop the current track & clear the queue.");
     }
 
     @Override
@@ -38,16 +39,17 @@ public final class PauseCommand extends Command {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
+        assert interaction.getMember() != null;
+        final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
+        assert selfVoiceState != null;
         if (AudioUtil.audioCheck(interaction)) return;
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        if (!musicManager.scheduler.player.isPaused()) {
-            musicManager.scheduler.player.setPaused(true);
-            MessageEmbed embed = EmbedUtil.sendDefaultEmbed("Successfully paused the queue.");
-            interaction.reply(embed, false);
-        } else {
-            MessageEmbed embed = EmbedUtil.sendErrorEmbed("The queue is already paused.");
-            interaction.reply(embed, false);
+        final AudioManager audioManager = interaction.getGuild().getAudioManager();
+        if (selfVoiceState.inAudioChannel()) {
+            audioManager.closeAudioConnection();
         }
+        musicManager.stop();
+        interaction.reply(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped."));
     }
 }
