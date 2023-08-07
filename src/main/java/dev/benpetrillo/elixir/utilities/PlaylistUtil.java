@@ -43,7 +43,7 @@ public final class PlaylistUtil {
      * @param playlistId The playlist ID.
      * @return If the playlist was created.
      */
-    
+
     public static boolean createPlaylist(String playlistId, Member member) {
         if (findPlaylist(playlistId) != null) return false;
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
@@ -54,13 +54,13 @@ public final class PlaylistUtil {
                 ))));
         return true;
     }
-    
+
     /**
      * Deletes a custom playlist.
      *
      * @param playlistId The playlist ID.
      */
-    
+
     public static void deletePlaylist(String playlistId) {
         if (findPlaylist(playlistId) == null) return;
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
@@ -114,7 +114,7 @@ public final class PlaylistUtil {
      * @param playlist The playlist to get tracks from.
      * @return A collection of playable tracks.
      */
-    
+
     public static List<PlaylistTrack> getTracks(CustomPlaylist playlist) {
         final List<PlaylistTrack> tracks = new ArrayList<>();
         for (CustomPlaylist.CustomPlaylistTrack track : playlist.tracks) {
@@ -135,12 +135,11 @@ public final class PlaylistUtil {
      * @param track The track to add.
      * @param playlist The playlist to add the track to.
      */
-    
+
     public static void addTrackToList(AudioTrackInfo track, CustomPlaylist playlist, int index) {
         if(track.uri == null) {
             try {
                 var url = HttpUtil.searchForVideo(track.title);
-                if(url == null) return;
 
                 track = new ExtendedAudioTrackInfo(
                         track.title, track.author, track.length, track.identifier, track.isStream, url
@@ -163,7 +162,7 @@ public final class PlaylistUtil {
      * @param index The track to remove.
      * @param playlist The playlist to remove the track from.
      */
-    
+
     public static void removeTrackFromList(int index, CustomPlaylist playlist) throws IndexOutOfBoundsException {
         playlist.tracks.remove(index - 1);
         updatePlaylist(playlist);
@@ -174,7 +173,7 @@ public final class PlaylistUtil {
      * @param playlist The playlist to set the cover of.
      * @param url The URL of the cover image.
      */
-    
+
     public static void setPlaylistCover(CustomPlaylist playlist, String url) {
         playlist.info.playlistCoverUrl = url;
         updatePlaylist(playlist);
@@ -185,7 +184,7 @@ public final class PlaylistUtil {
      * @param playlist The playlist to set the name of.
      * @param name The name to set.
      */
-    
+
     public static void setPlaylistName(CustomPlaylist playlist, String name) {
         playlist.info.name = name;
         updatePlaylist(playlist);
@@ -196,7 +195,7 @@ public final class PlaylistUtil {
      * @param playlist The playlist to set the description of.
      * @param description The description to set.
      */
-    
+
     public static void setPlaylistDescription(CustomPlaylist playlist, String description) {
         playlist.info.description = description;
         updatePlaylist(playlist);
@@ -207,7 +206,7 @@ public final class PlaylistUtil {
      * @param playlist The playlist to set the starting volume of.
      * @param volume The volume, as an integer, to set this playlist to.
      */
-    
+
     public static void setPlaylistVolume(CustomPlaylist playlist, int volume) {
         playlist.info.volume = volume;
         updatePlaylist(playlist);
@@ -219,7 +218,7 @@ public final class PlaylistUtil {
      * @param playlist The playlist to set the author of.
      * @param value The value to set.
      */
-    
+
     public static void setPlaylistSetting(Setting setting, CustomPlaylist playlist, boolean value) {
         switch (setting) {
             case SHUFFLE -> playlist.options.shuffle = value;
@@ -231,7 +230,7 @@ public final class PlaylistUtil {
      * Updates a custom playlist.
      * @param playlist The playlist to update.
      */
-    
+
     private static void updatePlaylist(CustomPlaylist playlist) {
         MongoCollection<Document> dbCollection = DatabaseManager.getPlaylistCollection();
         Bson dbObject = new BasicDBObject("playlistId", playlist.info.id);
@@ -243,7 +242,7 @@ public final class PlaylistUtil {
             dbCollection.updateOne(dbObject, update, new UpdateOptions().upsert(true));
         } catch (MongoException ignored) {}
     }
-    
+
     public enum Setting {
         SHUFFLE,
         REPEAT

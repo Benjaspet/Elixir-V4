@@ -21,8 +21,10 @@ package dev.benpetrillo.elixir.utilities;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.*;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import lombok.Getter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,35 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 public final class HttpUtil {
-
-    private static final OkHttpClient client = new OkHttpClient();
-    private static final TypeToken<List<YTSearchDataV2>> SEARCH_TYPE = new TypeToken<>() {};
-
-    /**
-     * Get a YouTube video URL from a search query.
-     * @param query The search query.
-     * @return String
-     */
-
-    @Deprecated
-    public static String getYouTubeURL(String query) {
-        String encodedQuery = Utilities.encodeURIComponent(query);
-        String url = "https://www.googleapis.com/youtube/v3/search?key=" +
-                Config.get("YOUTUBE-API-KEY") +
-                "&type=video&part=snippet&max=5&q=" +
-                encodedQuery;
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            assert response.body() != null;
-            var requestData = new Gson().fromJson(response.body().string(), YTSearchData.class);
-            return "https://www.youtube.com/watch?v=" + requestData.items.get(0).id.get("videoId");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-        }
-    }
+    @Getter private static final OkHttpClient client = new OkHttpClient();
 
     /**
      * Searches for a video on YouTube.
@@ -70,15 +44,16 @@ public final class HttpUtil {
      */
 
     public static String searchForVideo(String query) {
-        String encodedQuery = Utilities.encodeURIComponent(query);
-        String url = "https://app.seikimo.moe/search/" + encodedQuery;
-        Request request = new Request.Builder().url(url).build();
-        try (Response response = client.newCall(request).execute()) {
+        var encodedQuery = Utilities.encodeURIComponent(query);
+        var url = "https://app.seikimo.moe/search/" + encodedQuery;
+        var request = new Request.Builder().url(url).build();
+        try (var response = client.newCall(request).execute()) {
             assert response.body() != null;
-            var requestData = new Gson().fromJson(response.body().string(), LaudiolinSearchData.class);
+            var requestData = Utilities.deserialize(
+                    response.body().string(), LaudiolinSearchData.class);
             return "https://www.youtube.com/watch?v=" + requestData.top.id;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            ElixirClient.getLogger().warn("Failed to search for video: " + query, ex);
             return "https://www.youtube.com/watch?v=7-qGKqveZaM";
         }
     }
@@ -90,18 +65,19 @@ public final class HttpUtil {
      */
 
     public static YTVideoData getVideoData(String videoId) {
-        String url = "https://www.googleapis.com/youtube/v3/videos?key=" +
+        var url = "https://www.googleapis.com/youtube/v3/videos?key=" +
                 Config.get("YOUTUBE-API-KEY") +
                 "&part=snippet%2CcontentDetails&id=" +
                 videoId;
-        Request request = new Request.Builder()
+        var request = new Request.Builder()
                 .url(url)
                 .build();
-        try (Response response = client.newCall(request).execute()) {
+        try (var response = client.newCall(request).execute()) {
             assert response.body() != null;
-            return new Gson().fromJson(response.body().string(), YTVideoData.class);
+            return Utilities.deserialize(response.body().string(), YTVideoData.class);
         } catch (IOException ex) {
-            ex.printStackTrace(); return null;
+            ElixirClient.getLogger().warn("Failed to get video data for video ID: " + videoId, ex);
+            return null;
         }
     }
 
@@ -121,7 +97,9 @@ public final class HttpUtil {
             Request request = new Request.Builder().url(url).build();
             try (Response response = client.newCall(request).execute()) {
                 assert response.body() != null;
-                var playlistData = new Gson().fromJson(Objects.requireNonNull(response.body()).string(), YTPlaylistData.class);
+                var playlistData = Utilities.deserialize(
+                        Objects.requireNonNull(response.body()).string(),
+                        YTPlaylistData.class);
                 totalData.add(playlistData);
                 if(playlistData.nextPageToken != null) {
                     nextPageToken = playlistData.nextPageToken;

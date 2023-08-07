@@ -38,6 +38,7 @@ import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
@@ -61,15 +62,15 @@ public final class ElixirMusicManager {
     private static ElixirMusicManager instance;
     private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
-    
+
     public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
 
     public ElixirMusicManager() {
-        this.audioPlayerManager.registerSourceManager(this.spotifySource);
-        this.audioPlayerManager.registerSourceManager(this.youtubeSource);
-        this.audioPlayerManager.registerSourceManager(this.soundCloudSource);
+        // Add the Laudiolin source manager.
+        this.audioPlayerManager.registerSourceManager(new LaudiolinSourceManager());
+
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
@@ -77,7 +78,7 @@ public final class ElixirMusicManager {
         this.audioPlayerManager.registerSourceManager(new GetyarnAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
-        
+
         // IPv6 rotation setup.
         // If the bot receives a 429 from YouTube, it will rotate the IP address to another, provided that
         // an entire 64-bit block is provided in the config.
@@ -109,7 +110,7 @@ public final class ElixirMusicManager {
     public GuildMusicManager getMusicManager(String guildId) {
         return this.musicManagers.get(guildId);
     }
-    
+
     public GuildMusicManager[] getMusicManagers() {
         return this.musicManagers.values().toArray(new GuildMusicManager[0]);
     }
@@ -178,7 +179,7 @@ public final class ElixirMusicManager {
             }
         });
     }
-    
+
     @Internal public void loadAndPlay(Guild guild, String track, Consumer<Object> callback) {
         final GuildMusicManager musicManager = this.getMusicManager(guild);
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
