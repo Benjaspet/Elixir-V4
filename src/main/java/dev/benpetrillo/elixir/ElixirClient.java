@@ -24,7 +24,6 @@ import dev.benpetrillo.elixir.events.*;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.managers.ConfigStartupManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
-import dev.benpetrillo.elixir.audio.ElixirVoiceDispatchInterceptor;
 import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -50,7 +49,6 @@ public final class ElixirClient {
     public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
 
     public JDA jda;
-    public ElixirVoiceDispatchInterceptor dispatchInterceptor;
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -85,7 +83,6 @@ public final class ElixirClient {
                 .addEventListeners(
                         new GuildListener(),
                         new ReadyListener(),
-                        new MessageListener(),
                         new ShutdownListener()
                 )
                 .enableIntents(
@@ -104,7 +101,6 @@ public final class ElixirClient {
 
         ApplicationCommandManager.initialize();
         OAuthUpdateTask.schedule(); DatabaseManager.create();
-        this.dispatchInterceptor = new ElixirVoiceDispatchInterceptor();
     }
 
     public static Logger getLogger() {
