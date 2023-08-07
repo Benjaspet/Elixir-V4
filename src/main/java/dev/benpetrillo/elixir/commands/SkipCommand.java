@@ -67,7 +67,7 @@ public final class SkipCommand extends Command implements Arguments {
             final MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
             interaction.reply(embed, false);
         }
-        final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1L);
+        final long skipTo = interaction.getArgument("track", 1L, Long.class);
         assert musicManager.scheduler.queue.peek() != null;
         final AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
         for (int i = 0; i < skipTo; i++) {

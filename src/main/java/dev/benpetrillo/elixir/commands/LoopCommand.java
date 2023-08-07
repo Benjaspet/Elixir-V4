@@ -44,7 +44,7 @@ public final class LoopCommand extends Command implements Arguments {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
-        var mode = (String) interaction.getArguments().getOrDefault("mode", "Disable Loop");
+        var mode = interaction.getArgument("mode", "Disable Loop", String.class);
         if (AudioUtil.audioCheck(interaction)) return;
         if (AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         assert interaction.getGuild() != null;
