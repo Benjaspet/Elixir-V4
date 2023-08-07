@@ -23,11 +23,17 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.managers.AudioManager;
+import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.Command;
+import tech.xigam.cch.utils.Argument;
 import tech.xigam.cch.utils.Interaction;
 
-public final class StopCommand extends Command {
+import java.util.Collection;
+import java.util.List;
+
+public final class StopCommand extends Command implements Arguments {
 
     public StopCommand() {
         super("stop", "Stop the current track & clear the queue.");
@@ -39,6 +45,7 @@ public final class StopCommand extends Command {
             interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
             return;
         }
+
         assert interaction.getMember() != null;
         final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
         assert selfVoiceState != null;
@@ -46,10 +53,22 @@ public final class StopCommand extends Command {
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
-        if (selfVoiceState.inAudioChannel()) {
+
+        // Check if the bot should leave.
+        var shouldLeave = interaction.getArgument("leave", true, Boolean.class);
+        if (shouldLeave && selfVoiceState.inAudioChannel()) {
             audioManager.closeAudioConnection();
         }
+
         musicManager.stop();
-        interaction.reply(EmbedUtil.sendDefaultEmbed("The queue has been cleared and the player has been stopped."));
+        interaction.reply(EmbedUtil.sendDefaultEmbed("The queue has been cleared" +
+                (shouldLeave ? "and the player has been stopped" : "") + "."));
+    }
+
+    @Override
+    public Collection<Argument> getArguments() {
+        return List.of(
+                Argument.create("leave", "Should the bot leave the channel?", "leave", OptionType.BOOLEAN, false, 0)
+        );
     }
 }
