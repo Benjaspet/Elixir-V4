@@ -46,7 +46,8 @@ public final class ElixirClient {
     private static ElixirClient instance;
 
     public static ComplexCommandHandler commandHandler;
-    public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
+    public static Logger logger
+            = LoggerFactory.getLogger("Elixir");
 
     public JDA jda;
 
@@ -70,7 +71,7 @@ public final class ElixirClient {
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         final boolean usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
         commandHandler = new ComplexCommandHandler(usePrefix).setPrefix(ElixirConstants.COMMAND_PREFIX);
-        logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
+
         logger.info("JDA Version: " + Utilities.getJDAVersion());
         final JDABuilder builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
@@ -95,7 +96,11 @@ public final class ElixirClient {
                         GatewayIntent.GUILD_VOICE_STATES,
                         GatewayIntent.GUILD_WEBHOOKS
                 );
-        if (usePrefix) builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
+        if (usePrefix) {
+            builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
+            logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
+        }
+
         this.jda = builder.build();
         commandHandler.setJda(this.jda);
 
