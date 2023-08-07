@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 public final class ReadyListener extends ListenerAdapter {
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onReady(@NotNull ReadyEvent event) {
         final JDA jda = event.getJDA();
         ElixirClient.getLogger().info("{} has logged in.", event.getJDA().getSelfUser().getAsTag());
