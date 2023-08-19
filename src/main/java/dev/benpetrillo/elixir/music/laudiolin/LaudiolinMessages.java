@@ -11,6 +11,8 @@ public interface LaudiolinMessages {
     Map<String, LaudiolinMessages> HANDLERS = new HashMap<>() {{
         this.put("initialize", LaudiolinMessages::initialize);
         this.put("playTrack", LaudiolinMessages::playTrack);
+        this.put("resume", LaudiolinMessages::resume);
+        this.put("pause", LaudiolinMessages::pause);
     }};
 
     /**
@@ -53,5 +55,25 @@ public interface LaudiolinMessages {
         // Play the track in the guild.
         var track = message.getTrack().toAudioItem();
         handle.getManager().play(track);
+    }
+
+    /**
+     * Handles the server's request to resume the player.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void resume(LaudiolinInterface handle, JsonObject content) {
+        handle.getManager().getAudioPlayer().setPaused(false);
+    }
+
+    /**
+     * Handles the server's request to pause the player.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void pause(LaudiolinInterface handle, JsonObject content) {
+        handle.getManager().getAudioPlayer().setPaused(true);
     }
 }
