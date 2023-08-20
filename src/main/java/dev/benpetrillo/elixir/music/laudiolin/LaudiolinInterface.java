@@ -2,7 +2,9 @@ package dev.benpetrillo.elixir.music.laudiolin;
 
 import ch.qos.logback.classic.Level;
 import com.google.gson.JsonObject;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import lombok.Getter;
@@ -12,23 +14,67 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 @Getter
 public final class LaudiolinInterface extends WebSocketClient {
     private final Logger logger;
     private final Guild guild;
+
     private final GuildMusicManager manager;
+    private final AudioPlayer player;
+    private final TrackScheduler scheduler;
+
+    private final Timer timer = new Timer();
 
     public LaudiolinInterface(GuildMusicManager manager, Guild guild) {
         super(ElixirConstants.LAUDIOLIN_API);
 
         this.guild = guild;
         this.manager = manager;
+        this.player = manager.getAudioPlayer();
+        this.scheduler = manager.getScheduler();
+
         this.logger = LoggerFactory.getLogger(guild.getName());
 
         if (ElixirConstants.DEBUG) {
             // Set the logger in debug mode.
             ((ch.qos.logback.classic.Logger) this.logger)
                     .setLevel(Level.DEBUG);
+        }
+    }
+
+    @Override
+    public void connect() {
+        super.connect(); // Connect to the web socket.
+
+        // Schedule a task to update the backend.
+        this.getTimer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                LaudiolinInterface.this.update();
+            }
+        }, 0, 100);
+    }
+
+    @Override
+    public void close() {
+        super.close(); // Close the web socket.
+
+        // Cancel the update task.
+        this.getTimer().cancel();
+    }
+
+    /**
+     * Updates the backend with useful information.
+     */
+    private void update() {
+        var player = this.getPlayer();
+        var track = player.getPlayingTrack();
+        if (!player.isPaused() && track != null) {
+            this.send(new LaudiolinTypes.Seek(
+                    track.getPosition() / 1000f));
         }
     }
 

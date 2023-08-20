@@ -3,6 +3,7 @@ package dev.benpetrillo.elixir.music.laudiolin;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@SuppressWarnings("FieldMayBeFinal")
 public interface LaudiolinTypes {
     @AllArgsConstructor
     final class Initialize {
@@ -31,7 +32,17 @@ public interface LaudiolinTypes {
 
     @Getter
     final class Seek {
-        // This message is server -> client.
+        // This message is both ways.
         private long position; // This is milliseconds.
+        private float seek; // This is in seconds.
+
+        /**
+         * This constructor is used for the server -> client message.
+         *
+         * @param position The position in milliseconds.
+         */
+        public Seek(float position) {
+            this.seek = position;
+        }
     }
 }
