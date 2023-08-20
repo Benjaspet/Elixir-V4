@@ -13,9 +13,20 @@ public interface LaudiolinTypes {
     }
 
     @Getter
-    @AllArgsConstructor
     final class PlayTrack {
         // This message is server -> client.
-        private final LaudiolinTrackInfo track;
+        private String data;
+    }
+
+    @Getter
+    final class Volume {
+        // This message is server -> client.
+        private int volume;
+    }
+
+    @Getter
+    final class Skip {
+        // This message is server -> client.
+        private int track;
     }
 }

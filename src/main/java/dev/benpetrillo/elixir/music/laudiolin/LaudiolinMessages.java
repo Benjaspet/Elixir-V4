@@ -1,6 +1,8 @@
 package dev.benpetrillo.elixir.music.laudiolin;
 
 import com.google.gson.JsonObject;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 
@@ -13,6 +15,9 @@ public interface LaudiolinMessages {
         this.put("playTrack", LaudiolinMessages::playTrack);
         this.put("resume", LaudiolinMessages::resume);
         this.put("pause", LaudiolinMessages::pause);
+        this.put("volume", LaudiolinMessages::volume);
+        this.put("shuffle", LaudiolinMessages::shuffle);
+        this.put("skip", LaudiolinMessages::skip);
     }};
 
     /**
@@ -52,9 +57,15 @@ public interface LaudiolinMessages {
     static void playTrack(LaudiolinInterface handle, JsonObject content) {
         var message = Utilities.deserialize(content, LaudiolinTypes.PlayTrack.class);
 
+        // Check if the data is a URL.
+        var url = message.getData();
+        if (!Utilities.isValidURL(url)) {
+            url = HttpUtil.searchForVideo(url);
+        }
+
         // Play the track in the guild.
-        var track = message.getTrack().toAudioItem();
-        handle.getManager().play(track);
+        ElixirMusicManager.getInstance().loadAndPlay(
+                handle.getGuild(), url, r -> {});
     }
 
     /**
@@ -75,5 +86,42 @@ public interface LaudiolinMessages {
      */
     static void pause(LaudiolinInterface handle, JsonObject content) {
         handle.getManager().getAudioPlayer().setPaused(true);
+    }
+
+    /**
+     * Handles the server's request to set the player's volume.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void volume(LaudiolinInterface handle, JsonObject content) {
+        var message = Utilities.deserialize(content, LaudiolinTypes.Volume.class);
+        handle.getManager().getAudioPlayer().setVolume(message.getVolume());
+    }
+
+    /**
+     * Handles the server's request to shuffle the player's queue.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void shuffle(LaudiolinInterface handle, JsonObject content) {
+        handle.getManager().getScheduler().shuffle();
+    }
+
+    /**
+     * Handles the server's request to skip the current track.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void skip(LaudiolinInterface handle, JsonObject content) {
+        var message = Utilities.deserialize(content, LaudiolinTypes.Skip.class);
+
+        var skipAmount = message.getTrack();
+        var scheduler = handle.getManager().getScheduler();
+        for (var i = 0; i < skipAmount; i++) {
+            scheduler.nextTrack();
+        }
     }
 }
