@@ -58,8 +58,7 @@ public final class ApplicationCommandManager {
                 new ShuffleCommand(),
                 new SkipCommand(),
                 new StopCommand(),
-                new VolumeCommand(),
-                new GuessCommand()
+                new VolumeCommand()
         );
 
         handler.onArgumentError = interaction -> interaction.setEphemeral().reply(EmbedUtil.sendErrorEmbed("Invalid argument(s) provided."));
