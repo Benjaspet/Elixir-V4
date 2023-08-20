@@ -23,6 +23,7 @@ import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -221,12 +222,34 @@ public final class Utilities {
 
     /**
      * Convert a given object to a JSON string.
+     * @param json The object to convert.
+     * @param klass The class of the object.
+     * @param <T> The type of the object.
+     * @return A de-serialized object.
+     */
+
+    public static <T> T deserialize(JsonElement json, Class <T> klass) {
+        return gson.fromJson(json, klass);
+    }
+
+    /**
+     * Convert a given object to a JSON string.
      * @param object The object to convert.
      * @return A serialized object.
      */
 
     public static String serialize(Object object) {
         return gson.toJson(object);
+    }
+
+    /**
+     * Convert a given object to a JSON object.
+     *
+     * @param object The object to convert.
+     * @return A serialized object.
+     */
+    public static JsonElement tree(Object object) {
+        return gson.toJsonTree(object);
     }
 
     /**
@@ -265,6 +288,6 @@ public final class Utilities {
      */
 
     public static String getJDAVersion() {
-        return JDAInfo.VERSION;
+        return JDAInfo.VERSION.split("_")[0];
     }
 }

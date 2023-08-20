@@ -40,9 +40,9 @@ public final class ApplicationCommandManager {
             ElixirClient.logger.info("All global slash commands have been deleted.");
         }
     }
-    
+
     private ApplicationCommandManager(ComplexCommandHandler handler) {
-        registerCommand(handler, 
+        registerCommand(handler,
                 new InfoCommand(),
                 new JoinCommand(),
                 new LoopCommand(),
@@ -58,12 +58,13 @@ public final class ApplicationCommandManager {
                 new ShuffleCommand(),
                 new SkipCommand(),
                 new StopCommand(),
-                new VolumeCommand()
+                new VolumeCommand(),
+                new GuessCommand()
         );
-        
+
         handler.onArgumentError = interaction -> interaction.setEphemeral().reply(EmbedUtil.sendErrorEmbed("Invalid argument(s) provided."));
     }
-    
+
     private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {
         final List<String> commandNames = new ArrayList<>();
         for (BaseCommand command : commands) {

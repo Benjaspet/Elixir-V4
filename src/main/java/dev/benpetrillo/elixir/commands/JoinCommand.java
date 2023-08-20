@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -33,7 +34,7 @@ public final class JoinCommand extends Command {
     public JoinCommand() {
         super("join", "Bind Elixir to your voice channel.");
     }
-    
+
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
@@ -58,6 +59,9 @@ public final class JoinCommand extends Command {
             String name = memberChannel.getName();
             MessageEmbed embed = EmbedUtil.sendDefaultEmbed(String.format("I've connected to **%s** successfully.", name));
             interaction.reply(embed, false);
+
+            // Create a guild music manager if needed.
+            ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         } else {
             interaction.reply(EmbedUtil.sendErrorEmbed("I'm already connected to a voice channel."), false);
         }

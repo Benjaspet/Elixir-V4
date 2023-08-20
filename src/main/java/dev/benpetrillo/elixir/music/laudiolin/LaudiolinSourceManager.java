@@ -11,6 +11,7 @@ import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.types.laudiolin.Source;
 import dev.benpetrillo.elixir.utilities.LaudiolinUtil;
 import dev.benpetrillo.elixir.utilities.SourceUtil;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.DataInput;
@@ -18,7 +19,7 @@ import java.io.DataOutput;
 import java.util.ArrayList;
 
 public final class LaudiolinSourceManager implements AudioSourceManager {
-    private final HttpAudioSourceManager httpAudioSource = new HttpAudioSourceManager();
+    @Getter private final HttpAudioSourceManager httpAudioSource = new HttpAudioSourceManager();
     private final YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager();
     private final SpotifySourceManager spotifyAudioSourceManager = new SpotifySourceManager(this.youtubeAudioSourceManager);
     private final SoundCloudAudioSourceManager soundCloudAudioSourceManager = SoundCloudAudioSourceManager.createDefault();

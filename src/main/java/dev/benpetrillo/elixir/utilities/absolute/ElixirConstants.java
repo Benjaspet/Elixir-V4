@@ -21,6 +21,7 @@ package dev.benpetrillo.elixir.utilities.absolute;
 import dev.benpetrillo.elixir.Config;
 
 import java.awt.*;
+import java.net.URI;
 
 public final class ElixirConstants {
 
@@ -39,4 +40,7 @@ public final class ElixirConstants {
     public static String[] GUILDS = Config.get("GUILDS").split(",");
     public static Color DEFAULT_EMBED_COLOR = Color.decode(Config.get("DEFAULT-EMBED-COLOR"));
     public static Color ERROR_EMBED_COLOR = Color.decode(Config.get("ERROR-EMBED-COLOR"));
+    public static final URI LAUDIOLIN_API = URI.create(Config.get("LAUDIOLIN-HANDLE"));
+    public static final String LAUDIOLIN_TOKEN = Config.get("LAUDIOLIN-TOKEN");
+    public static final boolean DEBUG = Boolean.parseBoolean(Config.get("DEBUG"));
 }

@@ -44,6 +44,7 @@ import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -61,15 +62,16 @@ public final class ElixirMusicManager {
 
     private static ElixirMusicManager instance;
     private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
-    private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
+    @Getter private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
 
+    public final LaudiolinSourceManager laudiolinSource = new LaudiolinSourceManager();
     public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
 
     public ElixirMusicManager() {
         // Add the Laudiolin source manager.
-        this.audioPlayerManager.registerSourceManager(new LaudiolinSourceManager());
+        this.audioPlayerManager.registerSourceManager(this.laudiolinSource);
 
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());

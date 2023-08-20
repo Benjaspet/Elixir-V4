@@ -24,6 +24,7 @@ import dev.benpetrillo.elixir.events.*;
 import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
 import dev.benpetrillo.elixir.managers.ConfigStartupManager;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
+import dev.benpetrillo.elixir.managers.MusicGameManager;
 import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -32,6 +33,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -84,7 +86,8 @@ public final class ElixirClient {
                 .addEventListeners(
                         new GuildListener(),
                         new ReadyListener(),
-                        new ShutdownListener()
+                        new ShutdownListener(),
+                        new MusicGameManager.Listener()
                 )
                 .enableIntents(
                         GatewayIntent.DIRECT_MESSAGES,
@@ -99,6 +102,8 @@ public final class ElixirClient {
         if (usePrefix) {
             builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
             logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
+        } else {
+            Message.suppressContentIntentWarning();
         }
 
         this.jda = builder.build();

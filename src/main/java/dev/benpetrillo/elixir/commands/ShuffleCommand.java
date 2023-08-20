@@ -49,10 +49,8 @@ public final class ShuffleCommand extends Command {
         interaction.deferReply();
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
-        final List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
-        Collections.shuffle(tracks);
-        musicManager.scheduler.queue.clear();
-        musicManager.scheduler.queue.addAll(tracks);
+        var tracks = musicManager.getScheduler().shuffle();
+
         final StringBuilder description = new StringBuilder();
         final int maxAmount = Math.min(tracks.size(), 12);
         for (int i = 0; i < maxAmount; i++) {
@@ -65,7 +63,7 @@ public final class ShuffleCommand extends Command {
         if (tracks.size() > maxAmount) {
             description.append("\n").append(String.format("...and %s more tracks.", tracks.size() - maxAmount));
         }
-        
+
         interaction.reply(new EmbedBuilder().setTitle("New Queue:")
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setAuthor("Shuffled the queue.")

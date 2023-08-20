@@ -25,11 +25,14 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.api.entities.Guild;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public final class TrackScheduler extends AudioEventAdapter {
-    
+
     public final AudioPlayer player;
     public final BlockingQueue<AudioTrack> queue;
     public final Guild guild;
@@ -40,6 +43,21 @@ public final class TrackScheduler extends AudioEventAdapter {
         this.guild = guild;
         this.player = player;
         this.queue = new LinkedBlockingQueue<>();
+    }
+
+    /**
+     * Shuffles the remaining songs in the queue.
+     */
+    public List<AudioTrack> shuffle() {
+        // Shuffle the queue.
+        var tracks = new ArrayList<>(this.getQueue());
+        Collections.shuffle(tracks);
+
+        // Add the tracks to the queue.
+        this.queue.clear();
+        this.queue.addAll(tracks);
+
+        return tracks;
     }
 
     public void queue(AudioTrack track) {
@@ -65,7 +83,7 @@ public final class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (this.queue.size() == 0 && this.repeating == LoopMode.NONE) {
+        if (this.queue.isEmpty() && this.repeating == LoopMode.NONE) {
             this.player.destroy();
         }
         if (endReason.mayStartNext) {
@@ -90,7 +108,7 @@ public final class TrackScheduler extends AudioEventAdapter {
     public BlockingQueue<AudioTrack> getQueue() {
         return this.queue;
     }
-    
+
     public enum LoopMode {
         NONE,
         TRACK,

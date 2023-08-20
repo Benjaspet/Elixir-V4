@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.benpetrillo.elixir</groupId>
     <artifactId>Elixir-V4</artifactId>
-    <version>4.0.0</version>
+    <version>4.1.0</version>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -27,12 +27,12 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.12</version>
+            <version>5.0.0-beta.13</version>
         </dependency>
         <dependency>
-            <groupId>com.github.walkyst</groupId>
-            <artifactId>lavaplayer-fork</artifactId>
-            <version>1.4.2</version>
+            <groupId>dev.arbjerg</groupId>
+            <artifactId>lavaplayer</artifactId>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>tech.xigam</groupId>
@@ -89,6 +89,11 @@
             <groupId>com.github.LowLevelSubmarine</groupId>
             <artifactId>GeniusLyricsAPI</artifactId>
             <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.5.4</version>
         </dependency>
     </dependencies>
 </project>
