@@ -18,6 +18,7 @@ public interface LaudiolinMessages {
         this.put("volume", LaudiolinMessages::volume);
         this.put("shuffle", LaudiolinMessages::shuffle);
         this.put("skip", LaudiolinMessages::skip);
+        this.put("seek", LaudiolinMessages::seek);
     }};
 
     /**
@@ -123,5 +124,20 @@ public interface LaudiolinMessages {
         for (var i = 0; i < skipAmount; i++) {
             scheduler.nextTrack();
         }
+    }
+
+    /**
+     * Handles the server's request to seek the current track.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void seek(LaudiolinInterface handle, JsonObject content) {
+        var message = Utilities.deserialize(content, LaudiolinTypes.Seek.class);
+        var player = handle.getManager().getAudioPlayer();
+
+        var currentTrack = player.getPlayingTrack();
+        if (currentTrack != null)
+            currentTrack.setPosition(message.getPosition());
     }
 }

@@ -1,6 +1,5 @@
 package dev.benpetrillo.elixir.music.laudiolin;
 
-import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -28,5 +27,11 @@ public interface LaudiolinTypes {
     final class Skip {
         // This message is server -> client.
         private int track;
+    }
+
+    @Getter
+    final class Seek {
+        // This message is server -> client.
+        private long position; // This is milliseconds.
     }
 }
