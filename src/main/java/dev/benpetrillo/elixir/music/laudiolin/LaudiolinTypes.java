@@ -1,7 +1,10 @@
 package dev.benpetrillo.elixir.music.laudiolin;
 
+import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.List;
 
 @SuppressWarnings("FieldMayBeFinal")
 public interface LaudiolinTypes {
@@ -44,5 +47,11 @@ public interface LaudiolinTypes {
         public Seek(float position) {
             this.seek = position;
         }
+    }
+
+    @AllArgsConstructor
+    final class Queue {
+        // This message is client -> server.
+        private final List<LaudiolinTrackInfo> queue;
     }
 }

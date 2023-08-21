@@ -2,10 +2,12 @@ package dev.benpetrillo.elixir.music.laudiolin;
 
 import com.google.gson.JsonObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +21,7 @@ public interface LaudiolinMessages {
         this.put("shuffle", LaudiolinMessages::shuffle);
         this.put("skip", LaudiolinMessages::skip);
         this.put("seek", LaudiolinMessages::seek);
+        this.put("queue", LaudiolinMessages::queue);
     }};
 
     /**
@@ -139,5 +142,35 @@ public interface LaudiolinMessages {
         var currentTrack = player.getPlayingTrack();
         if (currentTrack != null)
             currentTrack.setPosition(message.getPosition());
+    }
+
+    /**
+     * Handles the server's request to fetch all tracks in the queue.
+     * The server expects a 'queue' response.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void queue(LaudiolinInterface handle, JsonObject content) {
+        var message = Utilities.deserialize(content, LaudiolinTypes.Queue.class);
+        var scheduler = handle.getManager().getScheduler();
+
+        // Serialize the queue.
+        var tracks = scheduler.getQueue();
+        var queue = new ArrayList<LaudiolinTrackInfo>();
+        for (var track : tracks) {
+            var trackInfo = track.getInfo();
+            queue.add(LaudiolinTrackInfo.builder()
+                    .title(trackInfo.title)
+                    .artist(trackInfo.author)
+                    .icon(trackInfo.artworkUrl)
+                    .url(trackInfo.uri)
+                    .id(trackInfo.identifier)
+                    .duration((int) Math.floor(trackInfo.length / 1000f))
+                    .build());
+        }
+
+        // Send the queue to the server.
+        handle.send(new LaudiolinTypes.Queue(queue));
     }
 }

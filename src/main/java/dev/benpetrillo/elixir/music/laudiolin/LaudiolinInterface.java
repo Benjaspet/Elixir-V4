@@ -94,7 +94,9 @@ public final class LaudiolinInterface extends WebSocketClient {
         var tree = Utilities.tree(data).getAsJsonObject();
         tree.addProperty("type", typeName);
 
-        this.send(Utilities.serialize(tree));
+        if (this.isOpen()) {
+            this.send(Utilities.serialize(tree));
+        }
     }
 
     @Override

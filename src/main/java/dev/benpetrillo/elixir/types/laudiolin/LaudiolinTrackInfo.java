@@ -4,15 +4,14 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.laudiolin.LaudiolinAudioTrack;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public final class LaudiolinTrackInfo {
     private String title, artist, icon, url, id;
     private int duration; // in seconds
-
-    public LaudiolinTrackInfo() {
-    }
 
     /**
      * Converts this object into a Lavaplayer object.
