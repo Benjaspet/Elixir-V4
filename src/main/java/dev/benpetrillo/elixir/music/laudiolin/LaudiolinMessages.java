@@ -2,6 +2,8 @@ package dev.benpetrillo.elixir.music.laudiolin;
 
 import com.google.gson.JsonObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
+import dev.benpetrillo.elixir.music.TrackScheduler;
+import dev.benpetrillo.elixir.music.TrackScheduler.LoopMode;
 import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
@@ -22,6 +24,7 @@ public interface LaudiolinMessages {
         this.put("skip", LaudiolinMessages::skip);
         this.put("seek", LaudiolinMessages::seek);
         this.put("queue", LaudiolinMessages::queue);
+        this.put("loop", LaudiolinMessages::loop);
     }};
 
     /**
@@ -160,17 +163,28 @@ public interface LaudiolinMessages {
         var queue = new ArrayList<LaudiolinTrackInfo>();
         for (var track : tracks) {
             var trackInfo = track.getInfo();
-            queue.add(LaudiolinTrackInfo.builder()
-                    .title(trackInfo.title)
-                    .artist(trackInfo.author)
-                    .icon(trackInfo.artworkUrl)
-                    .url(trackInfo.uri)
-                    .id(trackInfo.identifier)
-                    .duration((int) Math.floor(trackInfo.length / 1000f))
-                    .build());
+            queue.add(LaudiolinTrackInfo.from(track));
         }
 
         // Send the queue to the server.
         handle.send(new LaudiolinTypes.Queue(queue));
+    }
+
+    /**
+     * Handles the server's request to set the player's loop.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void loop(LaudiolinInterface handle, JsonObject content) {
+        var message = Utilities.deserialize(content, LaudiolinTypes.Loop.class);
+        var scheduler = handle.getManager().getScheduler();
+
+        scheduler.repeating = switch (message.getLoopMode()) {
+            default -> throw new RuntimeException("Invalid loop mode.");
+            case 0 -> LoopMode.NONE;
+            case 1 -> LoopMode.QUEUE;
+            case 2 -> LoopMode.TRACK;
+        };
     }
 }

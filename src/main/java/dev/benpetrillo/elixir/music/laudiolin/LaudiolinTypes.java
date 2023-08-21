@@ -22,8 +22,9 @@ public interface LaudiolinTypes {
     }
 
     @Getter
+    @AllArgsConstructor
     final class Volume {
-        // This message is server -> client.
+        // This message is both ways.
         private int volume;
     }
 
@@ -53,5 +54,24 @@ public interface LaudiolinTypes {
     final class Queue {
         // This message is client -> server.
         private final List<LaudiolinTrackInfo> queue;
+    }
+
+    @AllArgsConstructor
+    final class Playing {
+        // This message is client -> server.
+        private final LaudiolinTrackInfo track;
+    }
+
+    @AllArgsConstructor
+    final class Paused {
+        // This message is client -> server.
+        private boolean pause;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    final class Loop {
+        // This message is both ways.
+        private int loopMode;
     }
 }

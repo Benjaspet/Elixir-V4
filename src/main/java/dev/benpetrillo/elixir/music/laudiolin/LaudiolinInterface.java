@@ -3,8 +3,15 @@ package dev.benpetrillo.elixir.music.laudiolin;
 import ch.qos.logback.classic.Level;
 import com.google.gson.JsonObject;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.player.event.PlayerPauseEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.PlayerResumeEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.TrackEndEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.TrackStartEvent;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
+import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import lombok.Getter;
@@ -27,6 +34,10 @@ public final class LaudiolinInterface extends WebSocketClient {
     private final TrackScheduler scheduler;
 
     private final Timer timer = new Timer();
+
+    private int lastVolume = 100;
+    private boolean lastPaused = false;
+    private AudioTrackInfo lastTrack = null;
 
     public LaudiolinInterface(GuildMusicManager manager, Guild guild) {
         super(ElixirConstants.LAUDIOLIN_API);
@@ -56,6 +67,22 @@ public final class LaudiolinInterface extends WebSocketClient {
                 LaudiolinInterface.this.update();
             }
         }, 0, 100);
+
+        // Add event listeners.
+        var player = this.getPlayer();
+        player.addListener(event -> {
+            if (event instanceof PlayerPauseEvent) {
+                this.send(new LaudiolinTypes.Paused(true));
+            } else if (event instanceof PlayerResumeEvent) {
+                this.send(new LaudiolinTypes.Paused(false));
+            } else if (event instanceof TrackStartEvent startEvent) {
+                this.send(new LaudiolinTypes.Playing(
+                        LaudiolinTrackInfo.from(startEvent.track)));
+            } else if (event instanceof TrackEndEvent endEvent) {
+                if (endEvent.endReason.mayStartNext) return;
+                this.send(new LaudiolinTypes.Playing(null));
+            }
+        });
     }
 
     @Override
@@ -72,9 +99,17 @@ public final class LaudiolinInterface extends WebSocketClient {
     private void update() {
         var player = this.getPlayer();
         var track = player.getPlayingTrack();
-        if (!player.isPaused() && track != null) {
+
+        // Update the current track position.
+        if (track != null) {
             this.send(new LaudiolinTypes.Seek(
                     track.getPosition() / 1000f));
+        }
+
+        // Update the current volume.
+        if (player.getVolume() != this.getLastVolume()) {
+            this.send(new LaudiolinTypes.Volume(player.getVolume()));
+            this.lastVolume = player.getVolume();
         }
     }
 
