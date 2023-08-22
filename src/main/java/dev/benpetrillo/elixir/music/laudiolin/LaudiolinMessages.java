@@ -1,8 +1,8 @@
 package dev.benpetrillo.elixir.music.laudiolin;
 
 import com.google.gson.JsonObject;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.music.TrackScheduler.LoopMode;
 import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
@@ -48,7 +48,7 @@ public interface LaudiolinMessages {
 
         handle.send(new LaudiolinTypes.Initialize(
                 ElixirConstants.LAUDIOLIN_TOKEN,
-                guild.getId()
+                ElixirClient.getId(), guild.getId()
         ));
 
         handle.getLogger().debug("Guild '{}' ({}) has finished initializing.",

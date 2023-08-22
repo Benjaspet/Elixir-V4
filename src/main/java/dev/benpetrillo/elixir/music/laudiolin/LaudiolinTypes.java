@@ -12,6 +12,7 @@ public interface LaudiolinTypes {
     final class Initialize {
         // This message is client -> server.
         private final String token;
+        private final String botId;
         private final String guildId;
     }
 
@@ -73,5 +74,13 @@ public interface LaudiolinTypes {
     final class Loop {
         // This message is both ways.
         private int loopMode;
+    }
+
+    @AllArgsConstructor
+    final class Guilds {
+        // This message is client -> server.
+        // This is sent over HTTP.
+        private String botId;
+        private List<String> inGuilds;
     }
 }

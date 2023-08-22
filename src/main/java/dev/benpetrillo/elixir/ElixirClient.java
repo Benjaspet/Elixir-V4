@@ -21,10 +21,7 @@ package dev.benpetrillo.elixir;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.benpetrillo.elixir.api.APIHandler;
 import dev.benpetrillo.elixir.events.*;
-import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
-import dev.benpetrillo.elixir.managers.ConfigStartupManager;
-import dev.benpetrillo.elixir.managers.DatabaseManager;
-import dev.benpetrillo.elixir.managers.MusicGameManager;
+import dev.benpetrillo.elixir.managers.*;
 import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -45,6 +42,8 @@ import java.io.IOException;
 
 public final class ElixirClient {
     @Getter private static String envFile;
+    @Getter private static String id;
+
     private static ElixirClient instance;
 
     public static ComplexCommandHandler commandHandler;
@@ -84,6 +83,7 @@ public final class ElixirClient {
                 .setBulkDeleteSplittingEnabled(true)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
+                        new GuildManager(),
                         new GuildListener(),
                         new ReadyListener(),
                         new ShutdownListener(),
@@ -108,6 +108,7 @@ public final class ElixirClient {
 
         this.jda = builder.build();
         commandHandler.setJda(this.jda);
+        id = this.jda.getSelfUser().getId();
 
         ApplicationCommandManager.initialize();
         OAuthUpdateTask.schedule(); DatabaseManager.create();

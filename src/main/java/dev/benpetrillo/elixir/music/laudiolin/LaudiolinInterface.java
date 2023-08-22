@@ -7,8 +7,6 @@ import com.sedmelluq.discord.lavaplayer.player.event.PlayerPauseEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.PlayerResumeEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.TrackEndEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.TrackStartEvent;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
@@ -21,11 +19,25 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 @Getter
 public final class LaudiolinInterface extends WebSocketClient {
+    private static final List<LaudiolinInterface> INSTANCES
+            = new ArrayList<>();
+
+    /**
+     * Dispatches a message to all connected clients.
+     *
+     * @param message The message to dispatch.
+     */
+    public static void dispatch(Object message) {
+        INSTANCES.forEach(instance -> instance.send(message));
+    }
+
     private final Logger logger;
     private final Guild guild;
 
@@ -36,8 +48,6 @@ public final class LaudiolinInterface extends WebSocketClient {
     private final Timer timer = new Timer();
 
     private int lastVolume = 100;
-    private boolean lastPaused = false;
-    private AudioTrackInfo lastTrack = null;
 
     public LaudiolinInterface(GuildMusicManager manager, Guild guild) {
         super(ElixirConstants.LAUDIOLIN_API);
@@ -54,6 +64,8 @@ public final class LaudiolinInterface extends WebSocketClient {
             ((ch.qos.logback.classic.Logger) this.logger)
                     .setLevel(Level.DEBUG);
         }
+
+        INSTANCES.add(this);
     }
 
     @Override
@@ -91,6 +103,8 @@ public final class LaudiolinInterface extends WebSocketClient {
 
         // Cancel the update task.
         this.getTimer().cancel();
+        // Remove the instance from the list.
+        INSTANCES.remove(this);
     }
 
     /**
@@ -110,6 +124,11 @@ public final class LaudiolinInterface extends WebSocketClient {
         if (player.getVolume() != this.getLastVolume()) {
             this.send(new LaudiolinTypes.Volume(player.getVolume()));
             this.lastVolume = player.getVolume();
+        }
+
+        // Check if the socket is connected.
+        if (!this.isOpen()) {
+            this.close(); // Close the socket.
         }
     }
 

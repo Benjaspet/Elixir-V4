@@ -20,6 +20,7 @@ package dev.benpetrillo.elixir.events;
 
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.managers.GuildManager;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -48,5 +49,7 @@ public final class ReadyListener extends ListenerAdapter {
                 ElixirClient.getLogger().error("An error occurred while deploying guild slash commands.");
             }
         }
+
+        GuildManager.loadGuilds();
     }
 }
