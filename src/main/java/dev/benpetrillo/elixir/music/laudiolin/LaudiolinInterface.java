@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.TrackEndEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.TrackStartEvent;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
+import dev.benpetrillo.elixir.music.TrackScheduler.LoopMode;
 import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -48,6 +49,7 @@ public final class LaudiolinInterface extends WebSocketClient {
     private final Timer timer = new Timer();
 
     private int lastVolume = 100;
+    private LoopMode lastLoopState = LoopMode.NONE;
 
     public LaudiolinInterface(GuildMusicManager manager, Guild guild) {
         super(ElixirConstants.LAUDIOLIN_API);
@@ -112,10 +114,11 @@ public final class LaudiolinInterface extends WebSocketClient {
      */
     private void update() {
         var player = this.getPlayer();
+        var scheduler = this.getScheduler();
         var track = player.getPlayingTrack();
 
         // Update the current track position.
-        if (track != null) {
+        if (!player.isPaused() && track != null) {
             this.send(new LaudiolinTypes.Seek(
                     track.getPosition() / 1000f));
         }
@@ -126,10 +129,40 @@ public final class LaudiolinInterface extends WebSocketClient {
             this.lastVolume = player.getVolume();
         }
 
-        // Check if the socket is connected.
-        if (!this.isOpen()) {
-            this.close(); // Close the socket.
+        // Update the current loop state.
+        if (scheduler.repeating != this.getLastLoopState()) {
+            this.send(new LaudiolinTypes.Loop(scheduler.repeating.getValue()));
+            this.lastLoopState = scheduler.repeating;
         }
+    }
+
+    public void sync() {
+        var player = this.getPlayer();
+        var track = player.getPlayingTrack();
+
+        this.send(LaudiolinTypes.Synchronize.builder()
+                .playingTrack(track != null ?
+                        LaudiolinTrackInfo.from(track) : null)
+                .build());
+    }
+
+    /**
+     * Performs a full sync with the Laudiolin backend.
+     */
+    public void fullSync() {
+        var player = this.getPlayer();
+        var scheduler = this.getScheduler();
+        var track = player.getPlayingTrack();
+
+        this.send(LaudiolinTypes.Synchronize.builder()
+                .playingTrack(track != null ?
+                        LaudiolinTrackInfo.from(track) : null)
+                .paused(player.isPaused())
+                .volume(player.getVolume())
+                .queue(scheduler.serialize())
+                .loopMode(scheduler.repeating.getValue())
+                .position(track != null ? track.getPosition() / 1000f : 0)
+                .build());
     }
 
     /**

@@ -50,6 +50,6 @@ public final class ReadyListener extends ListenerAdapter {
             }
         }
 
-        GuildManager.loadGuilds();
+        GuildManager.loadGuilds(jda);
     }
 }

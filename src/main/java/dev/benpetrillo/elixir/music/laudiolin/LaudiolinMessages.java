@@ -1,6 +1,7 @@
 package dev.benpetrillo.elixir.music.laudiolin;
 
 import com.google.gson.JsonObject;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler.LoopMode;
@@ -25,6 +26,7 @@ public interface LaudiolinMessages {
         this.put("seek", LaudiolinMessages::seek);
         this.put("queue", LaudiolinMessages::queue);
         this.put("loop", LaudiolinMessages::loop);
+        this.put("synchronize", LaudiolinMessages::synchronize);
     }};
 
     /**
@@ -180,11 +182,53 @@ public interface LaudiolinMessages {
         var message = Utilities.deserialize(content, LaudiolinTypes.Loop.class);
         var scheduler = handle.getManager().getScheduler();
 
-        scheduler.repeating = switch (message.getLoopMode()) {
-            default -> throw new RuntimeException("Invalid loop mode.");
-            case 0 -> LoopMode.NONE;
-            case 1 -> LoopMode.QUEUE;
-            case 2 -> LoopMode.TRACK;
-        };
+        scheduler.repeating = LoopMode.fromNumber(message.getLoopMode());
+    }
+
+    /**
+     * Handles the server's request to synchronize the player.
+     *
+     * @param handle The session that received the message.
+     * @param content The message that was sent.
+     */
+    static void synchronize(LaudiolinInterface handle, JsonObject content) {
+        var message = Utilities.deserialize(content, LaudiolinTypes.Synchronize.class);
+        var player = handle.getManager().getAudioPlayer();
+        var scheduler = handle.getManager().getScheduler();
+
+        if (message.getDoAll() != null && message.getDoAll()) {
+            handle.fullSync();
+        }
+        if (message.getPlayingTrack() != null) {
+            if (player.getPlayingTrack() != null)
+                player.stopTrack();
+
+            player.playTrack(message.getPlayingTrack().toAudioItem());
+        }
+        if (message.getPaused() != null) {
+            player.setPaused(message.getPaused());
+        }
+        if (message.getVolume() != null) {
+            player.setVolume(Utilities.clamp(
+                    message.getVolume(), 0, 150));
+        }
+        if (message.getQueue() != null) {
+            scheduler.setQueue(message.getQueue().stream()
+                    .map(LaudiolinTrackInfo::toAudioItem)
+                    .map(AudioTrack.class::cast)
+                    .toList());
+        }
+        if (message.getLoopMode() != null) {
+            scheduler.repeating = LoopMode.fromNumber(message.getLoopMode());
+        }
+        if (message.getPosition() != null) {
+            var playing = player.getPlayingTrack();
+            if (playing != null && playing.isSeekable()) {
+                playing.setPosition(Math.round(message.getPosition() * 1000f));
+            }
+        }
+        if (message.getShuffle() != null && message.getShuffle()) {
+            scheduler.shuffle();
+        }
     }
 }

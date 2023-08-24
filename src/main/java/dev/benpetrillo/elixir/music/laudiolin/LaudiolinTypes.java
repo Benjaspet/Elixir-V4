@@ -2,6 +2,7 @@ package dev.benpetrillo.elixir.music.laudiolin;
 
 import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -82,5 +83,19 @@ public interface LaudiolinTypes {
         // This is sent over HTTP.
         private String botId;
         private List<String> inGuilds;
+    }
+
+    @Getter
+    @Builder
+    final class Synchronize {
+        // This message is both ways.
+        private Boolean doAll;
+        private LaudiolinTrackInfo playingTrack; // This can be a 'blank track'.
+        private Boolean paused;
+        private Integer volume;
+        private List<LaudiolinTrackInfo> queue;
+        private Integer loopMode;
+        private Float position;
+        private Boolean shuffle;
     }
 }

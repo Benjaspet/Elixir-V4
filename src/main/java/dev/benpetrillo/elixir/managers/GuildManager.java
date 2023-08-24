@@ -6,6 +6,7 @@ import dev.benpetrillo.elixir.utilities.HttpUtil;
 import dev.benpetrillo.elixir.utilities.LaudiolinUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -27,8 +28,7 @@ public final class GuildManager extends ListenerAdapter {
     /**
      * Load the guilds from the database.
      */
-    public static void loadGuilds() {
-        var jda = ElixirClient.getJda();
+    public static void loadGuilds(JDA jda) {
         jda.getGuilds().forEach(guild ->
                 IN_GUILDS.add(guild.getId()));
         GuildManager.updateGuilds(IN_GUILDS);

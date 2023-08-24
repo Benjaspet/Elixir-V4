@@ -290,4 +290,16 @@ public final class Utilities {
     public static String getJDAVersion() {
         return JDAInfo.VERSION.split("_")[0];
     }
+
+    /**
+     * Clamps a value between a min and max.
+     *
+     * @param value The value to clamp.
+     * @param min The minimum value.
+     * @param max The maximum value.
+     * @return The clamped value.
+     */
+    public static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
 }
