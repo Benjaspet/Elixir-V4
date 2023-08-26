@@ -43,6 +43,7 @@ public final class ApplicationCommandManager {
 
     private ApplicationCommandManager(ComplexCommandHandler handler) {
         registerCommand(handler,
+                new GuildsCommand(),
                 new InfoCommand(),
                 new JoinCommand(),
                 new LoopCommand(),
