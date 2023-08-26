@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public interface LaudiolinUtil {
     /* HTTP client for this utility. */
-    String ENDPOINT = "http://localhost:3001";
+    String ENDPOINT = "https://app.seikimo.moe";
     OkHttpClient CLIENT = HttpUtil.getClient();
 
     /**
