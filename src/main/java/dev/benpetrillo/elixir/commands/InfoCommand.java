@@ -31,6 +31,8 @@ import java.lang.management.ManagementFactory;
 import java.time.OffsetDateTime;
 
 public final class InfoCommand extends Command {
+    private static final String INVITE = ElixirConstants.INVITE
+            .replace("{}", ElixirClient.getId());
 
     public InfoCommand() {
         super("info", "Get information about Elixir.");
@@ -71,7 +73,7 @@ public final class InfoCommand extends Command {
         final EmbedBuilder embed = new EmbedBuilder()
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setAuthor("Total Playing Streams: " + streams)
-                .setDescription("[Invite Elixir to your server!](" + ElixirConstants.INVITE + ")")
+                .setDescription("[Invite Elixir to your server!](" + INVITE + ")")
                 .addField("Bot Information", """
                         • Powered by: %s
                         • Developed by: Ponjo Studios

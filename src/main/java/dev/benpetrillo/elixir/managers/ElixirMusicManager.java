@@ -192,7 +192,7 @@ public final class ElixirMusicManager {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
                 ElixirClient.logger.debug("Track loaded: " + audioTrack.getInfo().title);
-                audioTrack.setUserData(ElixirConstants.BOT_ID);
+                audioTrack.setUserData(ElixirClient.getId());
                 musicManager.scheduler.queue(audioTrack);
                 callback.accept(audioTrack);
             }
@@ -205,7 +205,7 @@ public final class ElixirMusicManager {
                     this.trackLoaded(tracks.get(0));
                 } else {
                     for (final AudioTrack audioTrack : tracks) {
-                        audioTrack.setUserData(ElixirConstants.BOT_ID);
+                        audioTrack.setUserData(ElixirClient.getId());
                         musicManager.scheduler.queue(audioTrack);
                     }
                     callback.accept(tracks);

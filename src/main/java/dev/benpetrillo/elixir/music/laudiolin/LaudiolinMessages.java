@@ -203,7 +203,12 @@ public interface LaudiolinMessages {
             if (player.getPlayingTrack() != null)
                 player.stopTrack();
 
-            player.playTrack(message.getPlayingTrack().toAudioItem());
+            // Prepare the audio track...
+            var audioTrack = message.getPlayingTrack().toAudioItem();
+            // ...to append the bot's user ID.
+            audioTrack.setUserData(ElixirClient.getId());
+
+            player.playTrack(audioTrack);
         }
         if (message.getPaused() != null) {
             player.setPaused(message.getPaused());
@@ -215,6 +220,7 @@ public interface LaudiolinMessages {
         if (message.getQueue() != null) {
             scheduler.setQueue(message.getQueue().stream()
                     .map(LaudiolinTrackInfo::toAudioItem)
+                    .peek(track -> track.setUserData(ElixirClient.getId()))
                     .map(AudioTrack.class::cast)
                     .toList());
         }
