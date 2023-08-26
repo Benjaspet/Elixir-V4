@@ -39,8 +39,16 @@ import tech.xigam.cch.ComplexCommandHandler;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public final class ElixirClient {
+    @Getter private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+            2, 4, 60,
+            TimeUnit.SECONDS, new LinkedBlockingDeque<>()
+    );
+
     @Getter private static String envFile;
     @Getter private static String id;
 

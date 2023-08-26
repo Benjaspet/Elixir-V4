@@ -83,6 +83,7 @@ public interface LaudiolinTypes {
         // This is sent over HTTP.
         private String botId;
         private List<String> inGuilds;
+        private List<String> connectedGuilds;
     }
 
     @Getter

@@ -52,10 +52,7 @@ import org.apache.hc.core5.annotation.Internal;
 import org.jetbrains.annotations.Nullable;
 import tech.xigam.cch.utils.Interaction;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class ElixirMusicManager {
@@ -98,14 +95,20 @@ public final class ElixirMusicManager {
 
     public GuildMusicManager getMusicManager(Guild guild) {
         return this.musicManagers.computeIfAbsent(guild.getId(), (guildId) -> {
-            GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager, guild);
+            // Create the music manager.
+            var guildMusicManager = new GuildMusicManager(this.audioPlayerManager, guild);
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
+            // Update the guilds.
+            ElixirClient.getExecutor().submit(GuildManager::updateGuilds);
             return guildMusicManager;
         });
     }
 
     public void removeGuildMusicManager(Guild guild) {
+        // Remove the music manager.
         this.musicManagers.remove(guild.getId());
+        // Update the guilds.
+        ElixirClient.getExecutor().submit(GuildManager::updateGuilds);
     }
 
     @Nullable
@@ -113,8 +116,8 @@ public final class ElixirMusicManager {
         return this.musicManagers.get(guildId);
     }
 
-    public GuildMusicManager[] getMusicManagers() {
-        return this.musicManagers.values().toArray(new GuildMusicManager[0]);
+    public Collection<GuildMusicManager> getMusicManagers() {
+        return this.musicManagers.values();
     }
 
     public void loadAndPlay(String track, Interaction interaction, String url) {

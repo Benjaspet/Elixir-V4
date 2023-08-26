@@ -31,7 +31,7 @@ public final class GuildManager extends ListenerAdapter {
     public static void loadGuilds(JDA jda) {
         jda.getGuilds().forEach(guild ->
                 IN_GUILDS.add(guild.getId()));
-        GuildManager.updateGuilds(IN_GUILDS);
+        GuildManager.updateGuilds();
     }
 
     /**
@@ -41,7 +41,7 @@ public final class GuildManager extends ListenerAdapter {
      */
     public static void addNewGuild(Guild guild) {
         IN_GUILDS.add(guild.getId());
-        GuildManager.updateGuilds(IN_GUILDS);
+        GuildManager.updateGuilds();
     }
 
     /**
@@ -51,7 +51,7 @@ public final class GuildManager extends ListenerAdapter {
      */
     public static void removeGuild(Guild guild) {
         IN_GUILDS.remove(guild.getId());
-        GuildManager.updateGuilds(IN_GUILDS);
+        GuildManager.updateGuilds();
     }
 
     /**
@@ -66,12 +66,14 @@ public final class GuildManager extends ListenerAdapter {
 
     /**
      * Updates the guilds on the backend.
-     *
-     * @param guilds The guilds to update.
      */
-    private static void updateGuilds(List<String> guilds) {
+    public static void updateGuilds() {
         var botId = ElixirClient.getId();
-        var message = new LaudiolinTypes.Guilds(botId, guilds);
+        var message = new LaudiolinTypes.Guilds(botId,
+                GuildManager.IN_GUILDS,
+                ElixirMusicManager.getInstance().getMusicManagers().stream()
+                        .map(manager -> manager.getGuild().getId())
+                        .toList());
 
         // Prepare the request.
         var guildList = RequestBody.create(
