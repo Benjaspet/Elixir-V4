@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 public enum Source {
     YOUTUBE("https://youtu.be/"),
     SPOTIFY("https://open.spotify.com/track/"),
-    LAUDIOLIN("https://laudiolin.seikimo.moe/track/"),
+    LAUDIOLIN("https://laudiol.in/track/"),
     SOUNDCLOUD("https://www.soundcloud.com/"),
     UNKNOWN("");
 

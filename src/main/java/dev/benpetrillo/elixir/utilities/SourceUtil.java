@@ -58,7 +58,11 @@ public interface SourceUtil {
      * @return The track ID.
      */
     static String pullGenericId(String query) {
-        return query.split("/track/")[1];
+        var id = query.split("/track/")[1];
+        if (id.contains("?")) {
+            id = id.split("\\?")[0];
+        }
+        return id;
     }
 
     /**
