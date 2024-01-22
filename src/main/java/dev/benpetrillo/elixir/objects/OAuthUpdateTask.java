@@ -16,7 +16,7 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.tasks;
+package dev.benpetrillo.elixir.objects;
 
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;

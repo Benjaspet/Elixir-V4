@@ -75,6 +75,20 @@ public final class Utilities {
     }
 
     /**
+     * Send a message to a webhook.
+     *
+     * @param message The message to send.
+     */
+
+    public static void sendToWebhook(String message) {
+        var webhook = Config.get("DEBUG-WEBHOOK");
+
+        try (var client = WebhookClient.withUrl(webhook)) {
+            client.send(message);
+        }
+    }
+
+    /**
      * Determine if a URL is valid.
      * @param input The URL to check.
      * @return boolean

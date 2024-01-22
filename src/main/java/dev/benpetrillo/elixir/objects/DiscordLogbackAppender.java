@@ -1,0 +1,17 @@
+package dev.benpetrillo.elixir.objects;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.ConsoleAppender;
+import dev.benpetrillo.elixir.utilities.Utilities;
+
+import java.util.Arrays;
+
+public final class DiscordLogbackAppender extends ConsoleAppender<ILoggingEvent> {
+    @Override
+    protected void append(ILoggingEvent eventObject) {
+        if (!this.started) return;
+
+        Arrays.stream(new String(encoder.encode(eventObject)).split("\n\r"))
+                .forEach(Utilities::sendToWebhook);
+    }
+}
