@@ -7,12 +7,6 @@
         </encoder>
     </appender>
 
-    <appender name="DISCORD" class="dev.benpetrillo.elixir.objects.DiscordLogbackAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss} [%level] [%logger] %msg%n</pattern>
-        </encoder>
-    </appender>
-
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/latest.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -33,7 +27,6 @@
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="DISCORD"/>
         <appender-ref ref="FILE"/>
     </root>
 </Configuration>
