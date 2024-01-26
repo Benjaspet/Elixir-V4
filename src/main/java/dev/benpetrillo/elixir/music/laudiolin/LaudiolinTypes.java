@@ -90,13 +90,13 @@ public interface LaudiolinTypes {
     @Builder
     final class Synchronize {
         // This message is both ways.
-        private Boolean doAll;
-        private LaudiolinTrackInfo playingTrack; // This can be a 'blank track'.
-        private Boolean paused;
-        private Integer volume;
-        private List<LaudiolinTrackInfo> queue;
-        private Integer loopMode;
-        private Float position;
-        private Boolean shuffle;
+        @Builder.Default private Boolean doAll = null;
+        @Builder.Default private LaudiolinTrackInfo playingTrack = null;
+        @Builder.Default private Boolean paused = null;
+        @Builder.Default private Integer volume = null;
+        @Builder.Default private List<LaudiolinTrackInfo> queue = null;
+        @Builder.Default private Integer loopMode = null;
+        @Builder.Default private Float position = null;
+        @Builder.Default private Boolean shuffle = null;
     }
 }

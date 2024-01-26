@@ -123,12 +123,6 @@ public final class LaudiolinInterface extends WebSocketClient {
                     track.getPosition() / 1000f));
         }
 
-        // Update the current volume.
-        if (player.getVolume() != this.getLastVolume()) {
-            this.send(new LaudiolinTypes.Volume(player.getVolume()));
-            this.lastVolume = player.getVolume();
-        }
-
         // Update the current loop state.
         if (scheduler.repeating != this.getLastLoopState()) {
             this.send(new LaudiolinTypes.Loop(scheduler.repeating.getValue()));

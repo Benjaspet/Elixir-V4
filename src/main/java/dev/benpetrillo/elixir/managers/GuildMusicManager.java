@@ -25,6 +25,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.music.AudioPlayerSendHandler;
 import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.music.laudiolin.LaudiolinInterface;
+import dev.benpetrillo.elixir.music.laudiolin.LaudiolinTypes;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 
@@ -66,6 +67,26 @@ public final class GuildMusicManager {
     public void play(AudioPlaylist playlist) {
         for (var track : playlist.getTracks())
             this.getScheduler().queue(track);
+    }
+
+    /**
+     * Sets the volume of the audio player.
+     *
+     * @param volume The volume to set.
+     */
+    public void setVolume(int volume) {
+        volume = Math.max(0, Math.min(150, volume));
+
+        this.audioPlayer.setVolume(volume);
+        this.laudiolin.send(new LaudiolinTypes.Volume(volume));
+    }
+
+    /**
+     * Shuffles the queue.
+     */
+    public void shuffle() {
+        this.scheduler.shuffle();
+        this.laudiolin.send(new LaudiolinTypes.Queue(this.scheduler.serialize()));
     }
 
     public void stop() {

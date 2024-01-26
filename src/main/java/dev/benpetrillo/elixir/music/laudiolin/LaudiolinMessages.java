@@ -234,7 +234,7 @@ public interface LaudiolinMessages {
             }
         }
         if (message.getShuffle() != null && message.getShuffle()) {
-            scheduler.shuffle();
+            handle.getManager().shuffle();
         }
     }
 }
