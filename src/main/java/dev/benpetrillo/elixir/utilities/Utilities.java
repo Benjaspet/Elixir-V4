@@ -72,6 +72,7 @@ public final class Utilities {
             embed.addField(new WebhookEmbed.EmbedField(false, "Additional Information", exception.additionalInformation));
         }
         client.send(embed.build());
+        client.close();
     }
 
     /**
