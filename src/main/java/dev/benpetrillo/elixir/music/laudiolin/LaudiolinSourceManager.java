@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceM
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
+import dev.benpetrillo.elixir.objects.LoadArguments;
 import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.types.laudiolin.Source;
 import dev.benpetrillo.elixir.utilities.LaudiolinUtil;
@@ -64,8 +65,8 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
         if (trackInfo == null) trackInfo = LaudiolinUtil.fetch(trackId);
         if (trackInfo == null) throw new Exception("Invalid track info.");
 
-        return new LaudiolinAudioTrack(this.httpAudioSource,
-                trackInfo.toLavaplayer(), trackId);
+        return new LaudiolinAudioTrack(this.httpAudioSource, trackInfo.toLavaplayer(),
+                new LoadArguments(manager, reference, source), trackId);
     }
 
     /**
@@ -94,9 +95,11 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
 
                 // Create a collection of tracks.
                 var tracks = new ArrayList<AudioTrack>();
-                playlist.getTracks().forEach(track -> tracks.add(
-                        new LaudiolinAudioTrack(this.httpAudioSource,
-                                track.toLavaplayer(), track.getId())));
+                playlist.getTracks().forEach(track -> {
+                    var trackReference = new AudioReference(track.getId(), track.getTitle());
+                    tracks.add(new LaudiolinAudioTrack(this.httpAudioSource, track.toLavaplayer(),
+                            new LoadArguments(manager, trackReference, source), track.getId()));
+                });
 
                 // Return the playlist.
                 yield new BasicAudioPlaylist(playlist.getName(),
