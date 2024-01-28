@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 2024 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *

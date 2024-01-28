@@ -1,9 +1,11 @@
 package dev.benpetrillo.elixir.types.laudiolin;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.laudiolin.LaudiolinAudioTrack;
+import dev.benpetrillo.elixir.objects.LoadArguments;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,11 +58,10 @@ public final class LaudiolinTrackInfo {
      */
     public LaudiolinAudioTrack toAudioItem() {
         return new LaudiolinAudioTrack(
-                ElixirMusicManager.getInstance()
-                        .laudiolinSource
-                        .getHttpAudioSource(),
-                this.toLavaplayer(), this.getId()
-        );
+                ElixirMusicManager.getInstance().laudiolinSource.getHttpAudioSource(),
+                this.toLavaplayer(), new LoadArguments(
+                    ElixirMusicManager.getInstance().getAudioPlayerManager(),
+                    new AudioReference(this.id, this.title), Source.LAUDIOLIN), this.id);
     }
 
     @Override

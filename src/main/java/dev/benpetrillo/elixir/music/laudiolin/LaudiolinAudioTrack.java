@@ -9,6 +9,7 @@ import dev.benpetrillo.elixir.objects.LoadArguments;
 import dev.benpetrillo.elixir.utilities.LaudiolinUtil;
 
 public final class LaudiolinAudioTrack extends DelegatedAudioTrack {
+
     private final HttpAudioSourceManager httpAudioSource;
     private final LoadArguments fallback;
     private final String trackId;

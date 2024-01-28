@@ -24,6 +24,7 @@ import io.github.cdimascio.dotenv.DotenvEntry;
 import java.util.Set;
 
 public final class Config {
+
     private static final Dotenv dotenv = Dotenv.configure()
             .filename(ElixirClient.getEnvFile()).load();
 

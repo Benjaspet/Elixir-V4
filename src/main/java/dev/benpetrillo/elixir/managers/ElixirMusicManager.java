@@ -37,6 +37,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
+import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
@@ -68,8 +69,14 @@ public final class ElixirMusicManager {
 
     public ElixirMusicManager() {
         // Add the Laudiolin source manager.
-        this.audioPlayerManager.registerSourceManager(this.laudiolinSource);
+        if (!Config.get("LAUDIOLIN-HANDLE").isEmpty() || !ElixirConstants.LAUDIOLIN_TOKEN.isEmpty()) {
+            this.audioPlayerManager.registerSourceManager(this.laudiolinSource);
+            ElixirClient.logger.info("Laudiolin source manager registered.");
+        } else {
+            ElixirClient.logger.warn("Laudiolin source manager not registered. Please set the Laudiolin API in the config.");
+        }
 
+        this.audioPlayerManager.registerSourceManager(this.youtubeSource);
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());

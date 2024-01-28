@@ -20,6 +20,7 @@ import java.io.DataOutput;
 import java.util.ArrayList;
 
 public final class LaudiolinSourceManager implements AudioSourceManager {
+
     @Getter private final HttpAudioSourceManager httpAudioSource = new HttpAudioSourceManager();
     private final YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager();
     private final SpotifySourceManager spotifyAudioSourceManager = new SpotifySourceManager(this.youtubeAudioSourceManager);

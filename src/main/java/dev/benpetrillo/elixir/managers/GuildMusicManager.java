@@ -29,17 +29,20 @@ import dev.benpetrillo.elixir.music.laudiolin.LaudiolinTypes;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 
+@Getter
 public final class GuildMusicManager {
-    @Getter private final Guild guild;
-    @Getter public final AudioPlayer audioPlayer;
-    @Getter public final TrackScheduler scheduler;
-    @Getter private final LaudiolinInterface laudiolin;
+
+    private final Guild guild;
+    public final AudioPlayer audioPlayer;
+    public final TrackScheduler scheduler;
+    private final LaudiolinInterface laudiolin;
 
     public GuildMusicManager(AudioPlayerManager manager, Guild guild) {
         this.guild = guild;
         this.audioPlayer = manager.createPlayer();
         this.scheduler = new TrackScheduler(this);
         this.audioPlayer.addListener(this.scheduler);
+
         this.laudiolin = new LaudiolinInterface(this, guild);
 
         // Try connecting to the Laudiolin Backend.
