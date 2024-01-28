@@ -77,6 +77,12 @@ public final class ElixirMusicManager {
         }
 
         this.audioPlayerManager.registerSourceManager(this.youtubeSource);
+        if (!Config.get("SPOTIFY-CLIENT-ID").isEmpty() || !ElixirConstants.SPOTIFY_CLIENT_ID.isEmpty()) {
+            this.audioPlayerManager.registerSourceManager(this.spotifySource);
+            ElixirClient.logger.info("Spotify source manager registered.");
+        } else {
+            ElixirClient.logger.warn("Spotify source manager not registered. Please set the Spotify Client ID in the config.");
+        }
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
