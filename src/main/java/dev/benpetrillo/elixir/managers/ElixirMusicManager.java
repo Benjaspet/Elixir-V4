@@ -18,6 +18,15 @@
 
 package dev.benpetrillo.elixir.managers;
 
+import dev.benpetrillo.elixir.Config;
+import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
+import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
+import dev.benpetrillo.elixir.types.ElixirException;
+import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -37,14 +46,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
-import dev.benpetrillo.elixir.Config;
-import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
-import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
-import dev.benpetrillo.elixir.types.ElixirException;
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import dev.benpetrillo.elixir.utilities.Utilities;
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

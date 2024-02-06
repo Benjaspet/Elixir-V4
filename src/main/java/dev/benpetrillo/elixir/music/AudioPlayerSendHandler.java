@@ -42,7 +42,7 @@ public final class AudioPlayerSendHandler implements AudioSendHandler {
 
     @Override
     public boolean canProvide() {
-        return player.provide(this.frame);
+        return this.player.provide(this.frame);
     }
 
     @Override

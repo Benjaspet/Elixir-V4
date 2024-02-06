@@ -64,7 +64,7 @@ public final class StopCommand extends Command implements Arguments {
         ElixirMusicManager.getInstance() // Remove the guild music manager.
                 .removeGuildMusicManager(interaction.getGuild());
         interaction.reply(EmbedUtil.sendDefaultEmbed("The queue has been cleared" +
-                (shouldLeave ? "and the player has been stopped" : "") + "."));
+                (shouldLeave ? " and the player has been stopped" : "") + "."));
     }
 
     @Override
