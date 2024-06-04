@@ -31,15 +31,16 @@ import java.util.concurrent.TimeUnit;
 public final class OAuthUpdateTask extends TimerTask {
 
     public static void schedule() {
-        new Timer().schedule(new OAuthUpdateTask(), 0L, TimeUnit.MINUTES.toMillis(45));
+        var delay = TimeUnit.MINUTES.toMillis(45);
+        new Timer().schedule(new OAuthUpdateTask(), delay, delay);
     }
 
     @Override
     public void run() {
-//        try {
-//            SpotifySourceManager.authorize();
-//        } catch (IOException | ParseException | SpotifyWebApiException e) {
-//            ElixirClient.logger.debug(e.getMessage());
-//        }
+        try {
+            SpotifySourceManager.authorize();
+        } catch (IOException | ParseException | SpotifyWebApiException e) {
+            ElixirClient.logger.debug(e.getMessage());
+        }
     }
 }

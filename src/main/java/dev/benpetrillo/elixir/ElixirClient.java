@@ -121,7 +121,8 @@ public final class ElixirClient {
         id = this.jda.getSelfUser().getId();
 
         ApplicationCommandManager.initialize();
-        OAuthUpdateTask.schedule(); DatabaseManager.create();
+        OAuthUpdateTask.schedule();
+        DatabaseManager.create();
     }
 
     public static JDA getJda() {

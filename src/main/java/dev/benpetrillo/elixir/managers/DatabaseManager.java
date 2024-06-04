@@ -30,13 +30,17 @@ import lombok.Getter;
 
 public final class DatabaseManager {
 
+    private static MongoClient client;
     @Getter private static MongoCollection<Document> playlists;
-    
+
     public static void create() {
         String uri = Config.get("MONGO-URI");
-        try (MongoClient client = MongoClients.create(uri)) {
+        try {
+            DatabaseManager.client = MongoClients.create(uri);
+
             MongoDatabase db = client.getDatabase("Elixir");
             playlists = db.getCollection("playlists");
+
             ElixirClient.logger.info("Database loaded successfully.");
         } catch (Exception e) {
             ElixirClient.logger.error("Failed to load database: " + e.getMessage());

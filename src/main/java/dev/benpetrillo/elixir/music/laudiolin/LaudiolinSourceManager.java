@@ -5,12 +5,14 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
+import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.objects.LoadArguments;
 import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.types.laudiolin.Source;
 import dev.benpetrillo.elixir.utilities.LaudiolinUtil;
 import dev.benpetrillo.elixir.utilities.SourceUtil;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.SneakyThrows;
 
@@ -20,16 +22,19 @@ import java.util.ArrayList;
 
 public final class LaudiolinSourceManager implements AudioSourceManager {
 
+    private final boolean forceLaudiolin;
     private final HttpAudioSourceManager httpMan;
     private final YoutubeAudioSourceManager ytMan;
     private final SpotifySourceManager spotifyMan;
-    private final SoundCloudAudioSourceManager soundclouldMan;
+    private final SoundCloudAudioSourceManager soundCloudMan;
 
-    public LaudiolinSourceManager() {
-        this.httpMan = new HttpAudioSourceManager();
-        this.ytMan = new YoutubeAudioSourceManager();
-        this.spotifyMan = new SpotifySourceManager(this.ytMan);
-        this.soundclouldMan = SoundCloudAudioSourceManager.createDefault();
+    public LaudiolinSourceManager(ElixirMusicManager manager) {
+        this.forceLaudiolin = !ElixirConstants.FUCK_LAUDIOLIN;
+
+        this.httpMan = manager.httpSource;
+        this.ytMan = manager.youtubeSource;
+        this.spotifyMan = manager.spotifySource;
+        this.soundCloudMan = manager.soundCloudSource;
     }
 
     /**
@@ -44,7 +49,20 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
     private AudioItem loadTrack(Source source, String query, AudioPlayerManager manager, AudioReference ref) throws Exception {
         // Check if the source is SoundCloud.
         if (source == Source.SOUNDCLOUD) {
-            return this.soundclouldMan.loadItem(manager, ref);
+            return this.soundCloudMan.loadItem(manager, ref);
+        }
+
+        if (!this.forceLaudiolin) {
+            switch (source) {
+                case UNKNOWN, YOUTUBE -> {
+                    return this.ytMan.loadItem(manager, ref);
+                }
+                case SPOTIFY -> {
+                    return this.spotifyMan.loadItem(manager, ref);
+                }
+            }
+
+            // Everything else falls out of the if statement.
         }
 
         // Parse the track data.
@@ -89,7 +107,7 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
         return switch (source) {
             case YOUTUBE -> this.ytMan.loadItem(manager, reference);
             case SPOTIFY -> this.spotifyMan.loadItem(manager, reference);
-            case SOUNDCLOUD -> this.soundclouldMan.loadItem(manager, reference);
+            case SOUNDCLOUD -> this.soundCloudMan.loadItem(manager, reference);
             case LAUDIOLIN -> {
                 // Pull the playlist ID.
                 var playlistId = SourceUtil.pullPlaylistId(query);

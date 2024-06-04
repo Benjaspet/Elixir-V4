@@ -18,16 +18,6 @@
 
 package dev.benpetrillo.elixir.managers;
 
-import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingIpRoutePlanner;
-import dev.benpetrillo.elixir.Config;
-import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
-import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
-import dev.benpetrillo.elixir.types.ElixirException;
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import dev.benpetrillo.elixir.utilities.Utilities;
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
-
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -46,7 +36,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
-
+import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
+import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
+import dev.benpetrillo.elixir.types.ElixirException;
+import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -65,39 +61,21 @@ public final class ElixirMusicManager {
     private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
     @Getter private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
 
-    public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(true);
+    public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
+    public final HttpAudioSourceManager httpSource = new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY);
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
-
-    public LaudiolinSourceManager laudiolinSource;
+    public final LaudiolinSourceManager laudiolinSource = new LaudiolinSourceManager(this);
 
     public ElixirMusicManager() {
-        AudioPlayerManager apm = this.audioPlayerManager;
-
-        // Add the Laudiolin source manager.
-        if (!Config.get("LAUDIOLIN-HANDLE").isEmpty() || !ElixirConstants.LAUDIOLIN_TOKEN.isEmpty()) {
-            this.laudiolinSource = new LaudiolinSourceManager();
-            apm.registerSourceManager(this.laudiolinSource);
-            ElixirClient.logger.info("Laudiolin source manager registered.");
-        } else {
-            ElixirClient.logger.warn("Laudiolin source manager not registered. Please set the Laudiolin API in the config.");
-        }
-
-        apm.registerSourceManager(this.youtubeSource);
-        if (!Config.get("SPOTIFY-CLIENT-ID").isEmpty() || !ElixirConstants.SPOTIFY_CLIENT_ID.isEmpty()) {
-            apm.registerSourceManager(this.spotifySource);
-            ElixirClient.logger.info("Spotify source manager registered.");
-        } else {
-            ElixirClient.logger.warn("Spotify source manager not registered. Please set the Spotify Client ID in the config.");
-        }
-        apm.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        apm.registerSourceManager(new BandcampAudioSourceManager());
-        apm.registerSourceManager(new VimeoAudioSourceManager());
-        apm.registerSourceManager(new TwitchStreamAudioSourceManager());
-        apm.registerSourceManager(new BeamAudioSourceManager());
-        apm.registerSourceManager(new GetyarnAudioSourceManager());
-        apm.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
-        AudioSourceManagers.registerLocalSource(apm);
+        this.audioPlayerManager.registerSourceManager(this.laudiolinSource);
+        this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(new GetyarnAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(this.httpSource);
+        AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
 
         // IPv6 rotation setup.
         // If the bot receives a 429 from YouTube, it will rotate the IP address to another, provided that
@@ -106,10 +84,9 @@ public final class ElixirMusicManager {
         if (!ElixirConstants.IPV6_BLOCK.isEmpty()) {
             new YoutubeIpRotatorSetup(
                     new NanoIpRoutePlanner(Collections.singletonList(new Ipv6Block(ElixirConstants.IPV6_BLOCK)), true))
-                .forConfiguration(this.youtubeSource.getHttpInterfaceManager(), false)
-                .withMainDelegateFilter(null)
-                .withRetryLimit(Integer.parseInt(Config.get("YOUTUBE-RETRY-LIMIT")))
-                .setup();
+                    .forManager(this.audioPlayerManager)
+                    .withMainDelegateFilter(null)
+                    .setup();
             ElixirClient.logger.info("IPv6 rotator block set to " + ElixirConstants.IPV6_BLOCK + ".");
         } else {
             ElixirClient.logger.warn("You are not using an IPv6 rotator. This may cause issues with YouTube and rate-limiting.");
@@ -203,7 +180,6 @@ public final class ElixirMusicManager {
             @Override
             public void loadFailed(FriendlyException exception) {
                 Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception));
-                System.out.print(exception.getMessage());
                 interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track."));
             }
         });

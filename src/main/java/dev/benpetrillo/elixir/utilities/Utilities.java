@@ -98,7 +98,7 @@ public final class Utilities {
         try {
             new URI(input).toURL();
             return true;
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
             return false;
         }
     }
