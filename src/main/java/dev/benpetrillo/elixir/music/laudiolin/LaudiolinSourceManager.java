@@ -104,6 +104,19 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
             Source source, String query,
             AudioPlayerManager manager, AudioReference reference
     ) throws Exception {
+        if (!this.forceLaudiolin) {
+            switch (source) {
+                case UNKNOWN, YOUTUBE -> {
+                    return this.ytMan.loadItem(manager, reference);
+                }
+                case SPOTIFY -> {
+                    return this.spotifyMan.loadItem(manager, reference);
+                }
+            }
+
+            // Everything else falls out of the if statement.
+        }
+
         return switch (source) {
             case YOUTUBE -> this.ytMan.loadItem(manager, reference);
             case SPOTIFY -> this.spotifyMan.loadItem(manager, reference);
