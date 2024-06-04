@@ -77,7 +77,8 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
             audioManager.setSelfDeafened(true);
         }
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
-        final List<PlaylistTrack> tracks = PlaylistUtil.getTracks(playlist); TrackUtil.appendUser(member.getId(), tracks);
+        final List<PlaylistTrack> tracks = PlaylistUtil.getTracks(playlist);
+        TrackUtil.appendUser(member.getId(), tracks);
         if (playlist.options.shuffle) Collections.shuffle(tracks);
         if (musicManager.scheduler.queue.isEmpty() && musicManager.audioPlayer.getPlayingTrack() == null) {
             musicManager.scheduler.repeating = playlist.options.repeat ? TrackScheduler.LoopMode.QUEUE : TrackScheduler.LoopMode.NONE;
