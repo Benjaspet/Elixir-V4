@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.managers;
 
+import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingIpRoutePlanner;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
@@ -39,7 +40,6 @@ import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -47,6 +47,7 @@ import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -64,34 +65,39 @@ public final class ElixirMusicManager {
     private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
     @Getter private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
 
-    public final LaudiolinSourceManager laudiolinSource = new LaudiolinSourceManager();
-    public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
+    public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager(true);
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
 
+    public LaudiolinSourceManager laudiolinSource;
+
     public ElixirMusicManager() {
+        AudioPlayerManager apm = this.audioPlayerManager;
+
         // Add the Laudiolin source manager.
         if (!Config.get("LAUDIOLIN-HANDLE").isEmpty() || !ElixirConstants.LAUDIOLIN_TOKEN.isEmpty()) {
-            this.audioPlayerManager.registerSourceManager(this.laudiolinSource);
+            this.laudiolinSource = new LaudiolinSourceManager();
+            apm.registerSourceManager(this.laudiolinSource);
             ElixirClient.logger.info("Laudiolin source manager registered.");
         } else {
             ElixirClient.logger.warn("Laudiolin source manager not registered. Please set the Laudiolin API in the config.");
         }
 
-        this.audioPlayerManager.registerSourceManager(this.youtubeSource);
+        apm.registerSourceManager(this.youtubeSource);
         if (!Config.get("SPOTIFY-CLIENT-ID").isEmpty() || !ElixirConstants.SPOTIFY_CLIENT_ID.isEmpty()) {
-            this.audioPlayerManager.registerSourceManager(this.spotifySource);
+            apm.registerSourceManager(this.spotifySource);
             ElixirClient.logger.info("Spotify source manager registered.");
         } else {
             ElixirClient.logger.warn("Spotify source manager not registered. Please set the Spotify Client ID in the config.");
         }
-        this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
-        this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
-        this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        this.audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
-        this.audioPlayerManager.registerSourceManager(new GetyarnAudioSourceManager());
-        this.audioPlayerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
-        AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+        apm.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        apm.registerSourceManager(new BandcampAudioSourceManager());
+        apm.registerSourceManager(new VimeoAudioSourceManager());
+        apm.registerSourceManager(new TwitchStreamAudioSourceManager());
+        apm.registerSourceManager(new BeamAudioSourceManager());
+        apm.registerSourceManager(new GetyarnAudioSourceManager());
+        apm.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
+        AudioSourceManagers.registerLocalSource(apm);
 
         // IPv6 rotation setup.
         // If the bot receives a 429 from YouTube, it will rotate the IP address to another, provided that
@@ -100,8 +106,10 @@ public final class ElixirMusicManager {
         if (!ElixirConstants.IPV6_BLOCK.isEmpty()) {
             new YoutubeIpRotatorSetup(
                     new NanoIpRoutePlanner(Collections.singletonList(new Ipv6Block(ElixirConstants.IPV6_BLOCK)), true))
-                    .forSource(this.youtubeSource)
-                    .setup();
+                .forConfiguration(this.youtubeSource.getHttpInterfaceManager(), false)
+                .withMainDelegateFilter(null)
+                .withRetryLimit(Integer.parseInt(Config.get("YOUTUBE-RETRY-LIMIT")))
+                .setup();
             ElixirClient.logger.info("IPv6 rotator block set to " + ElixirConstants.IPV6_BLOCK + ".");
         } else {
             ElixirClient.logger.warn("You are not using an IPv6 rotator. This may cause issues with YouTube and rate-limiting.");
@@ -195,6 +203,7 @@ public final class ElixirMusicManager {
             @Override
             public void loadFailed(FriendlyException exception) {
                 Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception));
+                System.out.print(exception.getMessage());
                 interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track."));
             }
         });

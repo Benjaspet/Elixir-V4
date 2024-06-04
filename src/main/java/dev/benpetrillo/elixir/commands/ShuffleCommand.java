@@ -29,10 +29,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public final class ShuffleCommand extends Command {
 
     public ShuffleCommand() {

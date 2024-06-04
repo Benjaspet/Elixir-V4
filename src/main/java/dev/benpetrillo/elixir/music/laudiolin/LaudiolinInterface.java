@@ -16,6 +16,7 @@ import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.enums.ReadyState;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,9 @@ public final class LaudiolinInterface extends WebSocketClient {
      * @param data The message to send.
      */
     public void send(Object data) {
+        if (!this.isOpen() || this.getReadyState() != ReadyState.OPEN) {
+            return;
+        }
         // Determine the type to send.
         var typeName = data.getClass().getSimpleName();
         // De-capitalize the first letter.
@@ -175,9 +179,7 @@ public final class LaudiolinInterface extends WebSocketClient {
         var tree = Utilities.tree(data).getAsJsonObject();
         tree.addProperty("type", typeName);
 
-        if (this.isOpen()) {
-            this.send(Utilities.serialize(tree));
-        }
+        this.send(Utilities.serialize(tree));
     }
 
     @Override

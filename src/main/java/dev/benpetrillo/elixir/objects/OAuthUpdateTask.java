@@ -36,10 +36,10 @@ public final class OAuthUpdateTask extends TimerTask {
 
     @Override
     public void run() {
-        try {
-            SpotifySourceManager.authorize();
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            ElixirClient.logger.debug(e.getMessage());
-        }
+//        try {
+//            SpotifySourceManager.authorize();
+//        } catch (IOException | ParseException | SpotifyWebApiException e) {
+//            ElixirClient.logger.debug(e.getMessage());
+//        }
     }
 }

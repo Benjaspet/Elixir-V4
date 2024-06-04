@@ -30,9 +30,7 @@ import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDAInfo;
 import org.apache.commons.lang3.StringUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -95,12 +93,12 @@ public final class Utilities {
      * @return boolean
      */
 
+    @SuppressWarnings("unused")
     public static boolean isValidURL(String input) {
         try {
-            new URL(input);
+            new URI(input).toURL();
             return true;
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             return false;
         }
     }
@@ -112,9 +110,7 @@ public final class Utilities {
      */
 
     public static String encodeURIComponent(String str) {
-        String result;
-        result = URLEncoder.encode(str, StandardCharsets.UTF_8);
-        return result;
+        return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
 
     /**

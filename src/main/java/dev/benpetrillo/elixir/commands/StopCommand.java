@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo. All rights reserved.
+ * Copyright © 202 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands;
 
+import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
@@ -41,10 +42,7 @@ public final class StopCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
-            return;
-        }
+        CommandChecks.runIsInGuildCheck(interaction);
 
         assert interaction.getMember() != null;
         final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();

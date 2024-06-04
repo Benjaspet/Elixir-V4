@@ -215,11 +215,11 @@ public final class TrackUtil {
         Collection<AudioTrackInfo> trackInfoCollection = new ArrayList<>();
         switch (type) {
             case SPOTIFY -> {
-                var tracks = TrackUtil.getPlaylistDataFromSpotifyUrl(url);
+                List<se.michaelthelin.spotify.model_objects.specification.PlaylistTrack> tracks = TrackUtil.getPlaylistDataFromSpotifyUrl(url);
                 if (tracks == null) return null;
-                for(var track : tracks) {
+                for(se.michaelthelin.spotify.model_objects.specification.PlaylistTrack track : tracks) {
                     Track playlistItem = (Track) track.getTrack();
-                    var trackInfo = new ExtendedAudioTrackInfo(
+                    ExtendedAudioTrackInfo trackInfo = new ExtendedAudioTrackInfo(
                             playlistItem.getName(), playlistItem.getArtists()[0].getName(),
                             playlistItem.getDurationMs(), playlistItem.getId(), false,
                             playlistItem.getHref()
@@ -230,7 +230,7 @@ public final class TrackUtil {
             }
             case YOUTUBE -> {
                 YTVideoData searchData = HttpUtil.getPlaylistData(Utilities.extractPlaylistId(url));
-                for(var video : searchData.items) {
+                for(YTVideoData.Item video : searchData.items) {
                     YTVideoData.Item.Snippet query = video.snippet;
                     long length = Utilities.cleanYouTubeFormat(video.contentDetails.duration);
                     trackInfoCollection.add(new AudioTrackInfo(

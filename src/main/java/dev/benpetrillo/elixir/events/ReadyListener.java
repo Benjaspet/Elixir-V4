@@ -46,7 +46,8 @@ public final class ReadyListener extends ListenerAdapter {
                     ElixirClient.getLogger().info("All guild slash commands have been deleted.");
                 }
             } else {
-                ElixirClient.getLogger().error("An error occurred while deploying guild slash commands.");
+                ElixirClient.getLogger().warn("Could not deploy guild commands for guild with ID: {}.", id);
+                ElixirClient.getLogger().warn("No valid guilds were provided, or the bot is not in this guild.");
             }
         }
 

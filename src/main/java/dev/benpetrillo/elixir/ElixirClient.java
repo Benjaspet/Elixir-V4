@@ -26,6 +26,7 @@ import dev.benpetrillo.elixir.objects.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import lombok.Getter;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -33,25 +34,18 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import okhttp3.OkHttpClient;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.UserInterruptException;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.xigam.cch.ComplexCommandHandler;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOError;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public final class ElixirClient {
+
     @Getter private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
             2, 4, 60,
             TimeUnit.SECONDS, new LinkedBlockingDeque<>()
@@ -61,11 +55,9 @@ public final class ElixirClient {
     @Getter private static String id;
 
     @Getter private static ElixirClient instance;
-    private static org.jline.reader.LineReader lineReader;
 
     @Getter public static ComplexCommandHandler commandHandler;
-    @Getter public static Logger logger =
-            LoggerFactory.getLogger("Elixir");
+    @Getter public static Logger logger = LoggerFactory.getLogger("Elixir");
 
     public JDA jda;
 
@@ -91,6 +83,7 @@ public final class ElixirClient {
         commandHandler = new ComplexCommandHandler(usePrefix).setPrefix(ElixirConstants.COMMAND_PREFIX);
 
         logger.info("JDA Version: " + Utilities.getJDAVersion());
+
         final JDABuilder builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
@@ -103,8 +96,7 @@ public final class ElixirClient {
                         new GuildManager(),
                         new GuildListener(),
                         new ReadyListener(),
-                        new ShutdownListener(),
-                        new MusicGameManager.Listener()
+                        new ShutdownListener()
                 )
                 .enableIntents(
                         GatewayIntent.DIRECT_MESSAGES,
@@ -124,6 +116,7 @@ public final class ElixirClient {
         }
 
         this.jda = builder.build();
+
         commandHandler.setJda(this.jda);
         id = this.jda.getSelfUser().getId();
 

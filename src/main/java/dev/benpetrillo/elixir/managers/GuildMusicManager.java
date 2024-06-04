@@ -22,10 +22,12 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.music.AudioPlayerSendHandler;
 import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.music.laudiolin.LaudiolinInterface;
 import dev.benpetrillo.elixir.music.laudiolin.LaudiolinTypes;
+import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 
@@ -34,6 +36,7 @@ public final class GuildMusicManager {
 
     private final Guild guild;
     public final AudioPlayer audioPlayer;
+    @Getter
     public final TrackScheduler scheduler;
     private final LaudiolinInterface laudiolin;
 
@@ -42,11 +45,11 @@ public final class GuildMusicManager {
         this.audioPlayer = manager.createPlayer();
         this.scheduler = new TrackScheduler(this);
         this.audioPlayer.addListener(this.scheduler);
-
         this.laudiolin = new LaudiolinInterface(this, guild);
-
-        // Try connecting to the Laudiolin Backend.
-        this.laudiolin.connect();
+        // Try connecting to the Laudiolin backend.
+        if (Config.get("LAUDIOLIN-API") != null && !Config.get("LAUDIOLIN-API").isEmpty()) {
+            this.laudiolin.connect();
+        }
     }
 
     public AudioPlayerSendHandler getSendHandler() {
@@ -81,7 +84,9 @@ public final class GuildMusicManager {
         volume = Math.max(0, Math.min(150, volume));
 
         this.audioPlayer.setVolume(volume);
-        this.laudiolin.send(new LaudiolinTypes.Volume(volume));
+        if (this.laudiolin != null) {
+            this.laudiolin.send(new LaudiolinTypes.Volume(volume));
+        }
     }
 
     /**
@@ -89,6 +94,7 @@ public final class GuildMusicManager {
      */
     public void shuffle() {
         this.scheduler.shuffle();
+        assert this.laudiolin != null;
         this.laudiolin.send(new LaudiolinTypes.Queue(this.scheduler.serialize()));
     }
 
@@ -97,6 +103,7 @@ public final class GuildMusicManager {
         this.audioPlayer.destroy(); // Destroy the audio player.
         this.scheduler.queue.clear(); // Clear the queue.
         this.scheduler.repeating = TrackScheduler.LoopMode.NONE; // Disable loop mode.
+        assert this.laudiolin != null;
         this.laudiolin.close(); // Close the laudiolin interface.
     }
 }

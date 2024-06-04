@@ -13,8 +13,7 @@ public interface SourceUtil {
      * @return The source.
      */
     static Source identify(String query) {
-        if (query.contains("youtu.be") ||
-            query.contains("youtube.com"))
+        if (query.contains("youtu.be") || query.contains("youtube.com"))
             return Source.YOUTUBE;
 
         if (query.contains("open.spotify.com"))

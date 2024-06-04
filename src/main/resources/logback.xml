@@ -25,6 +25,9 @@
 
     <logger name="moe.seikimo.laudiolin" level="${LOG_LEVEL}"/>
 
+    <logger name="net.dv8tion.jda.api.JDA" level="WARN"/>
+    <logger name="net.dv8tion.jda.internal.requests" level="WARN"/>
+
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>

@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.objects.LoadArguments;
@@ -12,7 +11,7 @@ import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import dev.benpetrillo.elixir.types.laudiolin.Source;
 import dev.benpetrillo.elixir.utilities.LaudiolinUtil;
 import dev.benpetrillo.elixir.utilities.SourceUtil;
-import lombok.Getter;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.SneakyThrows;
 
 import java.io.DataInput;
@@ -21,10 +20,17 @@ import java.util.ArrayList;
 
 public final class LaudiolinSourceManager implements AudioSourceManager {
 
-    @Getter private final HttpAudioSourceManager httpAudioSource = new HttpAudioSourceManager();
-    private final YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager();
-    private final SpotifySourceManager spotifyAudioSourceManager = new SpotifySourceManager(this.youtubeAudioSourceManager);
-    private final SoundCloudAudioSourceManager soundCloudAudioSourceManager = SoundCloudAudioSourceManager.createDefault();
+    private final HttpAudioSourceManager httpMan;
+    private final YoutubeAudioSourceManager ytMan;
+    private final SpotifySourceManager spotifyMan;
+    private final SoundCloudAudioSourceManager soundclouldMan;
+
+    public LaudiolinSourceManager() {
+        this.httpMan = new HttpAudioSourceManager();
+        this.ytMan = new YoutubeAudioSourceManager();
+        this.spotifyMan = new SpotifySourceManager(this.ytMan);
+        this.soundclouldMan = SoundCloudAudioSourceManager.createDefault();
+    }
 
     /**
      * Loads an audio track.
@@ -32,17 +38,14 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
      * @param source The audio source.
      * @param query The audio query.
      * @param manager The audio player manager.
-     * @param reference The audio reference.
+     * @param ref The audio reference.
      * @return The loaded audio track.
      */
-    private AudioItem loadTrack(
-            Source source, String query,
-            AudioPlayerManager manager, AudioReference reference
-    ) throws Exception {
+    private AudioItem loadTrack(Source source, String query, AudioPlayerManager manager, AudioReference ref) throws Exception {
         // Check if the source is SoundCloud.
-        if (source == Source.SOUNDCLOUD)
-            return this.soundCloudAudioSourceManager
-                    .loadItem(manager, reference);
+        if (source == Source.SOUNDCLOUD) {
+            return this.soundclouldMan.loadItem(manager, ref);
+        }
 
         // Parse the track data.
         var trackId = query;
@@ -66,8 +69,8 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
         if (trackInfo == null) trackInfo = LaudiolinUtil.fetch(trackId);
         if (trackInfo == null) throw new Exception("Invalid track info.");
 
-        return new LaudiolinAudioTrack(this.httpAudioSource, trackInfo.toLavaplayer(),
-                new LoadArguments(manager, reference, source), trackId);
+        return new LaudiolinAudioTrack(this.httpMan, trackInfo.toLavaplayer(),
+                new LoadArguments(manager, ref, source), trackId);
     }
 
     /**
@@ -84,9 +87,9 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
             AudioPlayerManager manager, AudioReference reference
     ) throws Exception {
         return switch (source) {
-            case YOUTUBE -> this.youtubeAudioSourceManager.loadItem(manager, reference);
-            case SPOTIFY -> this.spotifyAudioSourceManager.loadItem(manager, reference);
-            case SOUNDCLOUD -> this.soundCloudAudioSourceManager.loadItem(manager, reference);
+            case YOUTUBE -> this.ytMan.loadItem(manager, reference);
+            case SPOTIFY -> this.spotifyMan.loadItem(manager, reference);
+            case SOUNDCLOUD -> this.soundclouldMan.loadItem(manager, reference);
             case LAUDIOLIN -> {
                 // Pull the playlist ID.
                 var playlistId = SourceUtil.pullPlaylistId(query);
@@ -98,7 +101,7 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
                 var tracks = new ArrayList<AudioTrack>();
                 playlist.getTracks().forEach(track -> {
                     var trackReference = new AudioReference(track.getId(), track.getTitle());
-                    tracks.add(new LaudiolinAudioTrack(this.httpAudioSource, track.toLavaplayer(),
+                    tracks.add(new LaudiolinAudioTrack(this.httpMan, track.toLavaplayer(),
                             new LoadArguments(manager, trackReference, source), track.getId()));
                 });
 
@@ -112,7 +115,7 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
 
     @Override
     public String getSourceName() {
-        return "laudiolin";
+        return "Laudiolin Backend";
     }
 
     @Override
@@ -133,14 +136,10 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
     }
 
     @Override
-    public boolean isTrackEncodable(AudioTrack track) {
-        return false;
-    }
+    public boolean isTrackEncodable(AudioTrack track) { return false; }
 
     @Override
-    public void encodeTrack(AudioTrack track, DataOutput output) {
-
-    }
+    public void encodeTrack(AudioTrack track, DataOutput output) {}
 
     @Override
     public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
@@ -148,7 +147,9 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown() {}
 
+    public HttpAudioSourceManager getHttpAudioSource() {
+        return this.httpMan;
     }
 }

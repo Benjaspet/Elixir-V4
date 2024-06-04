@@ -22,20 +22,10 @@ import tech.xigam.express.Request;
 
 public final class GeneralEndpoints {
 
-    /**
-     * /
-     * The index page.
-     */
-    
     public static void indexEndpoint(Request request) {
         request.respond("Welcome to the Elixir API!");
     }
 
-    /**
-     * /404
-     * The not found page.
-     */
-    
     public static void notFoundEndpoint(Request request) {
         request.code(404).respond("The requested resource was not found on our servers.");
     }

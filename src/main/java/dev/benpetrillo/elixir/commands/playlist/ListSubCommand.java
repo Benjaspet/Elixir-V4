@@ -45,6 +45,7 @@ public final class ListSubCommand extends SubCommand implements Arguments {
         int page = interaction.getArgument("page", 1L, Long.class).intValue();
         if (page == 0) page = 1; // Fallback the page to 1 if it's 0.
         final List<CustomPlaylist> playlists = PlaylistUtil.getAllPlaylists();
+        ElixirClient.getLogger().info("Playlists: " + playlists.size());
         int maxAmount = Math.min(playlists.size(), 12);
         int totalPages = playlists.size() / maxAmount;
         if (page > totalPages) {
