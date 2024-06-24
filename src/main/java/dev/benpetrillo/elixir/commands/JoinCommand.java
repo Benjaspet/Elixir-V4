@@ -22,12 +22,10 @@ import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
-
-import java.util.Objects;
 
 public final class JoinCommand extends Command {
 
@@ -51,12 +49,13 @@ public final class JoinCommand extends Command {
             return;
         }
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
-        final VoiceChannel memberChannel = Objects.requireNonNull(memberVoiceState.getChannel()).asVoiceChannel();
+        final AudioChannel audioChannel = memberVoiceState.getChannel();
         assert voiceState != null;
+        assert audioChannel != null;
         if (!voiceState.inAudioChannel()) {
-            audioManager.openAudioConnection(memberChannel);
+            audioManager.openAudioConnection(audioChannel);
             audioManager.setSelfDeafened(true);
-            String name = memberChannel.getName();
+            String name = audioChannel.getName();
             MessageEmbed embed = EmbedUtil.sendDefaultEmbed(String.format("I've connected to **%s** successfully.", name));
             interaction.reply(embed, false);
 
