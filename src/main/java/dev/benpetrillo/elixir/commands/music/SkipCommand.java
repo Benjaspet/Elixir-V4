@@ -20,6 +20,7 @@ package dev.benpetrillo.elixir.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
@@ -46,10 +47,9 @@ public final class SkipCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
-            return;
-        }
+
+        CommandChecks.runIsInGuildCheck(interaction);
+
         if (AudioUtil.audioCheck(interaction)) return;
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
@@ -67,8 +67,13 @@ public final class SkipCommand extends Command implements Arguments {
             final MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
             interaction.reply(embed, false);
         }
-        final long skipTo = (long) interaction.getArguments().getOrDefault("track", 1L);
+        final long skipTo = interaction.getArgument("track", 1L, Long.class);
         assert musicManager.scheduler.queue.peek() != null;
+        if (skipTo < 1 || skipTo > musicManager.scheduler.queue.size()) {
+            final MessageEmbed embed = EmbedUtil.sendErrorEmbed("Invalid track number.");
+            interaction.reply(embed, false);
+            return;
+        }
         final AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
         for (int i = 0; i < skipTo; i++) {
             musicManager.scheduler.nextTrack();

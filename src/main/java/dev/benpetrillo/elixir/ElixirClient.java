@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
+ * Copyright © 2024 Ben Petrillo, KingRainbow44. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -21,16 +21,17 @@ package dev.benpetrillo.elixir;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.benpetrillo.elixir.api.APIHandler;
 import dev.benpetrillo.elixir.events.*;
-import dev.benpetrillo.elixir.managers.ApplicationCommandManager;
-import dev.benpetrillo.elixir.managers.ConfigStartupManager;
-import dev.benpetrillo.elixir.managers.DatabaseManager;
-import dev.benpetrillo.elixir.tasks.OAuthUpdateTask;
+import dev.benpetrillo.elixir.managers.*;
+import dev.benpetrillo.elixir.objects.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import lombok.Getter;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -39,30 +40,40 @@ import tech.xigam.cch.ComplexCommandHandler;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public final class ElixirClient {
-    
-    private static ElixirClient instance;
 
-    public static ComplexCommandHandler commandHandler;
-    public static Logger logger = LoggerFactory.getLogger(ElixirClient.class);
-    
+    @Getter private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+            2, 4, 60,
+            TimeUnit.SECONDS, new LinkedBlockingDeque<>()
+    );
+
+    @Getter private static String envFile;
+    @Getter private static String id;
+
+    @Getter private static ElixirClient instance;
+
+    @Getter public static ComplexCommandHandler commandHandler;
+    @Getter public static Logger logger = LoggerFactory.getLogger("Elixir");
+
     public JDA jda;
 
-    public static String envName;
-    
     public static void main(String[] args) {
-        if (args.length >= 1) {
-            envName = args[0];
-            try {
-                ConfigStartupManager.checkAll(); APIHandler.initialize();
-                instance = new ElixirClient(ElixirConstants.TOKEN);
-            } catch (LoginException | IllegalArgumentException | IOException exception) {
-                logger.error("Unable to initiate Elixir Music.", exception);
-                System.exit(0);
-            }
-        } else {
-            logger.error("No environment name provided.");
+        if (args.length < 1) {
+            logger.error("No environment file specified.");
+            System.exit(0);
+        }
+
+        ElixirClient.envFile = args[0];
+
+        try {
+            ConfigStartupManager.checkAll(); APIHandler.initialize();
+            instance = new ElixirClient(ElixirConstants.TOKEN);
+        } catch (LoginException | IllegalArgumentException | IOException exception) {
+            logger.error("Unable to initiate Elixir Music.", exception);
             System.exit(0);
         }
     }
@@ -70,7 +81,9 @@ public final class ElixirClient {
     private ElixirClient(String token) throws LoginException, IllegalArgumentException, IOException {
         final boolean usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
         commandHandler = new ComplexCommandHandler(usePrefix).setPrefix(ElixirConstants.COMMAND_PREFIX);
+
         logger.info("JDA Version: " + Utilities.getJDAVersion());
+
         final JDABuilder builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
                 .setStatus(OnlineStatus.ONLINE)
@@ -80,9 +93,9 @@ public final class ElixirClient {
                 .setBulkDeleteSplittingEnabled(true)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
+                        new GuildManager(),
                         new GuildListener(),
                         new ReadyListener(),
-                        new MessageListener(),
                         new ShutdownListener()
                 )
                 .enableIntents(
@@ -98,26 +111,21 @@ public final class ElixirClient {
         if (usePrefix) {
             builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
             logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
+        } else {
+            Message.suppressContentIntentWarning();
         }
+
         this.jda = builder.build();
+
         commandHandler.setJda(this.jda);
+        id = this.jda.getSelfUser().getId();
+
         ApplicationCommandManager.initialize();
-        OAuthUpdateTask.schedule(); DatabaseManager.create();
-    }
-    
-    public static Logger getLogger() {
-        return logger;
-    }
-    
-    public static JDA getJda() {
-        return instance.jda;
-    }
-    
-    public static ComplexCommandHandler getCommandHandler() {
-        return commandHandler;
+        OAuthUpdateTask.schedule();
+        DatabaseManager.create();
     }
 
-    public static ElixirClient getInstance() {
-        return instance;
+    public static JDA getJda() {
+        return instance.jda;
     }
 }

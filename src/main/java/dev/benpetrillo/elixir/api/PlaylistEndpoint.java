@@ -50,10 +50,10 @@ public final class PlaylistEndpoint {
 
     /**
      * The base URL for the playlist endpoint.
-     * Ex: https://app.ponjo.club/v1/elixir/playlist?id=magix
+     * Ex: https://app.ponjo.site/v1/elixir/playlist?id=magix
      * @param playlistId The playlist ID.
      * @param action What to do with the playlist.
-     *               
+     *
      * @param track (optional) The track to add to the playlist.
      * @param position (optional) The position to add the track to.
      * @param guildId (optional) The guild ID of the guild you want to queue the playlist in.

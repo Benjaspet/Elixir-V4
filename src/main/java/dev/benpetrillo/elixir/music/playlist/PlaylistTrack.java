@@ -21,24 +21,24 @@ package dev.benpetrillo.elixir.music.playlist;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifyTrack;
-import dev.benpetrillo.elixir.types.CustomPlaylist;
+import dev.benpetrillo.elixir.types.CustomPlaylist.CustomPlaylistTrack;
 import dev.benpetrillo.elixir.utilities.TrackUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
+import dev.lavalink.youtube.track.YoutubeAudioTrack;
 
 public final class PlaylistTrack extends DelegatedAudioTrack {
 
     private final String isrc;
     private final AudioSourceManager sourceManager;
-    private final CustomPlaylist.CustomPlaylistTrack trackObject;
+    private final CustomPlaylistTrack trackObject;
     private long length;
-    
-    public PlaylistTrack(String title, CustomPlaylist.CustomPlaylistTrack from, AudioSourceManager sourceManager) {
+
+    public PlaylistTrack(String title, CustomPlaylistTrack from, AudioSourceManager sourceManager) {
         super(new AudioTrackInfo(
                 title, from.artist, from.duration,
                 switch(TrackUtil.determineTrackType(from.url)) {
@@ -52,7 +52,7 @@ public final class PlaylistTrack extends DelegatedAudioTrack {
         this.trackObject = from;
         this.length = from.duration;
     }
-    
+
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         DelegatedAudioTrack track = null;

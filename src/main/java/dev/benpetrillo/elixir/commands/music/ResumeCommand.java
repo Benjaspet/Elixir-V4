@@ -18,6 +18,7 @@
 
 package dev.benpetrillo.elixir.commands.music;
 
+import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.AudioUtil;
@@ -34,10 +35,7 @@ public final class ResumeCommand extends Command {
     
     @Override
     public void execute(Interaction interaction) {
-        if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
-            return;
-        }
+        CommandChecks.runIsInGuildCheck(interaction);
         if (AudioUtil.audioCheck(interaction)) return;
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());

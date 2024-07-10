@@ -20,6 +20,7 @@ package dev.benpetrillo.elixir.events;
 
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.managers.GuildManager;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 public final class ReadyListener extends ListenerAdapter {
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onReady(@NotNull ReadyEvent event) {
         final JDA jda = event.getJDA();
         final String username = jda.getSelfUser().getEffectiveName();
@@ -60,8 +62,11 @@ public final class ReadyListener extends ListenerAdapter {
                     ElixirClient.getLogger().info("All guild slash commands have been deleted.");
                 }
             } else {
-                ElixirClient.getLogger().error("An error occurred while deploying guild slash commands.");
+                ElixirClient.getLogger().warn("Could not deploy guild commands for guild with ID: {}.", id);
+                ElixirClient.getLogger().warn("No valid guilds were provided, or the bot is not in this guild.");
             }
         }
+
+        GuildManager.loadGuilds(jda);
     }
 }

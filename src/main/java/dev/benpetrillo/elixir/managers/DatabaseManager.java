@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
+ * Copyright © 2024 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -18,24 +18,33 @@
 
 package dev.benpetrillo.elixir.managers;
 
-import com.mongodb.*;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoClient;
+
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import org.bson.Document;
+import lombok.Getter;
 
 public final class DatabaseManager {
 
-    private static MongoClient mongoClient;
-    private static MongoDatabase database;
-    private static MongoCollection<Document> playlists;
-    
+    private static MongoClient client;
+    @Getter private static MongoCollection<Document> playlists;
+
     public static void create() {
-        mongoClient = new MongoClient(new MongoClientURI(Config.get("MONGO-URI")));
-        database = mongoClient.getDatabase("Elixir");
-        playlists = database.getCollection("playlists");
-        ElixirClient.logger.info("Database loaded successfully.");
+        String uri = Config.get("MONGO-URI");
+        try {
+            DatabaseManager.client = MongoClients.create(uri);
+
+            MongoDatabase db = client.getDatabase("Elixir");
+            playlists = db.getCollection("playlists");
+
+            ElixirClient.logger.info("Database loaded successfully.");
+        } catch (Exception e) {
+            ElixirClient.logger.error("Failed to load database: " + e.getMessage());
+        }
     }
 
     public static MongoCollection<Document> getPlaylistCollection() {

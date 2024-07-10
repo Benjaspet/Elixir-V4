@@ -30,7 +30,6 @@ import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -38,11 +37,14 @@ import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 import dev.benpetrillo.elixir.ElixirClient;
+import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -50,34 +52,31 @@ import org.apache.hc.core5.annotation.Internal;
 import org.jetbrains.annotations.Nullable;
 import tech.xigam.cch.utils.Interaction;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class ElixirMusicManager {
 
     private static ElixirMusicManager instance;
     private final Map<String, GuildMusicManager> musicManagers = new HashMap<>();
-    private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
-    
+    @Getter private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
+
     public final YoutubeAudioSourceManager youtubeSource = new YoutubeAudioSourceManager();
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
+    public final HttpAudioSourceManager httpSource = new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY);
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
+    public final LaudiolinSourceManager laudiolinSource = new LaudiolinSourceManager(this);
 
     public ElixirMusicManager() {
-        this.audioPlayerManager.registerSourceManager(this.spotifySource);
-        this.audioPlayerManager.registerSourceManager(this.youtubeSource);
-        this.audioPlayerManager.registerSourceManager(this.soundCloudSource);
+        this.audioPlayerManager.registerSourceManager(this.laudiolinSource);
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new GetyarnAudioSourceManager());
-        this.audioPlayerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
+        this.audioPlayerManager.registerSourceManager(this.httpSource);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
-        
+
         // IPv6 rotation setup.
         // If the bot receives a 429 from YouTube, it will rotate the IP address to another, provided that
         // an entire 64-bit block is provided in the config.
@@ -85,7 +84,8 @@ public final class ElixirMusicManager {
         if (!ElixirConstants.IPV6_BLOCK.isEmpty()) {
             new YoutubeIpRotatorSetup(
                     new NanoIpRoutePlanner(Collections.singletonList(new Ipv6Block(ElixirConstants.IPV6_BLOCK)), true))
-                    .forSource(this.youtubeSource)
+                    .forManager(this.audioPlayerManager)
+                    .withMainDelegateFilter(null)
                     .setup();
             ElixirClient.logger.info("IPv6 rotator block set to " + ElixirConstants.IPV6_BLOCK + ".");
         } else {
@@ -95,23 +95,29 @@ public final class ElixirMusicManager {
 
     public GuildMusicManager getMusicManager(Guild guild) {
         return this.musicManagers.computeIfAbsent(guild.getId(), (guildId) -> {
-            GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager, guild);
+            // Create the music manager.
+            var guildMusicManager = new GuildMusicManager(this.audioPlayerManager, guild);
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
+            // Update the guilds.
+            ElixirClient.getExecutor().submit(GuildManager::updateGuilds);
             return guildMusicManager;
         });
     }
 
     public void removeGuildMusicManager(Guild guild) {
+        // Remove the music manager.
         this.musicManagers.remove(guild.getId());
+        // Update the guilds.
+        ElixirClient.getExecutor().submit(GuildManager::updateGuilds);
     }
 
     @Nullable
     public GuildMusicManager getMusicManager(String guildId) {
         return this.musicManagers.get(guildId);
     }
-    
-    public GuildMusicManager[] getMusicManagers() {
-        return this.musicManagers.values().toArray(new GuildMusicManager[0]);
+
+    public Collection<GuildMusicManager> getMusicManagers() {
+        return this.musicManagers.values();
     }
 
     public void loadAndPlay(String track, Interaction interaction, String url) {
@@ -178,7 +184,7 @@ public final class ElixirMusicManager {
             }
         });
     }
-    
+
     @Internal public void loadAndPlay(Guild guild, String track, Consumer<Object> callback) {
         final GuildMusicManager musicManager = this.getMusicManager(guild);
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
@@ -186,7 +192,7 @@ public final class ElixirMusicManager {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
                 ElixirClient.logger.debug("Track loaded: " + audioTrack.getInfo().title);
-                audioTrack.setUserData(ElixirConstants.BOT_ID);
+                audioTrack.setUserData(ElixirClient.getId());
                 musicManager.scheduler.queue(audioTrack);
                 callback.accept(audioTrack);
             }
@@ -199,7 +205,7 @@ public final class ElixirMusicManager {
                     this.trackLoaded(tracks.get(0));
                 } else {
                     for (final AudioTrack audioTrack : tracks) {
-                        audioTrack.setUserData(ElixirConstants.BOT_ID);
+                        audioTrack.setUserData(ElixirClient.getId());
                         musicManager.scheduler.queue(audioTrack);
                     }
                     callback.accept(tracks);

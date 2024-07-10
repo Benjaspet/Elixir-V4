@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -22,27 +22,32 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.JDAInfo;
 import org.apache.commons.lang3.StringUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 
 public final class Utilities {
+    private static final Gson gson
+            = new GsonBuilder()
+            .serializeNulls()
+            .disableHtmlEscaping()
+            .create();
 
     /**
      * Throws an exception to a webhook.
      * @param exception The throwable to throw.
      */
-    
+
     public static void throwThrowable(ElixirException exception) {
         var webhook = Config.get("DEBUG-WEBHOOK");
         var description = new StringBuilder();
@@ -65,6 +70,21 @@ public final class Utilities {
             embed.addField(new WebhookEmbed.EmbedField(false, "Additional Information", exception.additionalInformation));
         }
         client.send(embed.build());
+        client.close();
+    }
+
+    /**
+     * Send a message to a webhook.
+     *
+     * @param message The message to send.
+     */
+
+    public static void sendToWebhook(String message) {
+        var webhook = Config.get("DEBUG-WEBHOOK");
+
+        try (var client = WebhookClient.withUrl(webhook)) {
+            client.send(message);
+        }
     }
 
     /**
@@ -73,12 +93,12 @@ public final class Utilities {
      * @return boolean
      */
 
+    @SuppressWarnings("unused")
     public static boolean isValidURL(String input) {
         try {
-            new URL(input);
+            new URI(input).toURL();
             return true;
-        }
-        catch (MalformedURLException e) {
+        } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
             return false;
         }
     }
@@ -90,9 +110,7 @@ public final class Utilities {
      */
 
     public static String encodeURIComponent(String str) {
-        String result;
-        result = URLEncoder.encode(str, StandardCharsets.UTF_8);
-        return result;
+        return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
 
     /**
@@ -117,7 +135,7 @@ public final class Utilities {
      * @param duration The ISO 8601 timestamp.
      * @return long
      */
-    
+
     public static long cleanYouTubeFormat(String duration) {
         duration = duration.replace("PT", "").replace("H", ":")
                 .replace("M", ":").replace("S", "");
@@ -147,7 +165,7 @@ public final class Utilities {
      * @param url The YouTube URL to extract the video ID from.
      * @return A video ID.
      */
-    
+
     public static String extractVideoId(String url) {
         String[] segments = url.split("/");
         return url.contains("youtu.be") ? segments[3] : segments[3].split("v=")[1];
@@ -158,7 +176,7 @@ public final class Utilities {
      * @param url The YouTube URL to extract the playlist ID from.
      * @return A playlist ID.
      */
-    
+
     public static String extractPlaylistId(String url) {
         String[] segments = url.split("/");
         return url.contains("youtu.be") ? segments[3] : segments[3].split("list=")[1];
@@ -169,7 +187,7 @@ public final class Utilities {
      * @param url The Spotify URL to extract the song ID from.
      * @return A song ID.
      */
-    
+
     public static String extractSongId(String url) {
         String[] segments = url.split("/");
         return segments[4].split("\\?")[0];
@@ -180,7 +198,7 @@ public final class Utilities {
      * @param toPrint The string to format.
      * @return A pretty/formatted string.
      */
-    
+
     public static String prettyPrint(String toPrint) {
         String pass1 = toPrint.toLowerCase();
         String[] lower = pass1.split(" ");
@@ -196,7 +214,7 @@ public final class Utilities {
      * @param toParse The string to parse.
      * @return A boolean, or false if unable to parse.
      */
-    
+
     public static boolean parseBoolean(String toParse) {
             return toParse.equalsIgnoreCase("true") || toParse.equalsIgnoreCase("yes") || toParse.equalsIgnoreCase("1");
     }
@@ -208,9 +226,21 @@ public final class Utilities {
      * @param <T> The type of the object.
      * @return A de-serialized object.
      */
-    
+
     public static <T> T deserialize(String json, Class <T> klass) {
-        return new Gson().fromJson(json, klass);
+        return gson.fromJson(json, klass);
+    }
+
+    /**
+     * Convert a given object to a JSON string.
+     * @param json The object to convert.
+     * @param klass The class of the object.
+     * @param <T> The type of the object.
+     * @return A de-serialized object.
+     */
+
+    public static <T> T deserialize(JsonElement json, Class <T> klass) {
+        return gson.fromJson(json, klass);
     }
 
     /**
@@ -218,9 +248,19 @@ public final class Utilities {
      * @param object The object to convert.
      * @return A serialized object.
      */
-    
+
     public static String serialize(Object object) {
-        return new Gson().toJson(object);
+        return gson.toJson(object);
+    }
+
+    /**
+     * Convert a given object to a JSON object.
+     *
+     * @param object The object to convert.
+     * @return A serialized object.
+     */
+    public static JsonElement tree(Object object) {
+        return gson.toJsonTree(object);
     }
 
     /**
@@ -228,7 +268,7 @@ public final class Utilities {
      * @param toEncode The string to encode.
      * @return A Base64 encoded string.
      */
-    
+
     public static String base64Encode(String toEncode) {
         return Base64.getUrlEncoder().encodeToString(toEncode.getBytes());
     }
@@ -238,7 +278,7 @@ public final class Utilities {
      * @param toDecode The string to decode.
      * @return A decoded string.
      */
-    
+
     public static String base64Decode(String toDecode) {
         return new String(Base64.getUrlDecoder().decode(toDecode));
     }
@@ -259,7 +299,18 @@ public final class Utilities {
      */
 
     public static String getJDAVersion() {
-        return JDAInfo.VERSION_MAJOR + "." + JDAInfo.VERSION_MINOR
-                + "." + JDAInfo.VERSION_REVISION + "-" + JDAInfo.VERSION_CLASSIFIER;
+        return JDAInfo.VERSION.split("_")[0];
+    }
+
+    /**
+     * Clamps a value between a min and max.
+     *
+     * @param value The value to clamp.
+     * @param min The minimum value.
+     * @param max The maximum value.
+     * @return The clamped value.
+     */
+    public static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
     }
 }

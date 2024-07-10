@@ -21,13 +21,11 @@ package dev.benpetrillo.elixir.utilities.absolute;
 import dev.benpetrillo.elixir.Config;
 
 import java.awt.*;
+import java.net.URI;
 
 public final class ElixirConstants {
-
     public static String TOKEN = Config.get("TOKEN");
     public static String ACTIVITY = Config.get("ACTIVITY");
-    public static String BOT_ID = Config.get("BOT-ID");
-    public static String INVITE = Config.get("INVITE");
     public static String YOUTUBE_API_KEY = Config.get("YOUTUBE-API-KEY");
     public static String MONGO_URI = Config.get("MONGO-URI");
     public static String SPOTIFY_CLIENT_ID = Config.get("SPOTIFY-CLIENT-ID");
@@ -39,4 +37,9 @@ public final class ElixirConstants {
     public static String[] GUILDS = Config.get("GUILDS").split(",");
     public static Color DEFAULT_EMBED_COLOR = Color.decode(Config.get("DEFAULT-EMBED-COLOR"));
     public static Color ERROR_EMBED_COLOR = Color.decode(Config.get("ERROR-EMBED-COLOR"));
+    public static final URI LAUDIOLIN_API = URI.create(Config.get("LAUDIOLIN-HANDLE"));
+    public static final String LAUDIOLIN_TOKEN = Config.get("LAUDIOLIN-TOKEN");
+    public static final boolean FUCK_LAUDIOLIN = Boolean.parseBoolean(Config.get("FUCK_LAUDIOLIN"));
+    public static final boolean DEBUG = Boolean.parseBoolean(Config.get("DEBUG"));
+    public static final String INVITE = "https://discord.com/api/oauth2/authorize?client_id={}&permissions=274881333504&scope=bot%20applications.commands";
 }

@@ -16,7 +16,7 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.tasks;
+package dev.benpetrillo.elixir.objects;
 
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
@@ -31,7 +31,8 @@ import java.util.concurrent.TimeUnit;
 public final class OAuthUpdateTask extends TimerTask {
 
     public static void schedule() {
-        new Timer().schedule(new OAuthUpdateTask(), 0L, TimeUnit.MINUTES.toMillis(45));
+        var delay = TimeUnit.MINUTES.toMillis(45);
+        new Timer().schedule(new OAuthUpdateTask(), delay, delay);
     }
 
     @Override

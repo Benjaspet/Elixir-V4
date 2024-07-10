@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
+ * Copyright © 2023 Ben Petrillo. All rights reserved.
  *
  * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
  *
@@ -16,24 +16,23 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands.info;
+package dev.benpetrillo.elixir.commands;
 
 import com.sun.management.OperatingSystemMXBean;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.time.OffsetDateTime;
 
 public final class InfoCommand extends Command {
+    private static final String INVITE = ElixirConstants.INVITE
+            .replace("{}", ElixirClient.getId());
 
     public InfoCommand() {
         super("info", "Get information about Elixir.");
@@ -41,38 +40,42 @@ public final class InfoCommand extends Command {
 
     @Override
     public void execute(Interaction interaction) {
-        int streams = 0; var users = 0;
-        int servers = ElixirClient.getInstance().jda.getGuilds().size();
-        for (GuildMusicManager musicManager : ElixirMusicManager.getInstance().getMusicManagers()) {
+        var streams = 0; var users = 0;
+        var servers = ElixirClient.getInstance().jda.getGuilds().size();
+        for (var musicManager : ElixirMusicManager.getInstance().getMusicManagers()) {
             streams += musicManager.audioPlayer.getPlayingTrack() != null ? 1 : 0;
         }
-        for (Guild server : ElixirClient.getInstance().jda.getGuilds()) {
+        for (var server : ElixirClient.getInstance().jda.getGuilds()) {
             users += server.getMemberCount();
         }
+
         // Get Java process memory usage.
-        final OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        final RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-        final long memory = os.getTotalMemorySize() / 1024 / 1024;
+        var os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        var runtime = ManagementFactory.getRuntimeMXBean();
+        var memory = os.getTotalMemorySize() / 1024 / 1024;
+
         // Get Java process CPU usage, and round it to 4 decimal places.
-        final double cpuUsage = Math.round(os.getProcessCpuLoad() * 100 * 10000.0) / 10000.0;
+        var cpuUsage = Math.round(os.getProcessCpuLoad() * 100 * 10000.0) / 10000.0;
         // Get the total amount of available CPU cores.
-        final int cores = Runtime.getRuntime().availableProcessors();
+        var cores = Runtime.getRuntime().availableProcessors();
         // Get the total amount of active threads.
-        final int threads = Thread.activeCount();
+        var threads = Thread.activeCount();
+
         // Get the total process uptime in milliseconds.
-        final long uptime = runtime.getUptime();
+        var uptime = runtime.getUptime();
         // Get the uptime in days, hours, minutes, and seconds.
-        final long days = uptime / 86400000;
-        final long hours = (uptime % 86400000) / 3600000;
-        final long minutes = (uptime % 3600000) / 60000;
-        final long seconds = (uptime % 60000) / 1000;
-        final String uptimeString = "%dd %dh %dm %ds".formatted(days, hours, minutes, seconds);
+        var days = uptime / 86400000;
+        var hours = (uptime % 86400000) / 3600000;
+        var minutes = (uptime % 3600000) / 60000;
+        var seconds = (uptime % 60000) / 1000;
+
+        var uptimeString = "%dd %dh %dm %ds".formatted(days, hours, minutes, seconds);
         final EmbedBuilder embed = new EmbedBuilder()
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
                 .setAuthor("Total Playing Streams: " + streams)
-                .setDescription("[Invite Elixir to your server!](" + ElixirConstants.INVITE + ")")
+                .setDescription("[Invite Elixir to your server!](" + INVITE + ")")
                 .addField("Bot Information", """
-                        • Powered by: JDA %s
+                        • Powered by: %s
                         • Developed by: Ponjo Studios
                         • Server count: %s
                         • User count: %s

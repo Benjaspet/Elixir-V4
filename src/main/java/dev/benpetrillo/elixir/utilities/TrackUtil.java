@@ -46,19 +46,19 @@ public final class TrackUtil {
     private static final SoundCloudDataLoader soundCloudDataLoader;
     private static final SoundCloudDataReader soundCloudDataReader;
     private static final SoundCloudFormatHandler formatHandler;
-    
+
     static {
         soundCloudDataLoader = new DefaultSoundCloudDataLoader();
         soundCloudDataReader = new DefaultSoundCloudDataReader();
         formatHandler = new DefaultSoundCloudFormatHandler();
     }
-    
+
     /**
      * Returns a URL of a track/video's cover art/thumbnail.
      * @param track The AudioTrack to fetch.
      * @return String
      */
-    
+
     public static String getCoverArt(AudioTrackInfo track) {
         var trackUri = track.uri;
         switch(TrackUtil.determineTrackType(trackUri)) {
@@ -108,7 +108,7 @@ public final class TrackUtil {
      * @param url The Spotify URL.
      * @return Track
      */
-    
+
     public static Track getTrackDataFromSpotifyURL(String url) {
         try {
             String[] firstSplit = url.split("/");
@@ -132,7 +132,7 @@ public final class TrackUtil {
      * @param url The Spotify URL.
      * @return Playlist
      */
-    
+
     public static List<se.michaelthelin.spotify.model_objects.specification.PlaylistTrack> getPlaylistDataFromSpotifyUrl(String url) {
         try {
             String[] firstSplit = url.split("/");
@@ -166,9 +166,9 @@ public final class TrackUtil {
                 if (track == null) return null;
                 var trackInfo = new ExtendedAudioTrackInfo(
                         track.getName(), track.getArtists()[0].getName(),
-                        track.getDurationMs(), track.getId(), false, 
+                        track.getDurationMs(), track.getId(), false,
                         track.getHref()
-                ); 
+                );
                 trackInfo.isrc = track.getExternalIds().getExternalIds().getOrDefault("isrc", null);
                 return trackInfo;
             }
@@ -209,17 +209,17 @@ public final class TrackUtil {
      * @param url The URL to fetch information from.
      * @return A collection of AudioTrackInfo objects.
      */
-    
+
     public static Collection<AudioTrackInfo> getPlaylistInfoFromUrl(String url) {
         TrackType type = TrackUtil.determineTrackType(url);
         Collection<AudioTrackInfo> trackInfoCollection = new ArrayList<>();
         switch (type) {
             case SPOTIFY -> {
-                var tracks = TrackUtil.getPlaylistDataFromSpotifyUrl(url);
+                List<se.michaelthelin.spotify.model_objects.specification.PlaylistTrack> tracks = TrackUtil.getPlaylistDataFromSpotifyUrl(url);
                 if (tracks == null) return null;
-                for(var track : tracks) {
+                for(se.michaelthelin.spotify.model_objects.specification.PlaylistTrack track : tracks) {
                     Track playlistItem = (Track) track.getTrack();
-                    var trackInfo = new ExtendedAudioTrackInfo(
+                    ExtendedAudioTrackInfo trackInfo = new ExtendedAudioTrackInfo(
                             playlistItem.getName(), playlistItem.getArtists()[0].getName(),
                             playlistItem.getDurationMs(), playlistItem.getId(), false,
                             playlistItem.getHref()
@@ -230,7 +230,7 @@ public final class TrackUtil {
             }
             case YOUTUBE -> {
                 YTVideoData searchData = HttpUtil.getPlaylistData(Utilities.extractPlaylistId(url));
-                for(var video : searchData.items) {
+                for(YTVideoData.Item video : searchData.items) {
                     YTVideoData.Item.Snippet query = video.snippet;
                     long length = Utilities.cleanYouTubeFormat(video.contentDetails.duration);
                     trackInfoCollection.add(new AudioTrackInfo(
@@ -239,6 +239,19 @@ public final class TrackUtil {
                             "https://youtu.be/" + video.id
                     ));
                 }
+            }
+            case LAUDIOLIN -> {
+                var playlist = LaudiolinUtil.fetchPlaylist(
+                        SourceUtil.pullPlaylistId(url));
+                if (playlist == null) return null;
+
+                return playlist.getTracks().stream()
+                        .map(track -> new AudioTrackInfo(
+                                track.getTitle(), track.getArtist(),
+                                track.getDuration(), track.getId(), false,
+                                track.getUrl()
+                        ))
+                        .toList();
             }
             default -> {
                 return null;
@@ -252,31 +265,33 @@ public final class TrackUtil {
      * @param userId The user ID to add to the track.
      * @param tracks The track(s) to append the user ID to.
      */
-    
+
     public static void appendUser(String userId, List<PlaylistTrack> tracks) {
         for (AudioTrack track : tracks) {
             track.setUserData(userId);
         }
     }
-    
+
     /**
      * Determines the source for a given URL.
      * @param url The URL to find the source of.
      * @return A {@link TrackType} representing the source of the URL.
      */
-    
+
     public static TrackType determineTrackType(String url) {
         if (url.contains("youtu")) return TrackType.YOUTUBE;
         if (url.contains("spotify")) return TrackType.SPOTIFY;
         if (url.contains("soundcloud")) return TrackType.SOUNDCLOUD;
+        if (url.contains("laudiolin")) return TrackType.LAUDIOLIN;
         if (url.contains("file")) return TrackType.CUSTOM;
         return TrackType.UNKNOWN;
     }
-    
+
     public enum TrackType {
         YOUTUBE,
         SPOTIFY,
         SOUNDCLOUD,
+        LAUDIOLIN,
         CUSTOM,
         UNKNOWN
     }
