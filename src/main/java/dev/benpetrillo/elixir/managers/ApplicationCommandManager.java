@@ -20,7 +20,9 @@ package dev.benpetrillo.elixir.managers;
 
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.commands.info.InfoCommand;
+import dev.benpetrillo.elixir.commands.GuildsCommand;
+import dev.benpetrillo.elixir.commands.InfoCommand;
+import dev.benpetrillo.elixir.commands.StopCommand;
 import dev.benpetrillo.elixir.commands.music.*;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
 import tech.xigam.cch.ComplexCommandHandler;

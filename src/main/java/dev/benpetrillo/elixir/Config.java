@@ -26,7 +26,7 @@ import java.util.Set;
 public final class Config {
 
     private static final Dotenv dotenv = Dotenv.configure()
-            .filename(ElixirClient.envName)
+            .filename(ElixirClient.getEnvFile())
             .load();
 
     /**
