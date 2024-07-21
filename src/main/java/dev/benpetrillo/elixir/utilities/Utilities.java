@@ -96,9 +96,9 @@ public final class Utilities {
     @SuppressWarnings("unused")
     public static boolean isValidURL(String input) {
         try {
-            new URI(input).toURL();
+            new URI(input);
             return true;
-        } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
+        } catch (IllegalArgumentException | URISyntaxException e) {
             return false;
         }
     }

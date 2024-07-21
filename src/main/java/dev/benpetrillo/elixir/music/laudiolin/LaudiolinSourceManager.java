@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
+import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.objects.LoadArguments;
@@ -15,11 +16,13 @@ import dev.benpetrillo.elixir.utilities.SourceUtil;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.util.ArrayList;
 
+@Slf4j
 public final class LaudiolinSourceManager implements AudioSourceManager {
 
     private final boolean forceLaudiolin;
@@ -30,6 +33,9 @@ public final class LaudiolinSourceManager implements AudioSourceManager {
 
     public LaudiolinSourceManager(ElixirMusicManager manager) {
         this.forceLaudiolin = !ElixirConstants.FUCK_LAUDIOLIN;
+        if (!this.forceLaudiolin) {
+            log.info("FUCK LAUDIOLIN ! ?");
+        }
 
         this.httpMan = manager.httpSource;
         this.ytMan = manager.youtubeSource;
