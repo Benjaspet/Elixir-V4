@@ -1,7 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
- *
- * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ * Copyright © 2024 Ben Petrillo, KingRainbow44.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -12,8 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * All portions of this software are available for public use, provided that
- * credit is given to the original author(s).
+ * All portions of this software are available for public use,
+ * provided that credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir.music.spotify;
@@ -23,12 +21,13 @@ import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utilities.HttpUtil;
+import lombok.Getter;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 public final class SpotifyTrack extends DelegatedAudioTrack {
 
   private final String isrc;
-  private final String artworkURL;
+  @Getter private final String artworkURL;
   private final SpotifySourceManager spotifySourceManager;
 
   public SpotifyTrack(String title, String identifier, String isrc, Image[] images, String uri, ArtistSimplified[] artists, Integer trackDuration, SpotifySourceManager spotifySourceManager) {
@@ -62,10 +61,6 @@ public final class SpotifyTrack extends DelegatedAudioTrack {
 
   public String getISRC() {
     return this.isrc;
-  }
-
-  public String getArtworkURL() {
-    return this.artworkURL;
   }
 
   private String getQuery() {

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 public final class HttpUtil {
+
     @Getter private static final OkHttpClient client = new OkHttpClient();
 
     /**

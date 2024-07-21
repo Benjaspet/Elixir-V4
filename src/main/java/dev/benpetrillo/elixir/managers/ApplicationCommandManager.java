@@ -1,7 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
- *
- * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ * Copyright © 2024 Ben Petrillo, KingRainbow44.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -12,8 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * All portions of this software are available for public use, provided that
- * credit is given to the original author(s).
+ * All portions of this software are available for public use,
+ * provided that credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir.managers;
@@ -21,7 +19,7 @@ package dev.benpetrillo.elixir.managers;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.GuildsCommand;
-import dev.benpetrillo.elixir.commands.InfoCommand;
+import dev.benpetrillo.elixir.commands.info.InfoCommand;
 import dev.benpetrillo.elixir.commands.StopCommand;
 import dev.benpetrillo.elixir.commands.music.*;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
@@ -75,6 +73,6 @@ public final class ApplicationCommandManager {
             commandNames.add(command.getLabel());
         }
         final String commandNamesString = String.join(", ", commandNames);
-        ElixirClient.logger.info("Registered commands: " + commandNamesString);
+        ElixirClient.logger.info("Registered commands: {}", commandNamesString);
     }
 }

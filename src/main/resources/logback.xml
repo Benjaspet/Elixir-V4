@@ -1,5 +1,5 @@
 <Configuration>
-    <variable name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
+    <variable name="LOG_LEVEL" value="${LOG_LEVEL:-DEBUG}"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -22,8 +22,6 @@
     <logger name="org.reflections" level="OFF"/>
     <logger name="org.eclipse.jetty" level="OFF"/>
     <logger name="org.mongodb.driver" level="OFF"/>
-
-    <logger name="moe.seikimo.laudiolin" level="${LOG_LEVEL}"/>
 
     <logger name="net.dv8tion.jda.api.JDA" level="WARN"/>
     <logger name="net.dv8tion.jda.internal.requests" level="WARN"/>

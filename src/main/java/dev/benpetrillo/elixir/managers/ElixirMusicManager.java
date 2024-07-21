@@ -1,7 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
- *
- * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ * Copyright © 2024 Ben Petrillo, KingRainbow44.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -12,8 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * All portions of this software are available for public use, provided that
- * credit is given to the original author(s).
+ * All portions of this software are available for public use,
+ * provided that credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir.managers;
@@ -37,7 +35,6 @@ import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.NanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.music.laudiolin.LaudiolinSourceManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ElixirException;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
@@ -65,15 +62,16 @@ public final class ElixirMusicManager {
     public final SpotifySourceManager spotifySource = new SpotifySourceManager(youtubeSource);
     public final HttpAudioSourceManager httpSource = new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY);
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
-    public final LaudiolinSourceManager laudiolinSource = new LaudiolinSourceManager(this);
 
     public ElixirMusicManager() {
-        this.audioPlayerManager.registerSourceManager(this.laudiolinSource);
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new GetyarnAudioSourceManager());
+        this.audioPlayerManager.registerSourceManager(this.youtubeSource);
+        this.audioPlayerManager.registerSourceManager(this.spotifySource);
+        this.audioPlayerManager.registerSourceManager(this.soundCloudSource);
         this.audioPlayerManager.registerSourceManager(this.httpSource);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
 
@@ -87,7 +85,7 @@ public final class ElixirMusicManager {
                     .forManager(this.audioPlayerManager)
                     .withMainDelegateFilter(null)
                     .setup();
-            ElixirClient.logger.info("IPv6 rotator block set to " + ElixirConstants.IPV6_BLOCK + ".");
+            ElixirClient.logger.info("IPv6 rotator block set to {}.", ElixirConstants.IPV6_BLOCK);
         } else {
             ElixirClient.logger.warn("You are not using an IPv6 rotator. This may cause issues with YouTube and rate-limiting.");
         }
@@ -95,20 +93,14 @@ public final class ElixirMusicManager {
 
     public GuildMusicManager getMusicManager(Guild guild) {
         return this.musicManagers.computeIfAbsent(guild.getId(), (guildId) -> {
-            // Create the music manager.
             var guildMusicManager = new GuildMusicManager(this.audioPlayerManager, guild);
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
-            // Update the guilds.
-            ElixirClient.getExecutor().submit(GuildManager::updateGuilds);
             return guildMusicManager;
         });
     }
 
     public void removeGuildMusicManager(Guild guild) {
-        // Remove the music manager.
         this.musicManagers.remove(guild.getId());
-        // Update the guilds.
-        ElixirClient.getExecutor().submit(GuildManager::updateGuilds);
     }
 
     @Nullable
@@ -123,13 +115,14 @@ public final class ElixirMusicManager {
     public void loadAndPlay(String track, Interaction interaction, String url) {
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = this.getMusicManager(interaction.getGuild());
+        ElixirClient.logger.info("Loading track: {}", track);
         this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
 
             @Override
             public void trackLoaded(AudioTrack track) {
                 assert interaction.getMember() != null;
                 track.setUserData(interaction.getMember().getId());
-                musicManager.scheduler.queue(track);
+                musicManager.getScheduler().queue(track);
                 final String title = track.getInfo().title;
                 final String shortenedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
                 MessageEmbed embed = new EmbedBuilder()
@@ -191,7 +184,7 @@ public final class ElixirMusicManager {
 
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
-                ElixirClient.logger.debug("Track loaded: " + audioTrack.getInfo().title);
+                ElixirClient.logger.debug("Track loaded: {}", audioTrack.getInfo().title);
                 audioTrack.setUserData(ElixirClient.getId());
                 musicManager.scheduler.queue(audioTrack);
                 callback.accept(audioTrack);
@@ -199,7 +192,7 @@ public final class ElixirMusicManager {
 
             @Override
             public void playlistLoaded(AudioPlaylist audioPlaylist) {
-                ElixirClient.logger.debug("Playlist loaded: " + audioPlaylist.getName());
+                ElixirClient.logger.debug("Playlist loaded: {}", audioPlaylist.getName());
                 final List<AudioTrack> tracks = audioPlaylist.getTracks();
                 if (audioPlaylist.isSearchResult()) {
                     this.trackLoaded(tracks.get(0));
@@ -214,13 +207,13 @@ public final class ElixirMusicManager {
 
             @Override
             public void noMatches() {
-                ElixirClient.logger.debug("No matches found for: " + track);
+                ElixirClient.logger.debug("No matches found for: {}", track);
                 callback.accept(null);
             }
 
             @Override
             public void loadFailed(FriendlyException e) {
-                ElixirClient.logger.debug("Failed to load: " + track);
+                ElixirClient.logger.debug("Failed to load: {}", track);
                 callback.accept(e);
                 Utilities.throwThrowable(new ElixirException().guild(guild).exception(e));
             }

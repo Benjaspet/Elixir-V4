@@ -1,7 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
- *
- * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ * Copyright © 2024 Ben Petrillo, KingRainbow44.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -12,8 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * All portions of this software are available for public use, provided that
- * credit is given to the original author(s).
+ * All portions of this software are available for public use,
+ * provided that credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir.utilities;
@@ -239,19 +237,6 @@ public final class TrackUtil {
                             "https://youtu.be/" + video.id
                     ));
                 }
-            }
-            case LAUDIOLIN -> {
-                var playlist = LaudiolinUtil.fetchPlaylist(
-                        SourceUtil.pullPlaylistId(url));
-                if (playlist == null) return null;
-
-                return playlist.getTracks().stream()
-                        .map(track -> new AudioTrackInfo(
-                                track.getTitle(), track.getArtist(),
-                                track.getDuration(), track.getId(), false,
-                                track.getUrl()
-                        ))
-                        .toList();
             }
             default -> {
                 return null;

@@ -75,9 +75,10 @@ public final class SkipCommand extends Command implements Arguments {
             return;
         }
         final AudioTrack upNext = (AudioTrack) musicManager.scheduler.queue.toArray()[(int) (skipTo - 1)];
-        for (int i = 0; i < skipTo; i++) {
-            musicManager.scheduler.nextTrack();
+        for (int i = 0; i < skipTo - 1; i++) {
+            musicManager.scheduler.queue.poll();
         }
+        musicManager.scheduler.nextTrack();
         final String title = upNext.getInfo().title.length() > 60 ? upNext.getInfo().title.substring(0, 60) + "..." : upNext.getInfo().title;
         final String duration = Utilities.formatDuration(upNext.getDuration());
         final String isLive = upNext.getInfo().isStream ? "yes" : "no";

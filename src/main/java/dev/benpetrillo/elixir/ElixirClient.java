@@ -1,7 +1,5 @@
 /*
- * Copyright © 2024 Ben Petrillo, KingRainbow44. All rights reserved.
- *
- * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ * Copyright © 2024 Ben Petrillo, KingRainbow44.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -12,8 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * All portions of this software are available for public use, provided that
- * credit is given to the original author(s).
+ * All portions of this software are available for public use,
+ * provided that credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir;
@@ -22,6 +20,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.benpetrillo.elixir.api.APIHandler;
 import dev.benpetrillo.elixir.events.*;
 import dev.benpetrillo.elixir.managers.*;
+import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.objects.OAuthUpdateTask;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
@@ -82,7 +81,7 @@ public final class ElixirClient {
         final boolean usePrefix = !ElixirConstants.COMMAND_PREFIX.isEmpty();
         commandHandler = new ComplexCommandHandler(usePrefix).setPrefix(ElixirConstants.COMMAND_PREFIX);
 
-        logger.info("JDA Version: " + Utilities.getJDAVersion());
+        logger.info("JDA Version: {}", Utilities.getJDAVersion());
 
         final JDABuilder builder = JDABuilder.createDefault(token)
                 .setActivity(Activity.listening(ElixirConstants.ACTIVITY))
@@ -93,7 +92,6 @@ public final class ElixirClient {
                 .setBulkDeleteSplittingEnabled(true)
                 .setWebsocketFactory(new WebSocketFactory())
                 .addEventListeners(
-                        new GuildManager(),
                         new GuildListener(),
                         new ReadyListener(),
                         new ShutdownListener()
@@ -110,7 +108,7 @@ public final class ElixirClient {
                 );
         if (usePrefix) {
             builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
-            logger.info("Prefix support enabled! Prefix: " + ElixirConstants.COMMAND_PREFIX);
+            logger.info("Prefix support enabled! Prefix: {}", ElixirConstants.COMMAND_PREFIX);
         } else {
             Message.suppressContentIntentWarning();
         }
@@ -123,6 +121,12 @@ public final class ElixirClient {
         ApplicationCommandManager.initialize();
         OAuthUpdateTask.schedule();
         DatabaseManager.create();
+
+        try {
+            SpotifySourceManager.authorize();
+        } catch (Exception exception) {
+            logger.error("Failed to authorize Spotify.", exception);
+        }
     }
 
     public static JDA getJda() {

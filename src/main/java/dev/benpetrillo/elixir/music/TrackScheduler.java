@@ -1,7 +1,5 @@
 /*
- * Copyright © 2022 Ben Petrillo. All rights reserved.
- *
- * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ * Copyright © 2024 Ben Petrillo, KingRainbow44.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -12,8 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * All portions of this software are available for public use, provided that
- * credit is given to the original author(s).
+ * All portions of this software are available for public use,
+ * provided that credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir.music;
@@ -24,8 +22,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.music.laudiolin.LaudiolinTypes;
-import dev.benpetrillo.elixir.types.laudiolin.LaudiolinTrackInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -38,8 +34,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public final class TrackScheduler extends AudioEventAdapter {
+
     private final GuildMusicManager manager;
+
     public final AudioPlayer player;
+    @Getter
     public final BlockingQueue<AudioTrack> queue;
     public final Guild guild;
 
@@ -67,44 +66,16 @@ public final class TrackScheduler extends AudioEventAdapter {
         return tracks;
     }
 
-    /**
-     * Serializes the queue into a list of LaudiolinTrackInfo objects.
-     *
-     * @see LaudiolinTrackInfo
-     * @return A list of LaudiolinTrackInfo objects.
-     */
-    public List<LaudiolinTrackInfo> serialize() {
-        return this.getQueue().stream()
-                .map(LaudiolinTrackInfo::from)
-                .toList();
-    }
-
-    /**
-     * Synchronizes the queue with the client.
-     */
-    public void syncQueue() {
-        this.manager.getLaudiolin().send(
-                new LaudiolinTypes.Queue(this.serialize()));
-    }
-
-    /**
-     * Queues or plays a track.
-     * If a track is already playing, the track will be queued.
-     * If a track is not playing, the track will be played.
-     *
-     * @param track The track to queue.
-     */
     public void queue(AudioTrack track) {
         // Check if an item is already playing.
         if (this.player.getPlayingTrack() == null) {
             this.player.playTrack(track);
-            this.manager.getLaudiolin().sync();
             return;
         }
 
         this.queue.add(track); // Place the track into the queue.
-        this.syncQueue();
     }
+
 
     public void nextTrack() {
         if (this.queue.isEmpty()) {
@@ -153,12 +124,7 @@ public final class TrackScheduler extends AudioEventAdapter {
         }
     }
 
-    public BlockingQueue<AudioTrack> getQueue() {
-        return this.queue;
-    }
-
-    @Getter
-    @AllArgsConstructor
+    @Getter @AllArgsConstructor
     public enum LoopMode {
         NONE(0),
         TRACK(2),
