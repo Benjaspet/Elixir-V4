@@ -16,21 +16,59 @@
 
 package dev.benpetrillo.elixir.api.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.APIError;
+import dev.benpetrillo.elixir.api.types.AuthObject;
 import dev.benpetrillo.elixir.api.types.NowPlayingObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
+import dev.benpetrillo.elixir.utils.APIAuthUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 import io.javalin.http.Context;
+import jdk.jshell.execution.Util;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.Objects;
 
 public class PlayerController {
+
+  public static Context postJoinChannel(Context ctx) {
+    String guildId = ctx.pathParam("guild");
+    Objects.requireNonNull(guildId, "No guild ID provided.");
+    String authHeader = ctx.header("Authorization");
+    Objects.requireNonNull(authHeader, "No authorization header provided.");
+    String apiKey = authHeader.split(" ")[1];
+
+    JsonObject body = Utilities.deserialize(ctx.body(), JsonObject.class);
+    String channelId = body.get("channel").getAsString();
+    String userId = body.get("user").getAsString();
+    Objects.requireNonNull(channelId, "No voice channel provided.");
+    Objects.requireNonNull(userId, "No user provided.");
+
+    Guild guild = ElixirClient.getJda().getGuildById(guildId);
+    Objects.requireNonNull(guild, "Guild not found.");
+    VoiceChannel channel = guild.getVoiceChannelById(channelId);
+    Objects.requireNonNull(channel, "Voice channel not found.");
+    User user = ElixirClient.getJda().getUserById(userId);
+    Objects.requireNonNull(user, "User not found.");
+
+    if (!APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
+      return ctx.status(401).json(APIError.from("Invalid API key."));
+    }
+
+    AudioManager audioManager = guild.getAudioManager();
+    audioManager.openAudioConnection(guild.getVoiceChannelById(channelId));
+
+    return ctx.status(200).json(Utilities.serialize("Joined voice channel."));
+
+  }
 
   public static Context getNowPlaying(Context ctx) {
     String guildId = ctx.pathParam("guild");

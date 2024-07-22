@@ -16,6 +16,7 @@
 
 package dev.benpetrillo.elixir.commands.misc;
 
+import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utils.APIAuthUtil;
 import dev.benpetrillo.elixir.ElixirConstants;
@@ -30,9 +31,6 @@ import java.time.OffsetDateTime;
 
 public final class GenKeyCommand extends Command {
 
-  private static final String INVITE = ElixirConstants.INVITE
-      .replace("{}", ElixirClient.getId());
-
   public GenKeyCommand() {
     super("genkey", "Generate an API key.");
   }
@@ -40,11 +38,13 @@ public final class GenKeyCommand extends Command {
   @Override
   public void execute(Interaction interaction) {
 
+    CommandChecks.runIsInGuildCheck(interaction);
+
     interaction.setEphemeral(true);
     interaction.deferReply();
 
     Member member = interaction.getMember();
-    if (member == null) {
+    if (member == null || interaction.getGuild() == null) {
       interaction.reply("You must be in a server to use this command.", false);
       return;
     }
@@ -55,19 +55,21 @@ public final class GenKeyCommand extends Command {
 
 
     String id = member.getId();
+    String guildId = interaction.getGuild().getId();
 
-    if (APIAuthUtil.hasAPIKey(id)) {
+
+    if (APIAuthUtil.hasAPIKey(id, guildId)) {
       interaction.reply("You already have an API key. Please contact a developer.", false);
       return;
     }
 
     try {
-      String key= APIAuthUtil.createAPIKey(id);
+      String key= APIAuthUtil.createAPIKey(id, guildId);
 
       String avatar = ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl();
 
       MessageEmbed embed = new EmbedBuilder()
-          .setDescription("Successfully generated. Save this for later use!")
+          .setDescription("API key for guild %s generated.".formatted(interaction.getGuild().getName()))
           .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)
           .addField("API Key", String.format("`%s`", key), false)
           .setFooter("Elixir Music", avatar)

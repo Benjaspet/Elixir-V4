@@ -28,22 +28,30 @@ import java.util.UUID;
 
 public final class APIAuthUtil {
 
-  public static String createAPIKey(String userId) {
+  public static String createAPIKey(String userId, String guildId) {
 
     String key = generateAPIKey();
 
     MongoCollection<Document> dbCollection = DatabaseManager.getAPIKeyCollection();
     dbCollection.insertOne(new Document("userId", userId)
+        .append("guildId", guildId)
         .append("apiKey", key)
         .append("createdAt", System.currentTimeMillis() / 1000L)
     );
-
     return key;
   }
 
-  public static boolean hasAPIKey(String userId) {
+  public static boolean hasAPIKey(String userId, String guildId) {
       MongoCollection<Document> dbCollection = DatabaseManager.getAPIKeyCollection();
-      return dbCollection.find(new Document("userId", userId)).first() != null;
+      return dbCollection.find(new Document("userId", userId)
+          .append("guildId", guildId)).first() != null;
+  }
+
+  public static boolean isValidAPIKey(String userId, String guildId, String apiKey) {
+    MongoCollection<Document> dbCollection = DatabaseManager.getAPIKeyCollection();
+    return dbCollection.find(new Document("userId", userId)
+        .append("guildId", guildId)
+        .append("apiKey", apiKey)).first() != null;
   }
 
   private static String generateAPIKey() {

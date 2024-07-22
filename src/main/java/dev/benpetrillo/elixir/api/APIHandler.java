@@ -23,8 +23,7 @@ import dev.benpetrillo.elixir.ElixirConstants;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
 
-import static io.javalin.apibuilder.ApiBuilder.path;
-import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 public final class APIHandler {
 
@@ -35,6 +34,7 @@ public final class APIHandler {
 
         EndpointGroup endpoints = () -> path("/api/v1", () -> {
             get("/{guild}/nowplaying", PlayerController::getNowPlaying);
+            post("/{guild}/join", PlayerController::postJoinChannel);
         });
 
       Javalin.create(config -> config.router.apiBuilder(endpoints))
