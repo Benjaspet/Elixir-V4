@@ -21,16 +21,16 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.utils.TrackUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 
-public record NowPlayingResponse(
+public record TrackDataResponse(
     String title, String author, long duration, String formattedDuration, String uri,
     String thumbnail, long position, boolean isStream, String identifier, String requestedBy) {
 
-  public static NowPlayingResponse create(AudioTrack track) {
+  public static TrackDataResponse create(AudioTrack track) {
 
     final long position = track.getPosition();
     final AudioTrackInfo trackInfo = track.getInfo();
 
-    return new NowPlayingResponse(
+    return new TrackDataResponse(
         trackInfo.title, trackInfo.author, trackInfo.length / 1000,
         Utilities.formatDuration(position) + "/" + Utilities.formatDuration(trackInfo.length),
         trackInfo.uri, TrackUtil.getCoverArt(trackInfo), track.getPosition(),

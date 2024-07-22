@@ -51,7 +51,7 @@ public final class APIAuthUtil {
     MongoCollection<Document> dbCollection = DatabaseManager.getAPIKeyCollection();
     return dbCollection.find(new Document("userId", userId)
         .append("guildId", guildId)
-        .append("apiKey", apiKey)).first() == null;
+        .append("apiKey", apiKey)).first() != null;
   }
 
   private static String generateAPIKey() {

@@ -37,11 +37,12 @@ public final class APIHandler {
             post("/{guild}/join", PlayerController::postJoinChannel);
             post("/{guild}/stop", PlayerController::postStopPlayer);
             post("/{guild}/volume", PlayerController::postVolume);
+            post("/{guild}/play", PlayerController::postPlay);
         });
 
       Javalin.create(config -> config.router.apiBuilder(endpoints))
             .exception(NullPointerException.class, (e, ctx) ->
-                ctx.status(400).json(APIError.from(e)))
+                ctx.status(400).json(APIError.from(e.getMessage())))
             .get("/", ctx -> ctx.result("Elixir Music API"))
             .start(address, port);
 

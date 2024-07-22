@@ -21,7 +21,7 @@ import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.GuildsCommand;
 import dev.benpetrillo.elixir.commands.misc.GenKeyCommand;
 import dev.benpetrillo.elixir.commands.misc.InfoCommand;
-import dev.benpetrillo.elixir.commands.StopCommand;
+import dev.benpetrillo.elixir.commands.music.StopCommand;
 import dev.benpetrillo.elixir.commands.music.*;
 import dev.benpetrillo.elixir.utils.Embed;
 import tech.xigam.cch.ComplexCommandHandler;

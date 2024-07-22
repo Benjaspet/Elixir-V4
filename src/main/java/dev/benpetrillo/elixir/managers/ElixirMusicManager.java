@@ -45,10 +45,12 @@ import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.hc.core5.annotation.Internal;
 import org.jetbrains.annotations.Nullable;
 import tech.xigam.cch.utils.Interaction;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public final class ElixirMusicManager {
 
@@ -172,6 +174,47 @@ public final class ElixirMusicManager {
             public void loadFailed(FriendlyException exception) {
                 Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception));
                 interaction.reply(Embed.error("An error occurred while attempting to play that track."));
+            }
+        });
+    }
+
+    @Internal
+    public void loadAndPlay(Guild guild, String track, Consumer<Object> callback) {
+        final GuildMusicManager musicManager = this.getMusicManager(guild);
+        this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
+
+            @Override
+            public void trackLoaded(AudioTrack audioTrack) {
+                audioTrack.setUserData(ElixirClient.getId());
+                musicManager.scheduler.queue(audioTrack);
+                callback.accept(audioTrack);
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist audioPlaylist) {
+                final List<AudioTrack> tracks = audioPlaylist.getTracks();
+                if (audioPlaylist.isSearchResult()) {
+                    this.trackLoaded(tracks.get(0));
+                } else {
+                    for (final AudioTrack audioTrack : tracks) {
+                        audioTrack.setUserData(ElixirClient.getId());
+                        musicManager.scheduler.queue(audioTrack);
+                    }
+                    callback.accept(tracks);
+                }
+            }
+
+            @Override
+            public void noMatches() {
+                ElixirClient.logger.debug("No matches found for: {}", track);
+                callback.accept(null);
+            }
+
+            @Override
+            public void loadFailed(FriendlyException e) {
+                ElixirClient.logger.debug("Failed to load: {}", track);
+                callback.accept(e);
+                Utilities.throwThrowable(new ElixirException().guild(guild).exception(e));
             }
         });
     }
