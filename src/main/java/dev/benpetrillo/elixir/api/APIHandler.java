@@ -35,6 +35,7 @@ public final class APIHandler {
         EndpointGroup endpoints = () -> path("/api/v1", () -> {
             get("/{guild}/nowplaying", PlayerController::getNowPlaying);
             post("/{guild}/join", PlayerController::postJoinChannel);
+            post("/{guild}/stop", PlayerController::postStopPlayer);
         });
 
       Javalin.create(config -> config.router.apiBuilder(endpoints))
