@@ -21,7 +21,7 @@ package dev.benpetrillo.elixir.commands.music;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.LyricManager;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.Utilities;
 import dev.benpetrillo.elixir.ElixirConstants;
 import genius.SongSearch;
@@ -54,7 +54,7 @@ public final class LyricsCommand extends Command implements Arguments {
                     .getMusicManager(interaction.getGuild())
                     .audioPlayer.getPlayingTrack();
             if (track == null) {
-                interaction.reply(EmbedUtil.sendErrorEmbed("There is not a song playing."), false);
+                interaction.reply(Embed.error("There is not a song playing."), false);
                 return;
             } else song = track.getInfo().title;
         }
@@ -71,7 +71,7 @@ public final class LyricsCommand extends Command implements Arguments {
                     .build();
             interaction.reply(embed);
         } catch (IOException | IndexOutOfBoundsException exception) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to fetch lyrics for that track."), false);
+            interaction.reply(Embed.error("Unable to fetch lyrics for that track."), false);
         }
     }
 

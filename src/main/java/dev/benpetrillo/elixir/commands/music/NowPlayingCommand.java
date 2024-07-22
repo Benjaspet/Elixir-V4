@@ -25,7 +25,7 @@ import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.types.ElixirException;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.TrackUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 import dev.benpetrillo.elixir.ElixirConstants;
@@ -46,7 +46,7 @@ public final class NowPlayingCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            interaction.reply(Embed.error("This command can only be used in a guild."));
             return;
         }
         interaction.deferReply();
@@ -56,7 +56,7 @@ public final class NowPlayingCommand extends Command {
             final AudioPlayer audioPlayer = musicManager.audioPlayer;
             final AudioTrack track = audioPlayer.getPlayingTrack();
             if (track == null) {
-                interaction.reply(EmbedUtil.sendErrorEmbed("There is no track playing at the moment."), false);
+                interaction.reply(Embed.error("There is no track playing at the moment."), false);
             } else {
                 final AudioTrackInfo info = track.getInfo();
                 final String thumbnail = TrackUtil.getCoverArt(track.getInfo());
@@ -84,11 +84,11 @@ public final class NowPlayingCommand extends Command {
                 interaction.reply(embed, false);
             }
         } catch (PermissionException ignored) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("I do not have permission to do this."), false);
+            interaction.reply(Embed.error("I do not have permission to do this."), false);
         } catch (Exception exception) {
             ElixirClient.logger.error("An error occurred while getting the currently playing track.", exception);
             Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception).additionalInformation("Not a permission exception."));
-            interaction.reply(EmbedUtil.sendErrorEmbed("An unknown error occurred."), false);
+            interaction.reply(Embed.error("An unknown error occurred."), false);
         }
     }
 }

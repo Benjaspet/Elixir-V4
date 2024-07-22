@@ -23,7 +23,7 @@ import dev.benpetrillo.elixir.commands.misc.GenKeyCommand;
 import dev.benpetrillo.elixir.commands.misc.InfoCommand;
 import dev.benpetrillo.elixir.commands.StopCommand;
 import dev.benpetrillo.elixir.commands.music.*;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;
 
@@ -65,7 +65,7 @@ public final class ApplicationCommandManager {
                 new VolumeCommand()
         );
 
-        handler.onArgumentError = interaction -> interaction.setEphemeral().reply(EmbedUtil.sendErrorEmbed("Invalid argument(s) provided."));
+        handler.onArgumentError = interaction -> interaction.setEphemeral().reply(Embed.error("Invalid argument(s) provided."));
     }
 
     private void registerCommand(ComplexCommandHandler handler, BaseCommand... commands) {

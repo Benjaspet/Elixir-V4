@@ -23,7 +23,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.TrackUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 import dev.benpetrillo.elixir.ElixirConstants;
@@ -47,13 +47,13 @@ public final class QueueCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            interaction.reply(Embed.error("This command can only be used in a guild."));
             return;
         }
         assert interaction.getGuild() != null;
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         if (musicManager.scheduler.queue.isEmpty()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("There are no songs in the queue."), false);
+            interaction.reply(Embed.error("There are no songs in the queue."), false);
             return;
         }
         interaction.deferReply();
@@ -90,7 +90,7 @@ public final class QueueCommand extends Command {
                     .build();
             interaction.reply(embed, false);
         } catch (PermissionException ignored) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while running this command."), false);
+            interaction.reply(Embed.error("An error occurred while running this command."), false);
         }
     }
 }

@@ -37,7 +37,7 @@ import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ElixirException;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.Utilities;
 import dev.benpetrillo.elixir.ElixirConstants;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
@@ -45,12 +45,10 @@ import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.apache.hc.core5.annotation.Internal;
 import org.jetbrains.annotations.Nullable;
 import tech.xigam.cch.utils.Interaction;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public final class ElixirMusicManager {
 
@@ -136,7 +134,7 @@ public final class ElixirMusicManager {
             public void playlistLoaded(AudioPlaylist playlist) {
                 final List<AudioTrack> tracks = playlist.getTracks();
                 if (tracks.size() > 300) {
-                    interaction.reply(EmbedUtil.sendErrorEmbed("Playlists that exceed 300 tracks cannot be played."));
+                    interaction.reply(Embed.error("Playlists that exceed 300 tracks cannot be played."));
                     return;
                 }
                 if (playlist.isSearchResult()) {
@@ -167,55 +165,13 @@ public final class ElixirMusicManager {
 
             @Override
             public void noMatches() {
-                interaction.reply(EmbedUtil.sendErrorEmbed("Nothing found by that search term."));
+                interaction.reply(Embed.error("Nothing found by that search term."));
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
                 Utilities.throwThrowable(new ElixirException(interaction.getGuild(), interaction.getMember()).exception(exception));
-                interaction.reply(EmbedUtil.sendErrorEmbed("An error occurred while attempting to play that track."));
-            }
-        });
-    }
-
-    @Internal public void loadAndPlay(Guild guild, String track, Consumer<Object> callback) {
-        final GuildMusicManager musicManager = this.getMusicManager(guild);
-        this.audioPlayerManager.loadItemOrdered(musicManager, track, new AudioLoadResultHandler() {
-
-            @Override
-            public void trackLoaded(AudioTrack audioTrack) {
-                ElixirClient.logger.debug("Track loaded: {}", audioTrack.getInfo().title);
-                audioTrack.setUserData(ElixirClient.getId());
-                musicManager.scheduler.queue(audioTrack);
-                callback.accept(audioTrack);
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist audioPlaylist) {
-                ElixirClient.logger.debug("Playlist loaded: {}", audioPlaylist.getName());
-                final List<AudioTrack> tracks = audioPlaylist.getTracks();
-                if (audioPlaylist.isSearchResult()) {
-                    this.trackLoaded(tracks.get(0));
-                } else {
-                    for (final AudioTrack audioTrack : tracks) {
-                        audioTrack.setUserData(ElixirClient.getId());
-                        musicManager.scheduler.queue(audioTrack);
-                    }
-                    callback.accept(tracks);
-                }
-            }
-
-            @Override
-            public void noMatches() {
-                ElixirClient.logger.debug("No matches found for: {}", track);
-                callback.accept(null);
-            }
-
-            @Override
-            public void loadFailed(FriendlyException e) {
-                ElixirClient.logger.debug("Failed to load: {}", track);
-                callback.accept(e);
-                Utilities.throwThrowable(new ElixirException().guild(guild).exception(e));
+                interaction.reply(Embed.error("An error occurred while attempting to play that track."));
             }
         });
     }

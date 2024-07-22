@@ -20,7 +20,7 @@ package dev.benpetrillo.elixir.commands.playlist;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.PlaylistUtil;
 import dev.benpetrillo.elixir.utils.TrackUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
@@ -45,28 +45,28 @@ public final class ImportSubCommand extends SubCommand implements Arguments {
         final String playlistId = interaction.getArgument("id", String.class);
         final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist with ID `" + playlistId + "`."), false);
+            interaction.reply(Embed.error("Unable to find a playlist with ID `" + playlistId + "`."), false);
             return;
         }
         assert interaction.getMember() != null;
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
+            interaction.reply(Embed.error("You are not the author of this playlist."), false);
             return;
         }
         final String sourcePlaylist = interaction.getArgument("playlist", String.class);
         if (!Utilities.isValidURL(sourcePlaylist)) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid playlist!"), false);
+            interaction.reply(Embed.error("That isn't a valid playlist!"), false);
             return;
         }
         final Collection<AudioTrackInfo> playlistInfo = TrackUtil.getPlaylistInfoFromUrl(sourcePlaylist);
         if (playlistInfo == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to get playlist info from that URL."), false);
+            interaction.reply(Embed.error("Unable to get playlist info from that URL."), false);
             return;
         }
         for (var track : playlistInfo) {
             PlaylistUtil.addTrackToList(track, playlist, -1);
         }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully imported `" + playlistInfo.size() + "` tracks from playlist."), false);
+        interaction.reply(Embed.def("Successfully imported `" + playlistInfo.size() + "` tracks from playlist."), false);
     }
 
     @Override

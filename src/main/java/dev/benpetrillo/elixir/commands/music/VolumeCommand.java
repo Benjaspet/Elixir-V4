@@ -22,7 +22,7 @@ import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utils.AudioUtil;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.Command;
@@ -48,7 +48,7 @@ public final class VolumeCommand extends Command implements Arguments {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         final int volume = interaction.getArgument("volume", Number.class).intValue();
         musicManager.audioPlayer.setVolume(volume);
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Volume set to **" + volume + "**."), false);
+        interaction.reply(Embed.def("Volume set to **" + volume + "**."), false);
     }
 
     @Override

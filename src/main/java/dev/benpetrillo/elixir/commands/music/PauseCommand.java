@@ -21,7 +21,7 @@ package dev.benpetrillo.elixir.commands.music;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utils.AudioUtil;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
@@ -35,7 +35,7 @@ public final class PauseCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            interaction.reply(Embed.error("This command can only be used in a guild."));
             return;
         }
         if (AudioUtil.audioCheck(interaction)) return;
@@ -43,10 +43,10 @@ public final class PauseCommand extends Command {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         if (!musicManager.scheduler.player.isPaused()) {
             musicManager.scheduler.player.setPaused(true);
-            MessageEmbed embed = EmbedUtil.sendDefaultEmbed("Successfully paused the queue.");
+            MessageEmbed embed = Embed.def("Successfully paused the queue.");
             interaction.reply(embed, false);
         } else {
-            MessageEmbed embed = EmbedUtil.sendErrorEmbed("The queue is already paused.");
+            MessageEmbed embed = Embed.error("The queue is already paused.");
             interaction.reply(embed, false);
         }
     }

@@ -22,16 +22,16 @@ import dev.benpetrillo.elixir.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-public final class EmbedUtil {
+public final class Embed {
 
-    public static MessageEmbed sendErrorEmbed(String description) {
+    public static MessageEmbed error(String description) {
         return new EmbedBuilder()
                 .setDescription(description)
                 .setColor(ElixirConstants.ERROR_EMBED_COLOR)
                 .build();
     }
 
-    public static MessageEmbed sendDefaultEmbed(String description) {
+    public static MessageEmbed def(String description) {
         return new EmbedBuilder()
                 .setDescription(description)
                 .setColor(ElixirConstants.DEFAULT_EMBED_COLOR)

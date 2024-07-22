@@ -63,15 +63,15 @@ public final class AudioUtil {
         AudioUtil.FailureReason reason = AudioUtil.simpleAudioCheck(interaction.getGuild(), interaction.getMember());
         switch (reason) {
             case BOT_NOT_IN_VOICE_CHANNEL -> {
-                interaction.reply(EmbedUtil.sendErrorEmbed("I must be in a voice channel."));
+                interaction.reply(Embed.error("I must be in a voice channel."));
                 return true;
             }
             case MEMBER_NOT_IN_VOICE_CHANNEL -> {
-                interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel."));
+                interaction.reply(Embed.error("You must be in a voice channel."));
                 return true;
             }
             case BOT_NOT_IN_SAME_VOICE_CHANNEL -> {
-                interaction.reply(EmbedUtil.sendErrorEmbed("You need to be in my voice channel."));
+                interaction.reply(Embed.error("You need to be in my voice channel."));
                 return true;
             }
         } return false;
@@ -88,7 +88,7 @@ public final class AudioUtil {
         }
         AudioUtil.FailureReason reason = AudioUtil.simplePlayerCheck(interaction.getGuild());
         if (reason == FailureReason.BOT_IS_NOT_PLAYING) {
-            interaction.reply(EmbedUtil.sendErrorEmbed(message.getContents()));
+            interaction.reply(Embed.error(message.getContents()));
         } return reason != FailureReason.PASSED;
     }
     

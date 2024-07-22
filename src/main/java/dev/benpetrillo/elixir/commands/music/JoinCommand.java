@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
@@ -36,7 +36,7 @@ public final class JoinCommand extends Command {
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            interaction.reply(Embed.error("This command can only be used in a guild."));
             return;
         }
         assert interaction.getGuild() != null;
@@ -45,7 +45,7 @@ public final class JoinCommand extends Command {
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();
         if (!memberVoiceState.inAudioChannel()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."), false);
+            interaction.reply(Embed.error("You must be in a voice channel to run this command."), false);
             return;
         }
         final AudioManager audioManager = interaction.getGuild().getAudioManager();
@@ -56,13 +56,13 @@ public final class JoinCommand extends Command {
             audioManager.openAudioConnection(audioChannel);
             audioManager.setSelfDeafened(true);
             String name = audioChannel.getName();
-            MessageEmbed embed = EmbedUtil.sendDefaultEmbed(String.format("I've connected to **%s** successfully.", name));
+            MessageEmbed embed = Embed.def(String.format("I've connected to **%s** successfully.", name));
             interaction.reply(embed, false);
 
             // Create a guild music manager if needed.
             ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         } else {
-            interaction.reply(EmbedUtil.sendErrorEmbed("I'm already connected to a voice channel."), false);
+            interaction.reply(Embed.error("I'm already connected to a voice channel."), false);
         }
     }
 }

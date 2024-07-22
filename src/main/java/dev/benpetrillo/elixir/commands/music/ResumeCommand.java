@@ -22,7 +22,7 @@ import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utils.AudioUtil;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
@@ -41,9 +41,9 @@ public final class ResumeCommand extends Command {
         final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
         MessageEmbed embed; if (musicManager.scheduler.player.isPaused()) {
             musicManager.scheduler.player.setPaused(false);
-            embed = EmbedUtil.sendDefaultEmbed("Successfully resumed the queue.");
+            embed = Embed.def("Successfully resumed the queue.");
         } else {
-            embed = EmbedUtil.sendErrorEmbed("The queue is already playing.");
+            embed = Embed.error("The queue is already playing.");
         }
         interaction.reply(embed, false);
     }

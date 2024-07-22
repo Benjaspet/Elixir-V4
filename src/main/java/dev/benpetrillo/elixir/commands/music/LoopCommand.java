@@ -22,7 +22,7 @@ import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.utils.AudioUtil;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.Command;
@@ -41,7 +41,7 @@ public final class LoopCommand extends Command implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            interaction.reply(Embed.error("This command can only be used in a guild."));
             return;
         }
         var mode = interaction.getArgument("mode", "Disable Loop", String.class);
@@ -61,15 +61,15 @@ public final class LoopCommand extends Command implements Arguments {
             }
             case "Disable Loop" -> {
                 scheduler.repeating = TrackScheduler.LoopMode.NONE;
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Turned **off** repeat mode."), false);
+                interaction.reply(Embed.def("Turned **off** repeat mode."), false);
                 return;
             }
             default -> {
-                interaction.reply(EmbedUtil.sendErrorEmbed("Invalid mode."), false);
+                interaction.reply(Embed.error("Invalid mode."), false);
                 return;
             }
         }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Set the loop mode to **%s**.".formatted(mode)), false);
+        interaction.reply(Embed.def("Set the loop mode to **%s**.".formatted(mode)), false);
     }
 
     @Override

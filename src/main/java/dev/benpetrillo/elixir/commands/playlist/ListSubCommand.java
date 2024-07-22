@@ -20,7 +20,7 @@ package dev.benpetrillo.elixir.commands.playlist;
 
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.PlaylistUtil;
 import dev.benpetrillo.elixir.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -48,7 +48,7 @@ public final class ListSubCommand extends SubCommand implements Arguments {
         int maxAmount = Math.min(playlists.size(), 12);
         int totalPages = playlists.size() / maxAmount;
         if (page > totalPages) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("There is not a page `" + page + "`!"), false);
+            interaction.reply(Embed.error("There is not a page `" + page + "`!"), false);
             return;
         }
         final EmbedBuilder embed = new EmbedBuilder()

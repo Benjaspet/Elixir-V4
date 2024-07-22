@@ -23,7 +23,7 @@ import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.music.TrackScheduler;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.PlaylistUtil;
 import dev.benpetrillo.elixir.utils.TrackUtil;
 import net.dv8tion.jda.api.entities.Guild;
@@ -51,7 +51,7 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            interaction.reply(Embed.error("This command can only be used in a guild."));
             return;
         }
         interaction.deferReply();
@@ -59,13 +59,13 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
         final String playlistId = interaction.getArgument("id", String.class);
         final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of ID `" + playlistId + "`."), false);
+            interaction.reply(Embed.error("Unable to find a playlist of ID `" + playlistId + "`."), false);
             return;
         }
         assert member != null;
         final GuildVoiceState memberVoiceState = member.getVoiceState(); assert memberVoiceState != null;
         if (!memberVoiceState.inAudioChannel()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to queue tracks."), false);
+            interaction.reply(Embed.error("You must be in a voice channel to queue tracks."), false);
             return;
         }
         assert guild != null;
@@ -86,7 +86,7 @@ public final class QueueSubCommand extends SubCommand implements Arguments {
         }
         musicManager.scheduler.getQueue().addAll(tracks);
         if (musicManager.audioPlayer.getPlayingTrack() == null) musicManager.scheduler.nextTrack();
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Queued **%s** tracks from %s.".formatted(playlist.tracks.size(), playlist.info.name)), false);
+        interaction.reply(Embed.def("Queued **%s** tracks from %s.".formatted(playlist.tracks.size(), playlist.info.name)), false);
     }
 
     @Override

@@ -21,12 +21,15 @@ package dev.benpetrillo.elixir.commands;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.ElixirConstants;
+import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
 
 import java.time.OffsetDateTime;
+import java.util.Collection;
 
 public final class GuildsCommand extends Command {
 
@@ -38,14 +41,24 @@ public final class GuildsCommand extends Command {
   public void execute(Interaction interaction) {
     EmbedBuilder embed = new EmbedBuilder();
     embed.setColor(ElixirConstants.DEFAULT_EMBED_COLOR);
-    embed.setDescription("**Guilds Now Streaming**");
-    for (var musicManager : ElixirMusicManager.getInstance().getMusicManagers()) {
-      if (musicManager.audioPlayer.getPlayingTrack() != null) {
-        Guild curr = musicManager.getGuild();
-        embed.addField("Guild Name: " + curr.getName(), "Member Count: " + curr.getMemberCount(), false);
+
+    Collection<GuildMusicManager> managers = ElixirMusicManager.getInstance().getMusicManagers();
+    User self = ElixirClient.getInstance().jda.getSelfUser();
+
+    if (managers.isEmpty()) {
+      embed.setDescription("No guilds are currently streaming.");
+      embed.setFooter("Elixir Music", self.getEffectiveAvatarUrl());
+
+    } else {
+      embed.setDescription("**Guilds Now Streaming**");
+      for (GuildMusicManager manager : managers) {
+        if (manager.audioPlayer.getPlayingTrack() != null) {
+          Guild guild = manager.getGuild();
+          embed.addField("Guild Name: " + guild.getName(), "Member Count: " + guild.getMemberCount(), false);
+        }
       }
+      embed.setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl());
     }
-    embed.setFooter("Elixir Music", ElixirClient.getInstance().jda.getSelfUser().getEffectiveAvatarUrl());
     embed.setTimestamp(OffsetDateTime.now());
     interaction.reply(embed.build(), false);
   }

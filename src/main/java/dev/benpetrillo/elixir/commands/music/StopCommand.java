@@ -22,7 +22,7 @@ import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utils.AudioUtil;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -61,7 +61,7 @@ public final class StopCommand extends Command implements Arguments {
         musicManager.stop(); // Stop the music.
         ElixirMusicManager.getInstance() // Remove the guild music manager.
                 .removeGuildMusicManager(interaction.getGuild());
-        interaction.reply(EmbedUtil.sendDefaultEmbed("The queue has been cleared" +
+        interaction.reply(Embed.def("The queue has been cleared" +
                 (shouldLeave ? " and the player has been stopped" : "") + "."));
     }
 

@@ -23,7 +23,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -46,19 +46,19 @@ public final class MoveQueueCommand extends Command implements Arguments {
         final String guildId = interaction.getArgument("guild", String.class);
         final Guild guild = ElixirClient.getJda().getGuildById(guildId);
         if (guild == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("The guild with the specified ID doesn't exist."));
+            interaction.reply(Embed.error("The guild with the specified ID doesn't exist."));
             return;
         }
         final AudioManager targetAudioManager = guild.getAudioManager();
         if (!targetAudioManager.isConnected()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Connect the bot to a voice channel before moving queues."));
+            interaction.reply(Embed.error("Connect the bot to a voice channel before moving queues."));
             return;
         }
         GuildMusicManager targetMusicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
         final BlockingQueue<AudioTrack> targetQueue = targetMusicManager.scheduler.queue;
         final AudioPlayer targetPlayer = targetMusicManager.audioPlayer;
         if (!targetQueue.isEmpty() || targetPlayer.getPlayingTrack() != null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed(guild.getName() + "'s Elixir is in use!"));
+            interaction.reply(Embed.error(guild.getName() + "'s Elixir is in use!"));
             return;
         }
         assert interaction.getGuild() != null;
@@ -75,7 +75,7 @@ public final class MoveQueueCommand extends Command implements Arguments {
             sourceMusicManager.stop();
             sourceAudioManager.closeAudioConnection();
         }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Moved the queue to `" + guild.getName() + "`."));
+        interaction.reply(Embed.def("Moved the queue to `" + guild.getName() + "`."));
     }
 
     @Override

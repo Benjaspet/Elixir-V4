@@ -21,7 +21,7 @@ package dev.benpetrillo.elixir.commands.music;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.types.ElixirException;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.HttpUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -49,7 +49,7 @@ public final class PlayCommand extends Command implements Arguments {
     @Override
     public void execute(Interaction interaction) {
         if (!interaction.isFromGuild()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("This command can only be used in a guild."));
+            interaction.reply(Embed.error("This command can only be used in a guild."));
             return;
         }
         assert interaction.getGuild() != null;
@@ -58,7 +58,7 @@ public final class PlayCommand extends Command implements Arguments {
         final GuildVoiceState memberVoiceState = interaction.getMember().getVoiceState();
         assert memberVoiceState != null; interaction.deferReply();
         if (!memberVoiceState.inAudioChannel()) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You must be in a voice channel to run this command."), false);
+            interaction.reply(Embed.error("You must be in a voice channel to run this command."), false);
             return;
         }
         String query = interaction.getArgument("query", "https://www.youtube.com/watch?v=7-qGKqveZaM", String.class);
@@ -72,7 +72,7 @@ public final class PlayCommand extends Command implements Arguments {
         if (!Utilities.isValidURL(query)) {
             query = HttpUtil.searchForVideo(query);
             if (query == null) {
-                interaction.reply(EmbedUtil.sendErrorEmbed("No results found for that query."));return;
+                interaction.reply(Embed.error("No results found for that query."));return;
             }
             ElixirMusicManager.getInstance().loadAndPlay(query, interaction, "https://www.youtube.com");
             return;

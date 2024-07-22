@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.utils.AudioUtil;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.managers.AudioManager;
 import tech.xigam.cch.command.Command;
@@ -42,6 +42,6 @@ public final class LeaveCommand extends Command {
         if (selfVoiceState.inAudioChannel()) {
             audioManager.closeAudioConnection();
         }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("I've left the voice channel."));
+        interaction.reply(Embed.def("I've left the voice channel."));
     }
 }

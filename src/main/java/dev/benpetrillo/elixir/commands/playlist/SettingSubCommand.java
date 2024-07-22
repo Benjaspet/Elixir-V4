@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir.commands.playlist;
 
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.PlaylistUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 import dev.benpetrillo.elixir.ElixirConstants;
@@ -45,22 +45,22 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
         final String playlistId = interaction.getArgument("id", String.class);
         final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
+            interaction.reply(Embed.error("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
         assert interaction.getMember() != null;
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
+            interaction.reply(Embed.error("You are not the author of this playlist."), false);
             return;
         }
         final String toChange = interaction.getArgument("setting", "name", String.class);
         final String value = interaction.getArgument("value", "Default Name", String.class);
         final String defAulr = interaction.getArgument("default", "false", String.class);
         switch (toChange) {
-            default -> interaction.reply(EmbedUtil.sendErrorEmbed("Invalid setting: `" + toChange + "`."), false);
+            default -> interaction.reply(Embed.error("Invalid setting: `" + toChange + "`."), false);
             case "cover" -> {
                 if (!Utilities.isValidURL(value)) {
-                    interaction.reply(EmbedUtil.sendErrorEmbed("That isn't a valid URL!"), false);
+                    interaction.reply(Embed.error("That isn't a valid URL!"), false);
                     return;
                 }
                 PlaylistUtil.setPlaylistCover(playlist, value);
@@ -71,7 +71,7 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
             }
             case "name" -> {
                 PlaylistUtil.setPlaylistName(playlist, value);
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the playlist name to `" + value + "`."), false);
+                interaction.reply(Embed.def("Successfully changed the playlist name to `" + value + "`."), false);
             }
             case "description" -> {
                 PlaylistUtil.setPlaylistDescription(playlist, value);
@@ -82,18 +82,18 @@ public final class SettingSubCommand extends SubCommand implements Arguments {
             }
             case "shuffle" -> {
                 PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.SHUFFLE, playlist, Utilities.parseBoolean(value));
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the shuffle setting to `" + value + "`."), false);
+                interaction.reply(Embed.def("Successfully changed the shuffle setting to `" + value + "`."), false);
             }
             case "repeat" -> {
                 PlaylistUtil.setPlaylistSetting(PlaylistUtil.Setting.REPEAT, playlist, Utilities.parseBoolean(value));
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the repeat setting to `" + value + "`."), false);
+                interaction.reply(Embed.def("Successfully changed the repeat setting to `" + value + "`."), false);
             }
             case "volume" -> {
                 int volume = Integer.parseInt(value);
                 if (volume < 0 || volume > 150)
                     volume = 100;
                 PlaylistUtil.setPlaylistVolume(playlist, volume);
-                interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully changed the volume to `" + volume + "`%."), false);
+                interaction.reply(Embed.def("Successfully changed the volume to `" + volume + "`%."), false);
             }
         }
     }

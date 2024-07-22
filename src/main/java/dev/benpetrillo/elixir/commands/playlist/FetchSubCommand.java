@@ -22,7 +22,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.PlaylistUtil;
 import dev.benpetrillo.elixir.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -50,7 +50,7 @@ public final class FetchSubCommand extends SubCommand implements Arguments {
         int page = interaction.getArgument("page", 1L, Long.class).intValue(); if(page == 0) page = 1;
         final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
+            interaction.reply(Embed.error("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
         final List<PlaylistTrack> tracks = PlaylistUtil.getTracks(playlist);

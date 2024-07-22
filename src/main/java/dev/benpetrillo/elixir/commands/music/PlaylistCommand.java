@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.commands.playlist.*;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import tech.xigam.cch.command.Baseless;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;
@@ -41,6 +41,6 @@ public final class PlaylistCommand extends Command implements Baseless {
     
     @Override
     public void execute(Interaction interaction) {
-        interaction.reply(EmbedUtil.sendErrorEmbed("Cannot execute this command."), false);
+        interaction.reply(Embed.error("Cannot execute this command."), false);
     }
 }

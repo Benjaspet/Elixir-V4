@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir.commands.playlist;
 
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.PlaylistUtil;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import tech.xigam.cch.command.Arguments;
@@ -42,20 +42,20 @@ public final class RemoveTrackSubCommand extends SubCommand implements Arguments
         final String playlistId = interaction.getArgument("id", String.class);
         final CustomPlaylist playlist = PlaylistUtil.findPlaylist(playlistId);
         if (playlist == null) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("Unable to find a playlist of id `" + playlistId + "`."), false);
+            interaction.reply(Embed.error("Unable to find a playlist of id `" + playlistId + "`."), false);
             return;
         }
         assert interaction.getMember() != null;
         if (!PlaylistUtil.isAuthor(playlist, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("You are not the author of this playlist."), false);
+            interaction.reply(Embed.error("You are not the author of this playlist."), false);
             return;
         }
         int index = interaction.getArgument("index", 0L, Long.class).intValue();
         try {
             PlaylistUtil.removeTrackFromList(index, playlist);
-            interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully removed track from playlist."), false);
+            interaction.reply(Embed.def("Successfully removed track from playlist."), false);
         } catch (IndexOutOfBoundsException ignored) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("That track doesn't exist."), false);
+            interaction.reply(Embed.error("That track doesn't exist."), false);
         }
     }
 

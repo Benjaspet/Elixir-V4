@@ -59,18 +59,18 @@ public final class SkipCommand extends Command implements Arguments {
             audioManager.closeAudioConnection();
             musicManager.scheduler.queue.clear();
             musicManager.audioPlayer.destroy();
-            final MessageEmbed embed = EmbedUtil.sendDefaultEmbed("There were no tracks left in the queue, so I left.");
+            final MessageEmbed embed = Embed.def("There were no tracks left in the queue, so I left.");
             interaction.reply(embed, false);
             return;
         }
         if (audioPlayer.getPlayingTrack() == null) {
-            final MessageEmbed embed = EmbedUtil.sendErrorEmbed("There is no track currently playing.");
+            final MessageEmbed embed = Embed.error("There is no track currently playing.");
             interaction.reply(embed, false);
         }
         final long skipTo = interaction.getArgument("track", 1L, Long.class);
         assert musicManager.scheduler.queue.peek() != null;
         if (skipTo < 1 || skipTo > musicManager.scheduler.queue.size()) {
-            final MessageEmbed embed = EmbedUtil.sendErrorEmbed("Invalid track number.");
+            final MessageEmbed embed = Embed.error("Invalid track number.");
             interaction.reply(embed, false);
             return;
         }

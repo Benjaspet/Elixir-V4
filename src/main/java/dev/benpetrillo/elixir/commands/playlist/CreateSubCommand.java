@@ -18,7 +18,7 @@
 
 package dev.benpetrillo.elixir.commands.playlist;
 
-import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.Embed;
 import dev.benpetrillo.elixir.utils.PlaylistUtil;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import tech.xigam.cch.command.Arguments;
@@ -40,10 +40,10 @@ public final class CreateSubCommand extends SubCommand implements Arguments {
         interaction.deferReply();
         final String playlistId = interaction.getArgument("id", String.class);
         if (!PlaylistUtil.createPlaylist(playlistId, interaction.getMember())) {
-            interaction.reply(EmbedUtil.sendErrorEmbed("A playlist with ID `" + playlistId + "` already exists."), false);
+            interaction.reply(Embed.error("A playlist with ID `" + playlistId + "` already exists."), false);
             return;
         }
-        interaction.reply(EmbedUtil.sendDefaultEmbed("Successfully created a playlist with id `" + playlistId + "`."), false);
+        interaction.reply(Embed.def("Successfully created a playlist with id `" + playlistId + "`."), false);
     }
 
     @Override
