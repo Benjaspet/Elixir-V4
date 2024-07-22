@@ -16,7 +16,6 @@
 
 package dev.benpetrillo.elixir.commands.misc;
 
-import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utils.APIAuthUtil;
 import dev.benpetrillo.elixir.ElixirConstants;
@@ -37,8 +36,6 @@ public final class GenKeyCommand extends Command {
 
   @Override
   public void execute(Interaction interaction) {
-
-    CommandChecks.runIsInGuildCheck(interaction);
 
     interaction.setEphemeral(true);
     interaction.deferReply();

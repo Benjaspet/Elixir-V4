@@ -20,7 +20,6 @@ package dev.benpetrillo.elixir.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
@@ -47,8 +46,6 @@ public final class SkipCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-
-        CommandChecks.runIsInGuildCheck(interaction);
 
         if (AudioUtil.audioCheck(interaction)) return;
         assert interaction.getGuild() != null;

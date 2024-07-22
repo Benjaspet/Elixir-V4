@@ -14,23 +14,23 @@
  * provided that credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.api.types;
+package dev.benpetrillo.elixir.api.response;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.utils.TrackUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 
-public record NowPlayingObject(
+public record NowPlayingResponse(
     String title, String author, long duration, String formattedDuration, String uri,
     String thumbnail, long position, boolean isStream, String identifier, String requestedBy) {
 
-  public static NowPlayingObject create(AudioTrack track) {
+  public static NowPlayingResponse create(AudioTrack track) {
 
     final long position = track.getPosition();
     final AudioTrackInfo trackInfo = track.getInfo();
 
-    return new NowPlayingObject(
+    return new NowPlayingResponse(
         trackInfo.title, trackInfo.author, trackInfo.length / 1000,
         Utilities.formatDuration(position) + "/" + Utilities.formatDuration(trackInfo.length),
         trackInfo.uri, TrackUtil.getCoverArt(trackInfo), track.getPosition(),

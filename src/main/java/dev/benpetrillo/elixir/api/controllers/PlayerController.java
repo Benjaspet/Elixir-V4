@@ -21,7 +21,7 @@ import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.APIError;
 import dev.benpetrillo.elixir.api.response.JoinChannelResponse;
 import dev.benpetrillo.elixir.api.response.GeneralPlayerResponse;
-import dev.benpetrillo.elixir.api.types.NowPlayingObject;
+import dev.benpetrillo.elixir.api.response.NowPlayingResponse;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.utils.APIAuthUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
@@ -46,7 +46,7 @@ public class PlayerController {
     requireNonNull(guild.getVoiceChannelById(channelId), "Voice channel not found.");
     requireNonNull(ElixirClient.getJda().getUserById(userId), "User not found.");
 
-    if (!APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
+    if (APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
       return ctx.status(401).json(APIError.from("Request not authorized."));
     }
 
@@ -69,7 +69,7 @@ public class PlayerController {
     var guild = requireNonNull(ElixirClient.getJda().getGuildById(guildId), "Guild not found.");
     requireNonNull(ElixirClient.getJda().getUserById(userId), "User not found.");
 
-    if (!APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
+    if (APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
       return ctx.status(401).json(APIError.from("Request not authorized."));
     }
 
@@ -108,7 +108,7 @@ public class PlayerController {
         return ctx.status(400).json(APIError.from("Volume must be between 0 and 100."));
       }
 
-      if (!APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
+      if (APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
         return ctx.status(401).json(APIError.from("Request not authorized."));
       }
 
@@ -142,7 +142,7 @@ public class PlayerController {
     var musicManager = requireNonNull(inst.getMusicManager(guildId), "No music manager found.");
     var track = requireNonNull(musicManager.audioPlayer.getPlayingTrack(), "No track is currently playing.");
 
-    return ctx.status(200).json(Utilities.serialize(NowPlayingObject.create(track)));
+    return ctx.status(200).json(Utilities.serialize(NowPlayingResponse.create(track)));
 
   }
 }

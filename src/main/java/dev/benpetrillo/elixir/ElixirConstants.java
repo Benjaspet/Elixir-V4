@@ -32,6 +32,5 @@ public final class ElixirConstants {
     public static String[] GUILDS = Config.get("GUILDS").split(",");
     public static Color DEFAULT_EMBED_COLOR = Color.decode(Config.get("DEFAULT-EMBED-COLOR"));
     public static Color ERROR_EMBED_COLOR = Color.decode(Config.get("ERROR-EMBED-COLOR"));
-    public static final boolean DEBUG = Boolean.parseBoolean(Config.get("DEBUG"));
     public static final String INVITE = "https://discord.com/api/oauth2/authorize?client_id={}&permissions=274881333504&scope=bot%20applications.commands";
 }

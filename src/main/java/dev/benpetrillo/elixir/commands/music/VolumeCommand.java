@@ -18,11 +18,11 @@
 
 package dev.benpetrillo.elixir.commands.music;
 
-import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utils.AudioUtil;
 import dev.benpetrillo.elixir.utils.Embed;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.Command;
@@ -40,12 +40,15 @@ public final class VolumeCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        CommandChecks.runIsInGuildCheck(interaction);
 
         if (AudioUtil.playerCheck(interaction, AudioUtil.ReturnMessage.NOT_PLAYING)) return;
         if (AudioUtil.audioCheck(interaction)) return;
-
-        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(interaction.getGuild());
+        if (!interaction.isFromGuild() || interaction.getGuild() == null) {
+            interaction.reply(Embed.error("This command can only be used in a server."), true);
+            return;
+        }
+        Guild guild = interaction.getGuild();
+        final GuildMusicManager musicManager = ElixirMusicManager.getInstance().getMusicManager(guild);
         final int volume = interaction.getArgument("volume", Number.class).intValue();
         musicManager.audioPlayer.setVolume(volume);
         interaction.reply(Embed.def("Volume set to **" + volume + "**."), false);

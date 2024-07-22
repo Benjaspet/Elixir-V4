@@ -16,9 +16,8 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands;
+package dev.benpetrillo.elixir.commands.music;
 
-import dev.benpetrillo.elixir.CommandChecks;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utils.AudioUtil;
@@ -42,7 +41,6 @@ public final class StopCommand extends Command implements Arguments {
 
     @Override
     public void execute(Interaction interaction) {
-        CommandChecks.runIsInGuildCheck(interaction);
 
         assert interaction.getMember() != null;
         final GuildVoiceState selfVoiceState = interaction.getMember().getVoiceState();
