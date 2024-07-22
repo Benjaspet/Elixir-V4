@@ -20,7 +20,7 @@ package dev.benpetrillo.elixir.commands.playlist;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utilities.*;
+import dev.benpetrillo.elixir.utils.*;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import tech.xigam.cch.command.Arguments;
 import tech.xigam.cch.command.SubCommand;

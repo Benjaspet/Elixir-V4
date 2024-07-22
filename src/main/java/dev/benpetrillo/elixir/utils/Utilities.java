@@ -14,7 +14,7 @@
  * provided that credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.utilities;
+package dev.benpetrillo.elixir.utils;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookEmbed;
@@ -24,14 +24,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.types.ElixirException;
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.benpetrillo.elixir.ElixirConstants;
 import net.dv8tion.jda.api.JDAInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Base64;

@@ -16,7 +16,7 @@
 
 package dev.benpetrillo.elixir.managers;
 
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.benpetrillo.elixir.ElixirConstants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

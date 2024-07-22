@@ -19,7 +19,7 @@
 package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.commands.playlist.*;
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utils.EmbedUtil;
 import tech.xigam.cch.command.Baseless;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;

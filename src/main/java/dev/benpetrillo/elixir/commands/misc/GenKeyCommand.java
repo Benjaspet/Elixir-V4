@@ -16,12 +16,9 @@
 
 package dev.benpetrillo.elixir.commands.misc;
 
-import com.sun.management.OperatingSystemMXBean;
 import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.utilities.APIAuthUtil;
-import dev.benpetrillo.elixir.utilities.Utilities;
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.benpetrillo.elixir.utils.APIAuthUtil;
+import dev.benpetrillo.elixir.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;

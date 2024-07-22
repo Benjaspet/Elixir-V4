@@ -20,9 +20,9 @@ package dev.benpetrillo.elixir.commands.playlist;
 
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.CustomPlaylist;
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
-import dev.benpetrillo.elixir.utilities.PlaylistUtil;
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.benpetrillo.elixir.utils.EmbedUtil;
+import dev.benpetrillo.elixir.utils.PlaylistUtil;
+import dev.benpetrillo.elixir.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import tech.xigam.cch.command.Arguments;

@@ -18,7 +18,7 @@ package dev.benpetrillo.elixir.api;
 
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.controllers.PlayerController;
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.benpetrillo.elixir.ElixirConstants;
 
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;

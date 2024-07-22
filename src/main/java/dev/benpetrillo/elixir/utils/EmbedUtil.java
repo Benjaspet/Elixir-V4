@@ -16,9 +16,9 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.utilities;
+package dev.benpetrillo.elixir.utils;
 
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.benpetrillo.elixir.ElixirConstants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 

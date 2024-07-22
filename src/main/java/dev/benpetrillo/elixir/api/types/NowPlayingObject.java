@@ -18,8 +18,8 @@ package dev.benpetrillo.elixir.api.types;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import dev.benpetrillo.elixir.utilities.TrackUtil;
-import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utils.TrackUtil;
+import dev.benpetrillo.elixir.utils.Utilities;
 
 public record NowPlayingObject(
     String title, String author, long duration, String formattedDuration, String uri,

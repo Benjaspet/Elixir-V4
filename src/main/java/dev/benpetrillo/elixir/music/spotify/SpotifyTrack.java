@@ -20,7 +20,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import dev.benpetrillo.elixir.ElixirClient;
-import dev.benpetrillo.elixir.utilities.HttpUtil;
+import dev.benpetrillo.elixir.utils.HttpUtil;
 import lombok.Getter;
 import se.michaelthelin.spotify.model_objects.specification.*;
 

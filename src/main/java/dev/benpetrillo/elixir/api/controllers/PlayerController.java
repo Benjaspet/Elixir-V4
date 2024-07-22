@@ -22,7 +22,7 @@ import dev.benpetrillo.elixir.api.APIError;
 import dev.benpetrillo.elixir.api.types.NowPlayingObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utils.Utilities;
 import io.javalin.http.Context;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

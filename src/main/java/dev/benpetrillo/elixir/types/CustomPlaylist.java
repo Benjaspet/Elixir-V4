@@ -18,7 +18,7 @@ package dev.benpetrillo.elixir.types;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.benpetrillo.elixir.Config;
-import dev.benpetrillo.elixir.utilities.TrackUtil;
+import dev.benpetrillo.elixir.utils.TrackUtil;
 import net.dv8tion.jda.api.entities.Member;
 
 import java.util.ArrayList;

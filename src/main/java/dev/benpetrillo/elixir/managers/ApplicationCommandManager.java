@@ -23,7 +23,7 @@ import dev.benpetrillo.elixir.commands.misc.GenKeyCommand;
 import dev.benpetrillo.elixir.commands.misc.InfoCommand;
 import dev.benpetrillo.elixir.commands.StopCommand;
 import dev.benpetrillo.elixir.commands.music.*;
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utils.EmbedUtil;
 import tech.xigam.cch.ComplexCommandHandler;
 import tech.xigam.cch.command.BaseCommand;
 

@@ -16,14 +16,12 @@
  * credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.utilities;
+package dev.benpetrillo.elixir.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.types.*;
-import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import dev.benpetrillo.elixir.ElixirConstants;
 import lombok.Getter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

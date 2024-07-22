@@ -24,8 +24,8 @@ import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.music.spotify.SpotifyTrack;
 import dev.benpetrillo.elixir.types.CustomPlaylist.CustomPlaylistTrack;
-import dev.benpetrillo.elixir.utilities.TrackUtil;
-import dev.benpetrillo.elixir.utilities.Utilities;
+import dev.benpetrillo.elixir.utils.TrackUtil;
+import dev.benpetrillo.elixir.utils.Utilities;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import dev.lavalink.youtube.track.YoutubeAudioTrack;
 

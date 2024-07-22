@@ -14,7 +14,7 @@
  * provided that credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.utilities;
+package dev.benpetrillo.elixir.utils;
 
 public interface SourceUtil {
 

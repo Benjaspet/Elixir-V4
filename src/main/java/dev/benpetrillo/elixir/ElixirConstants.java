@@ -14,12 +14,9 @@
  * provided that credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.utilities.absolute;
-
-import dev.benpetrillo.elixir.Config;
+package dev.benpetrillo.elixir;
 
 import java.awt.*;
-import java.net.URI;
 
 public final class ElixirConstants {
     public static String TOKEN = Config.get("TOKEN");

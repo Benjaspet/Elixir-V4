@@ -20,8 +20,8 @@ package dev.benpetrillo.elixir.commands.music;
 
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
-import dev.benpetrillo.elixir.utilities.AudioUtil;
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utils.AudioUtil;
+import dev.benpetrillo.elixir.utils.EmbedUtil;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import tech.xigam.cch.command.Command;
 import tech.xigam.cch.utils.Interaction;

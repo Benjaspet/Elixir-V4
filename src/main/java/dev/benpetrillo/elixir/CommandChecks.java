@@ -16,7 +16,7 @@
 
 package dev.benpetrillo.elixir;
 
-import dev.benpetrillo.elixir.utilities.EmbedUtil;
+import dev.benpetrillo.elixir.utils.EmbedUtil;
 import tech.xigam.cch.utils.Interaction;
 
 public class CommandChecks {
