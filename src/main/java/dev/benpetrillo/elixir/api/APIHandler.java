@@ -36,6 +36,7 @@ public final class APIHandler {
             get("/{guild}/nowplaying", PlayerController::getNowPlaying);
             post("/{guild}/join", PlayerController::postJoinChannel);
             post("/{guild}/stop", PlayerController::postStopPlayer);
+            post("/{guild}/volume", PlayerController::postVolume);
         });
 
       Javalin.create(config -> config.router.apiBuilder(endpoints))

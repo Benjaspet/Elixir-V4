@@ -21,7 +21,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.APIError;
 import dev.benpetrillo.elixir.api.response.JoinChannelResponse;
-import dev.benpetrillo.elixir.api.response.StopPlayerResponse;
+import dev.benpetrillo.elixir.api.response.GeneralPlayerResponse;
 import dev.benpetrillo.elixir.api.types.NowPlayingObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.managers.GuildMusicManager;
@@ -108,9 +108,51 @@ public class PlayerController {
     }
 
     return ctx.status(200).json(
-        StopPlayerResponse.create(
+        GeneralPlayerResponse.create(
             guildId, userId, "Successfully stopped the player."));
 
+  }
+
+  public static Context postVolume(Context ctx) {
+
+    try {
+
+      String guildId = ctx.pathParam("guild");
+      Objects.requireNonNull(guildId, "No guild ID provided.");
+
+      String authHeader = ctx.header("Authorization");
+      Objects.requireNonNull(authHeader, "No authorization header provided.");
+      String apiKey = authHeader.split(" ")[1];
+      Objects.requireNonNull(apiKey, "Invalid API key format.");
+
+      JsonObject body = Utilities.deserialize(ctx.body(), JsonObject.class);
+      Objects.requireNonNull(body, "No body provided.");
+      String userId = body.get("user").getAsString();
+      Objects.requireNonNull(userId, "No user provided.");
+
+      int volume = body.get("volume").getAsInt();
+
+      if (volume < 0 || volume > 100) {
+        return ctx.status(400).json(APIError.from("Volume must be between 0 and 100."));
+      }
+
+      if (!APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
+        return ctx.status(401).json(APIError.from("Request not authorized."));
+      }
+
+      ElixirMusicManager inst = ElixirMusicManager.getInstance();
+      GuildMusicManager musicManager = inst.getMusicManager(guildId);
+      Objects.requireNonNull(musicManager, "No music manager found.");
+
+      musicManager.audioPlayer.setVolume(volume);
+
+      return ctx.status(200).json(
+          GeneralPlayerResponse.create(guildId, userId,
+              "Successfully changed the volume to %s.".formatted(volume)));
+
+    } catch (Exception e) {
+      return ctx.status(500).json(APIError.from("An error occurred while setting the volume."));
+    }
   }
 
   public static Context getNowPlaying(Context ctx) {
