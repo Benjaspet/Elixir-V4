@@ -31,6 +31,7 @@ public final class DatabaseManager {
 
     private static MongoClient client;
     @Getter private static MongoCollection<Document> playlists;
+    @Getter private static MongoCollection<Document> apiKeys;
 
     public static void create() {
         String uri = Config.get("MONGO-URI");
@@ -39,6 +40,7 @@ public final class DatabaseManager {
 
             MongoDatabase db = client.getDatabase("Elixir");
             playlists = db.getCollection("playlists");
+            apiKeys = db.getCollection("apiKeys");
 
             ElixirClient.logger.info("Database loaded successfully.");
         } catch (Exception e) {
@@ -48,5 +50,9 @@ public final class DatabaseManager {
 
     public static MongoCollection<Document> getPlaylistCollection() {
         return playlists;
+    }
+
+    public static MongoCollection<Document> getAPIKeyCollection() {
+        return apiKeys;
     }
 }

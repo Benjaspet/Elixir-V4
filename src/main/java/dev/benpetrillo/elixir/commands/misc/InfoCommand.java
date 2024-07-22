@@ -14,7 +14,7 @@
  * provided that credit is given to the original author(s).
  */
 
-package dev.benpetrillo.elixir.commands.info;
+package dev.benpetrillo.elixir.commands.misc;
 
 import com.sun.management.OperatingSystemMXBean;
 import dev.benpetrillo.elixir.ElixirClient;

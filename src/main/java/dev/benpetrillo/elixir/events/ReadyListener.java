@@ -1,7 +1,5 @@
 /*
- * Copyright © 2023 Ben Petrillo, KingRainbow44. All rights reserved.
- *
- * Project licensed under the MIT License: https://www.mit.edu/~amini/LICENSE.md
+ * Copyright © 2024 Ben Petrillo, KingRainbow44.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -12,8 +10,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * All portions of this software are available for public use, provided that
- * credit is given to the original author(s).
+ * All portions of this software are available for public use,
+ * provided that credit is given to the original author(s).
  */
 
 package dev.benpetrillo.elixir.events;
@@ -21,50 +19,46 @@ package dev.benpetrillo.elixir.events;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+@Slf4j
 public final class ReadyListener extends ListenerAdapter {
 
     @Override
-    @SuppressWarnings("deprecation")
     public void onReady(@NotNull ReadyEvent event) {
         final JDA jda = event.getJDA();
         final String username = jda.getSelfUser().getEffectiveName();
-        ElixirClient.getLogger().info("{} has logged in.", username);
-        if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
-            for (String id : ElixirConstants.GUILDS) {
-                final Guild guild = jda.getGuildById(id);
+
+        log.info("{} has logged in.", username);
+
+        boolean deployGuild = Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"));
+        boolean deleteGuild = Boolean.parseBoolean(Config.get("DELETE-APPLICATION-COMMANDS-GUILD"));
+
+        if (deployGuild && deleteGuild) {
+            log.warn("Cannot deploy and delete guild commands at the same time.");
+        } else if (!deployGuild && !deleteGuild) {
+            log.warn("No action was specified for guild commands.");
+        } else {
+
+            for (String guildId : ElixirConstants.GUILDS) {
+                final Guild guild = jda.getGuildById(guildId);
                 if (guild != null) {
-                    ElixirClient.getCommandHandler().deployAll(guild);
-                    ElixirClient.getLogger().info("All guild slash commands have been deployed.");
+                    if (deployGuild) {
+                        ElixirClient.getCommandHandler().deployAll(guild);
+                        log.info("Guild slash commands deployed to: {}", guild.getId());
+                    } else {
+                        ElixirClient.getCommandHandler().downsert(guild);
+                        log.info("Guild slash commands deleted from: {}", guild.getId());
+                    }
                 } else {
-                    ElixirClient.getLogger().error("An error occurred while deploying guild slash commands.");
+                    log.warn("Could not deploy guild commands for guild with ID: {}.", guildId);
                 }
             }
         }
-
-
-
-
-        for (String id : ElixirConstants.GUILDS) {
-            final Guild guild = jda.getGuildById(id);
-            if (guild != null) {
-                if (Boolean.parseBoolean(Config.get("DEPLOY-APPLICATION-COMMANDS-GUILD"))) {
-                    ElixirClient.getCommandHandler().deployAll(guild);
-                    ElixirClient.getLogger().info("All guild slash commands have been deployed.");
-                } else if (Boolean.parseBoolean(Config.get("DELETE-APPLICATION-COMMANDS-GUILD"))) {
-                    ElixirClient.getCommandHandler().downsert(guild);
-                    ElixirClient.getLogger().info("All guild slash commands have been deleted.");
-                }
-            } else {
-                ElixirClient.getLogger().warn("Could not deploy guild commands for guild with ID: {}.", id);
-                ElixirClient.getLogger().warn("No valid guilds were provided, or the bot is not in this guild.");
-            }
-        }
-
     }
 }

@@ -22,6 +22,7 @@ import dev.benpetrillo.elixir.events.*;
 import dev.benpetrillo.elixir.managers.*;
 import dev.benpetrillo.elixir.music.spotify.SpotifySourceManager;
 import dev.benpetrillo.elixir.objects.OAuthUpdateTask;
+import dev.benpetrillo.elixir.utilities.APIAuthUtil;
 import dev.benpetrillo.elixir.utilities.Utilities;
 import dev.benpetrillo.elixir.utilities.absolute.ElixirConstants;
 import lombok.Getter;

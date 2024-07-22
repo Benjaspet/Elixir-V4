@@ -19,7 +19,8 @@ package dev.benpetrillo.elixir.managers;
 import dev.benpetrillo.elixir.Config;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.commands.GuildsCommand;
-import dev.benpetrillo.elixir.commands.info.InfoCommand;
+import dev.benpetrillo.elixir.commands.misc.GenKeyCommand;
+import dev.benpetrillo.elixir.commands.misc.InfoCommand;
 import dev.benpetrillo.elixir.commands.StopCommand;
 import dev.benpetrillo.elixir.commands.music.*;
 import dev.benpetrillo.elixir.utilities.EmbedUtil;
@@ -44,6 +45,7 @@ public final class ApplicationCommandManager {
 
     private ApplicationCommandManager(ComplexCommandHandler handler) {
         registerCommand(handler,
+                new GenKeyCommand(),
                 new GuildsCommand(),
                 new InfoCommand(),
                 new JoinCommand(),

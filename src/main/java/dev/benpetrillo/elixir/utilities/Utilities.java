@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Base64;

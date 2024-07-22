@@ -24,7 +24,6 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.managers.DatabaseManager;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
 import dev.benpetrillo.elixir.music.playlist.PlaylistTrack;
