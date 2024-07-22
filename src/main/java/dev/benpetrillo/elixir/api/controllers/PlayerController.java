@@ -17,47 +17,34 @@
 package dev.benpetrillo.elixir.api.controllers;
 
 import com.google.gson.JsonObject;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.benpetrillo.elixir.ElixirClient;
 import dev.benpetrillo.elixir.api.APIError;
 import dev.benpetrillo.elixir.api.response.JoinChannelResponse;
 import dev.benpetrillo.elixir.api.response.GeneralPlayerResponse;
 import dev.benpetrillo.elixir.api.types.NowPlayingObject;
 import dev.benpetrillo.elixir.managers.ElixirMusicManager;
-import dev.benpetrillo.elixir.managers.GuildMusicManager;
 import dev.benpetrillo.elixir.utils.APIAuthUtil;
 import dev.benpetrillo.elixir.utils.Utilities;
 import io.javalin.http.Context;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-import java.util.Objects;
+import static dev.benpetrillo.elixir.utils.Utilities.deserialize;
+import static java.util.Objects.requireNonNull;
 
 public class PlayerController {
 
   public static Context postJoinChannel(Context ctx) {
 
-    String guildId = ctx.pathParam("guild");
-    Objects.requireNonNull(guildId, "No guild ID provided.");
-    String authHeader = ctx.header("Authorization");
-    Objects.requireNonNull(authHeader, "No authorization header provided.");
-    String apiKey = authHeader.split(" ")[1];
+    var guildId = requireNonNull(ctx.pathParam("guild"), "No guild ID provided.");
+    var authHeader = requireNonNull(ctx.header("Authorization"), "No authorization header provided.");
+    var apiKey = requireNonNull(authHeader.split(" ")[1], "No API key provided.");
+    var body = requireNonNull(deserialize(ctx.body(), JsonObject.class), "No body provided.");
+    var channelId = requireNonNull(body.get("channel").getAsString(), "No voice channel provided.");
+    var userId = requireNonNull(body.get("user").getAsString(), "No user provided.");
+    var guild = requireNonNull(ElixirClient.getJda().getGuildById(guildId), "Guild not found.");
 
-    JsonObject body = Utilities.deserialize(ctx.body(), JsonObject.class);
-    String channelId = body.get("channel").getAsString();
-    String userId = body.get("user").getAsString();
-    Objects.requireNonNull(channelId, "No voice channel provided.");
-    Objects.requireNonNull(userId, "No user provided.");
-
-    Guild guild = ElixirClient.getJda().getGuildById(guildId);
-    Objects.requireNonNull(guild, "Guild not found.");
-    VoiceChannel channel = guild.getVoiceChannelById(channelId);
-    Objects.requireNonNull(channel, "Voice channel not found.");
-    User user = ElixirClient.getJda().getUserById(userId);
-    Objects.requireNonNull(user, "User not found.");
+    requireNonNull(guild.getVoiceChannelById(channelId), "Voice channel not found.");
+    requireNonNull(ElixirClient.getJda().getUserById(userId), "User not found.");
 
     if (!APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
       return ctx.status(401).json(APIError.from("Request not authorized."));
@@ -74,28 +61,20 @@ public class PlayerController {
 
   public static Context postStopPlayer(Context ctx) {
 
-    String guildId = ctx.pathParam("guild");
-    Objects.requireNonNull(guildId, "No guild ID provided.");
-    String authHeader = ctx.header("Authorization");
-    Objects.requireNonNull(authHeader, "No authorization header provided.");
-    String apiKey = authHeader.split(" ")[1];
-
-    JsonObject body = Utilities.deserialize(ctx.body(), JsonObject.class);
-    String userId = body.get("user").getAsString();
-    Objects.requireNonNull(userId, "No user provided.");
-
-    Guild guild = ElixirClient.getJda().getGuildById(guildId);
-    Objects.requireNonNull(guild, "Guild not found.");
-    User user = ElixirClient.getJda().getUserById(userId);
-    Objects.requireNonNull(user, "User not found.");
+    var guildId = requireNonNull(ctx.pathParam("guild"), "No guild ID provided.");
+    var authHeader = requireNonNull(ctx.header("Authorization"), "No authorization header provided.");
+    var apiKey = requireNonNull(authHeader.split(" ")[1], "No API key provided.");
+    var body = requireNonNull(deserialize(ctx.body(), JsonObject.class), "No body provided.");
+    var userId = requireNonNull(body.get("user").getAsString(), "No user provided.");
+    var guild = requireNonNull(ElixirClient.getJda().getGuildById(guildId), "Guild not found.");
+    requireNonNull(ElixirClient.getJda().getUserById(userId), "User not found.");
 
     if (!APIAuthUtil.isValidAPIKey(userId, guildId, apiKey)) {
       return ctx.status(401).json(APIError.from("Request not authorized."));
     }
 
     ElixirMusicManager inst = ElixirMusicManager.getInstance();
-    GuildMusicManager musicManager = inst.getMusicManager(guildId);
-    Objects.requireNonNull(musicManager, "No music manager found.");
+    var musicManager = requireNonNull(inst.getMusicManager(guildId), "No music manager found.");
 
     try {
       musicManager.scheduler.queue.clear();
@@ -114,24 +93,17 @@ public class PlayerController {
   }
 
   public static Context postVolume(Context ctx) {
-
     try {
+      var guildId = requireNonNull(ctx.pathParam("guild"), "No guild ID provided.");
+      var authHeader = requireNonNull(ctx.header("Authorization"), "Missing authorization header.");
+      var apiKey = requireNonNull(authHeader.split(" ")[1], "Invalid API key format.");
+      var body = requireNonNull(deserialize(ctx.body(), JsonObject.class), "No body provided.");
+      var userId = requireNonNull(body.get("user").getAsString(), "No user provided.");
+      var volumeString = requireNonNull(body.get("volume").getAsString(), "No volume provided.");
+      requireNonNull(ElixirClient.getJda().getGuildById(guildId), "Guild not found.");
+      requireNonNull(ElixirClient.getJda().getUserById(userId), "User not found.");
 
-      String guildId = ctx.pathParam("guild");
-      Objects.requireNonNull(guildId, "No guild ID provided.");
-
-      String authHeader = ctx.header("Authorization");
-      Objects.requireNonNull(authHeader, "No authorization header provided.");
-      String apiKey = authHeader.split(" ")[1];
-      Objects.requireNonNull(apiKey, "Invalid API key format.");
-
-      JsonObject body = Utilities.deserialize(ctx.body(), JsonObject.class);
-      Objects.requireNonNull(body, "No body provided.");
-      String userId = body.get("user").getAsString();
-      Objects.requireNonNull(userId, "No user provided.");
-
-      int volume = body.get("volume").getAsInt();
-
+      int volume = Integer.parseInt(volumeString);
       if (volume < 0 || volume > 100) {
         return ctx.status(400).json(APIError.from("Volume must be between 0 and 100."));
       }
@@ -140,9 +112,8 @@ public class PlayerController {
         return ctx.status(401).json(APIError.from("Request not authorized."));
       }
 
-      ElixirMusicManager inst = ElixirMusicManager.getInstance();
-      GuildMusicManager musicManager = inst.getMusicManager(guildId);
-      Objects.requireNonNull(musicManager, "No music manager found.");
+      var inst = ElixirMusicManager.getInstance();
+      var musicManager = requireNonNull(inst.getMusicManager(guildId), "No music manager found.");
 
       musicManager.audioPlayer.setVolume(volume);
 
@@ -156,28 +127,20 @@ public class PlayerController {
   }
 
   public static Context getNowPlaying(Context ctx) {
-    String guildId = ctx.pathParam("guild");
-    ElixirMusicManager inst = ElixirMusicManager.getInstance();
-    JDA jda = ElixirClient.getJda();
-    if (guildId.isEmpty()) {
-      return ctx.status(400).result("No guild ID provided.");
-    }
-    Guild guild = jda.getGuildById(guildId);
-    Objects.requireNonNull(guild, "Guild not found.");
 
-    AudioManager audioManager = guild.getAudioManager();
+    var jda = ElixirClient.getJda();
+    var inst = ElixirMusicManager.getInstance();
+
+    var guildId = requireNonNull(ctx.pathParam("guild"), "No guild ID provided.");
+    var guild = requireNonNull(jda.getGuildById(guildId), "Guild not found.");
+
+    var audioManager = guild.getAudioManager();
     if (!audioManager.isConnected()) {
       return ctx.status(400).json(APIError.from("Elixir isn't connected to a voice channel."));
     }
 
-    GuildMusicManager musicManager = inst.getMusicManager(guildId);
-    Objects.requireNonNull(musicManager, "No music manager found.");
-
-    AudioTrack track = musicManager.audioPlayer.getPlayingTrack();
-
-    if (musicManager.audioPlayer.getPlayingTrack() == null) {
-      return ctx.status(404).json(APIError.from("No track is currently playing."));
-    }
+    var musicManager = requireNonNull(inst.getMusicManager(guildId), "No music manager found.");
+    var track = requireNonNull(musicManager.audioPlayer.getPlayingTrack(), "No track is currently playing.");
 
     return ctx.status(200).json(Utilities.serialize(NowPlayingObject.create(track)));
 
