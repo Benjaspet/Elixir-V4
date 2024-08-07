@@ -75,6 +75,8 @@ public final class ElixirMusicManager {
         this.audioPlayerManager.registerSourceManager(this.httpSource);
         AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
 
+        ElixirClient.logger.info("Source managers registered.");
+
         // IPv6 rotation setup.
         // If the bot receives a 429 from YouTube, it will rotate the IP address to another, provided that
         // an entire 64-bit block is provided in the config.

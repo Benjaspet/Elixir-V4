@@ -18,8 +18,8 @@
         </encoder>
     </appender>
 
-    <logger name="io.javalin" level="OFF"/>
-    <logger name="org.reflections" level="OFF"/>
+<!--    <logger name="io.javalin" level="OFF"/>-->
+<!--    <logger name="org.reflections" level="OFF"/>-->
     <logger name="org.eclipse.jetty" level="OFF"/>
     <logger name="org.mongodb.driver" level="OFF"/>
 
