@@ -43,18 +43,7 @@ public final class HttpUtil {
      */
 
     public static String searchForVideo(String query) {
-        var encodedQuery = Utilities.encodeURIComponent(query);
-        var url = "https://app.seikimo.moe/search/" + encodedQuery;
-        var request = new Request.Builder().url(url).build();
-        try (var response = client.newCall(request).execute()) {
-            assert response.body() != null;
-            var requestData = Utilities.deserialize(
-                    response.body().string(), LaudiolinSearchData.class);
-            return "https://www.youtube.com/watch?v=" + requestData.top.id;
-        } catch (IOException ex) {
-            ElixirClient.getLogger().warn("Failed to search for video: " + query, ex);
-            return "https://www.youtube.com/watch?v=7-qGKqveZaM";
-        }
+        return "ytmsearch:" + query;
     }
 
     /**

@@ -64,6 +64,13 @@ public final class ElixirMusicManager {
     public final SoundCloudAudioSourceManager soundCloudSource = SoundCloudAudioSourceManager.createDefault();
 
     public ElixirMusicManager() {
+
+        // TODO: OAuth2 token setup for YouTube via a command for administrators.
+        // TODO: Set refresh token dynamically.
+
+        this.youtubeSource.useOauth2(null, false);
+        ElixirClient.logger.info("OAuth2 for YouTube enabling...");
+
         this.audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
         this.audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
